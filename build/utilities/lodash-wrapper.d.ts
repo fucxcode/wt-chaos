@@ -40,7 +40,7 @@ export declare function trim(value: string): string;
 export declare function sample<T>(collection: List<T> | Dictionary<T> | NumericDictionary<T> | null | undefined): T | undefined;
 export declare function sampleSize<T>(collection: List<T> | Dictionary<T> | NumericDictionary<T> | null | undefined, n?: number): T[];
 export declare function some<T>(collection: List<T> | null | undefined, predicate?: ListIterateeCustom<T, boolean>): boolean;
-export declare function uniqBy<T>(collection: List<T> | null | undefined, iteratee: ListIteratee<T>): T[];
+export declare function uniqBy<T>(collection: List<T> | null | undefined, iteratee: ValueIteratee<T>): T[];
 export declare function uniq<T>(collection: List<T> | null | undefined): T[];
 export declare function keys(object?: any): string[];
 export declare function sortBy<T>(collection: List<T> | null | undefined, iteratee: ListIteratee<T>): T[];

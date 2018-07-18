@@ -79,7 +79,7 @@ function sample(collection) {
 }
 exports.sample = sample;
 function sampleSize(collection, n) {
-    return lodash_1.default.sample(collection, n);
+    return lodash_1.default.sampleSize(collection, n);
 }
 exports.sampleSize = sampleSize;
 function some(collection, predicate) {
@@ -87,7 +87,7 @@ function some(collection, predicate) {
 }
 exports.some = some;
 function uniqBy(collection, iteratee) {
-    return lodash_1.default.uniq(collection, iteratee);
+    return lodash_1.default.uniqBy(collection, iteratee);
 }
 exports.uniqBy = uniqBy;
 function uniq(collection) {
@@ -263,11 +263,11 @@ function noop(...args) {
 }
 exports.noop = noop;
 function toPairs(value) {
-    return lodash_1.default.pairs(value);
+    return lodash_1.default.toPairs(value);
 }
 exports.toPairs = toPairs;
 function fromPairs(value) {
-    return lodash_1.default.zipObject(value);
+    return lodash_1.default.fromPairs(value);
 }
 exports.fromPairs = fromPairs;
 function isEqual(value, other) {

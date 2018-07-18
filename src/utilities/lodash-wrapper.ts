@@ -52,7 +52,7 @@ type MemoListIterator<T, TResult, TList> = (prev: TResult, curr: T, index: numbe
 type PartialObject<T> = Partial<T>;
 
 export function keyBy<T>(collection: List<T> | null | undefined, iteratee: any): Dictionary<T> {
-    return (_ as any).keyBy(collection, iteratee);
+    return _.keyBy(collection, iteratee);
 }
 
 export function filter<T>(collection: List<T> | null | undefined, predicate: ListIterateeCustom<T, boolean>): T[] {
@@ -123,20 +123,20 @@ export function sample<T>(collection: List<T> | Dictionary<T> | NumericDictionar
 }
 
 export function sampleSize<T>(collection: List<T> | Dictionary<T> | NumericDictionary<T> | null | undefined, n?: number): T[] {
-    return (_ as any).sample(collection, n);
+    return _.sampleSize(collection, n);
 }
 
 export function some<T>(collection: List<T> | null | undefined, predicate?: ListIterateeCustom<T, boolean>): boolean {
     return _.some(collection, predicate);
 }
 
-export function uniqBy<T>(collection: List<T> | null | undefined, iteratee: ListIteratee<T>): T[] {
-    return (_ as any).uniq(collection, iteratee);
+export function uniqBy<T>(collection: List<T> | null | undefined, iteratee: ValueIteratee<T>): T[] {
+    return _.uniqBy(collection, iteratee);
 }
 
 
 export function uniq<T>(collection: List<T> | null | undefined): T[] {
-    return (_ as any).uniq(collection);
+    return _.uniq(collection);
 }
 
 export function keys(object?: any): string[] {
@@ -326,11 +326,11 @@ export function noop(...args: any[]): void {
 }
 
 export function toPairs<T>(value: Dictionary<T>): Array<[string, T]> {
-    return (_ as any).pairs(value);
+    return _.toPairs(value);
 }
 
 export function fromPairs<T>(value: Array<[string, T]>): Dictionary<T> {
-    return (_ as any).zipObject(value);
+    return _.fromPairs(value);
 }
 
 export function isEqual(value: any, other: any): boolean {

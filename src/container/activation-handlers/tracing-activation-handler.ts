@@ -4,8 +4,8 @@ import { sep } from "path";
 import * as _ from "../../utilities";
 import { IActivationHandler } from "./i-activation-handler";
 import { TraceOptions } from "./trace-decorator";
-import CacheKey from "../../cache/cache-key";
-import ICache from "../../cache/i-cache";
+import { CacheKey } from "../../cache/cache-key";
+import { ICache } from "../../cache/i-cache";
 
 class ActivityTracingActivationHandler implements IActivationHandler {
 
@@ -76,7 +76,7 @@ class ActivityTracingActivationHandler implements IActivationHandler {
                         // for example if the incoming path was "/foo/bar/baz?id=1&name=shaun"
                         // we will check the path part of cache key in "/foo", "/foo/bar" and "/foo/bar/baz"
                         // and if ang of them we found it should be traced
-                        const pathnames = _.first(path.split("?")).split(sep).filter(x => !_.isEmpty(x));
+                        const pathnames = (_.first(path.split("?")) as string).split(sep).filter(x => !_.isEmpty(x));
                         let i = 1;
                         while (i <= pathnames.length) {
                             const pathKey = `/${_.take(pathnames, i).join(sep)}`;
@@ -106,7 +106,7 @@ class ActivityTracingActivationHandler implements IActivationHandler {
                     }
                     else {
                         // do NOT use arrow function since later we need to use "this" as the original function to process the original routine
-                        return function (...args: any[]) {
+                        return function (this: any, ...args: any[]) {
                             const options: TraceOptions = Reflect.getMetadata(`wt-trace-options:${propertyKey}`, target) || new TraceOptions();
                             self.trace(target, propertyKey, args, options);
                             // "this" means the original function container which being used to perform the original routine

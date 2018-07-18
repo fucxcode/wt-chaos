@@ -1,8 +1,6 @@
-import WTError from "../errors/wt-error";
-import code from "../errors/code";
-import { Nullable } from "../constants";
+import { WTError, code } from "../errors";
 
-export default class CacheKey {
+class CacheKey {
 
     public static readonly wildcard = `*`;
 
@@ -65,7 +63,7 @@ export default class CacheKey {
         }
     }
 
-    static tryParse(value: string): [boolean, Nullable<CacheKey>] {
+    static tryParse(value: string): [boolean, CacheKey | null] {
         try {
             return [true, CacheKey.parse(value)];
         }
@@ -75,3 +73,5 @@ export default class CacheKey {
     }
 
 }
+
+export { CacheKey };

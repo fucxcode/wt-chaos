@@ -64,7 +64,7 @@ interface IContainer {
 
     clear(): void;
 
-    resolve<T extends object>(type: Type, throwErrorUnregister?: boolean, ...params: any[]): T;
+    resolve<T extends object>(type: Type, throwErrorUnregister?: boolean, ...params: any[]): T | undefined;
 
 }
 

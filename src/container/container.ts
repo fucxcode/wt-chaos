@@ -1,18 +1,18 @@
 import * as _ from "../utilities";
 import { IContainer, lifecycles, Type, ParamType, PropertyType } from "./i-container";
 import { IActivationHandler } from "./activation-handlers/i-activation-handler";
-import { BypassActivationHandler } from "./activation-handlers/bypass-activation-handler";
-import { ActivityTracingActivationHandler } from "./activation-handlers/tracing-activation-handler";
+// import { BypassActivationHandler } from "./activation-handlers/bypass-activation-handler";
+// import { ActivityTracingActivationHandler } from "./activation-handlers/tracing-activation-handler";
 
 class Resolver {
 
     private _container: IContainer;
 
-    private _ctor: FunctionConstructor;
+    private _ctor!: FunctionConstructor;
 
-    private _paramTypes: ParamType[];
+    private _paramTypes!: ParamType[];
 
-    private _propTypes: PropertyType[];
+    private _propTypes!: PropertyType[];
 
     private _lifecycle: lifecycles;
     public get lifecycle(): lifecycles {
@@ -21,7 +21,7 @@ class Resolver {
 
     private _object: any;
 
-    constructor(container: IContainer, ctor: Function, paramTypes: ParamType[], propTypes: PropertyType[], lifecycle: lifecycles, object: any) {
+    constructor(container: IContainer, ctor?: Function, paramTypes: ParamType[] = [], propTypes: PropertyType[] = [], lifecycle: lifecycles = lifecycles.singleton, object?: any) {
         this._container = container;
         if (object) {
             this._object = object;
@@ -87,25 +87,25 @@ class Container implements IContainer {
 
     private _activationHandler: IActivationHandler;
 
-    constructor(key: Symbol, activationHandler: IActivationHandler = new BypassActivationHandler()) {
+    constructor(key: Symbol, activationHandler: IActivationHandler) {
         this._key = key;
         this._resolvers = new Map<Type, Resolver>();
         this._activationHandler = activationHandler;
     }
 
-    private registerInternal(type: Type, ctor: Function, lifecycle: lifecycles, paramTypes?: ParamType[], propTypes?: PropertyType[], instance?: any): Resolver {
+    private registerInternal(type: Type, ctor: Function | undefined, lifecycle: lifecycles, paramTypes?: ParamType[], propTypes?: PropertyType[], instance?: any): Resolver {
         const item = new Resolver(this, ctor, paramTypes, propTypes, lifecycle, instance);
         this._resolvers.set(type, item);
         return item;
     }
 
-    public registerType(type: Type, ctor: Function, lifecycle: lifecycles = lifecycles.singleton, paramTypes?: ParamType[], propTypes?: PropertyType[]): IContainer {
+    public registerType(type: Type, ctor: Function | undefined, lifecycle: lifecycles = lifecycles.singleton, paramTypes?: ParamType[], propTypes?: PropertyType[]): IContainer {
         this.registerInternal(type, ctor, lifecycle, paramTypes, propTypes);
         return this;
     }
 
     public registerInstance(type: Symbol, instance: any): IContainer {
-        this.registerInternal(type, undefined, undefined, undefined, undefined, instance);
+        this.registerInternal(type, undefined, lifecycles.singleton, undefined, undefined, instance);
         return this;
     }
 
@@ -117,7 +117,7 @@ class Container implements IContainer {
         this._resolvers.clear();
     }
 
-    public resolve<T extends object>(type: Type, throwErrorUnregister: boolean = true, ...params: any[]): T {
+    public resolve<T extends object>(type: Type, throwErrorUnregister: boolean = true, ...params: any[]): T | undefined {
         const resolver = this._resolvers.get(type);
 
         if (resolver) {
@@ -152,12 +152,12 @@ const clearContainers = function (): void {
     containers.clear();
 };
 
-const resolveContainer = function (key: Symbol): IContainer {
+const resolveContainer = function (key: Symbol): IContainer | undefined {
     return containers.get(key);
 };
 
-const defaultContainerKey = Symbol.for(`default`);
-const defaultContainer = registerContainer(defaultContainerKey, new ActivityTracingActivationHandler());
+// const defaultContainerKey = Symbol.for(`default`);
+// const defaultContainer = registerContainer(defaultContainerKey, new ActivityTracingActivationHandler());
 // const defaultContainer = registerContainer(defaultContainerKey, new BypassActivationHandler());
 
-export { registerContainer, unregisterContainer, clearContainers, resolveContainer, defaultContainer };
+export { registerContainer, unregisterContainer, clearContainers, resolveContainer };

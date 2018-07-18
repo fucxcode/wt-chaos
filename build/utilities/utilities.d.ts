@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { ObjectID, Projection } from "../constants";
+import { ObjectID, Projection, ObjectOrId } from "../constants";
 import * as mongodb from "mongodb";
 export declare function wait(milliseconds: number): Promise<void>;
 export declare function isNil(value: any): boolean;
@@ -23,5 +23,6 @@ export declare function nextTick(): Promise<void>;
 export declare function project<T extends object>(object: T, projection?: Projection<T>, defaultPicks?: string[]): T;
 export declare function toSafeDateTimeNumber(date: number): number;
 export declare function formatFromAndToTimeToTimestampSeconds(from?: string | number, to?: string | number, timezone?: string, unitOfTime?: any): Array<number>;
+export declare function getIdFromObjectOrId<T>(objectOrId: ObjectOrId<T>, idResolver: (obj: T) => mongodb.ObjectId): mongodb.ObjectId;
 export * from "./lodash-wrapper";
 //# sourceMappingURL=utilities.d.ts.map

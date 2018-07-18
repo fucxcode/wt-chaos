@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import * as _ from "./lodash-wrapper";
 import moment from "moment";
-import { ISomeObject, ObjectID, is, Projection } from "../constants";
+import { ObjectID, is, Projection, ObjectOrId } from "../constants";
 import * as mongodb from "mongodb";
 
 const REGEX_OBJECT_ID = new RegExp("^[0-9a-fA-F]{24}$");
@@ -237,5 +237,10 @@ export function formatFromAndToTimeToTimestampSeconds(from?: string | number, to
     to = moment(toSafeDateTimeNumber(parseInt(<string>to)), "X").tz(timezone).endOf(unitOfTime).unix();
     return [from, to];
 }
+
+export function getIdFromObjectOrId<T>(objectOrId: ObjectOrId<T>, idResolver: (obj: T) => mongodb.ObjectId): mongodb.ObjectId {
+    return isObjectId(objectOrId) ? objectOrId as mongodb.ObjectId : idResolver(objectOrId as T);
+}
+
 
 export * from "./lodash-wrapper";

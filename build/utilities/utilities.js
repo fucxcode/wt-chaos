@@ -248,5 +248,9 @@ function formatFromAndToTimeToTimestampSeconds(from, to, timezone = "Asia/Shangh
     return [from, to];
 }
 exports.formatFromAndToTimeToTimestampSeconds = formatFromAndToTimeToTimestampSeconds;
+function getIdFromObjectOrId(objectOrId, idResolver) {
+    return isObjectId(objectOrId) ? objectOrId : idResolver(objectOrId);
+}
+exports.getIdFromObjectOrId = getIdFromObjectOrId;
 __export(require("./lodash-wrapper"));
 //# sourceMappingURL=utilities.js.map

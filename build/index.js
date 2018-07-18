@@ -16,4 +16,6 @@ exports.WTError = errors_1.WTError;
 exports.code = errors_1.code;
 const container = __importStar(require("./container"));
 exports.container = container;
+const cache = __importStar(require("./cache"));
+exports.cache = cache;
 //# sourceMappingURL=index.js.map

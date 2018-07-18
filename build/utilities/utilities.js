@@ -17,6 +17,7 @@ require("reflect-metadata");
 const _ = __importStar(require("./lodash-wrapper"));
 const moment_1 = __importDefault(require("moment"));
 const constants_1 = require("../constants");
+const mongodb = __importStar(require("mongodb"));
 const REGEX_OBJECT_ID = new RegExp("^[0-9a-fA-F]{24}$");
 function wait(milliseconds) {
     return new Promise((resolve) => {
@@ -252,5 +253,48 @@ function getIdFromObjectOrId(objectOrId, idResolver) {
     return isObjectId(objectOrId) ? objectOrId : idResolver(objectOrId);
 }
 exports.getIdFromObjectOrId = getIdFromObjectOrId;
+function tryParseObjectId(id, createIfNil = true, objectIdCreator = (id) => new mongodb.ObjectId(id)) {
+    try {
+        return [true, parseObjectId(id, createIfNil, objectIdCreator)];
+    }
+    catch (_a) {
+        return [false, undefined];
+    }
+}
+exports.tryParseObjectId = tryParseObjectId;
+/**
+ * parse ObjectId from null, undefined, string or an existing ObjectId
+ * it will throw exception when input `id` cannot be parsed
+ * if `createIfNil = true` it will create a new ObjectId if `id` is falsy
+ * otherwise it will return null or undefined based on input parameter `id`
+ * especially, when input `id = ''` and `createIfNil = false` it will return null
+ * the 3rd argument `objectIdCreator` should NOT be specified unless in unit test
+ */
+function parseObjectId(id, createIfNil = true, objectIdCreator = (id) => new mongodb.ObjectId(id)) {
+    let objectId;
+    if (id) {
+        if (_.isString(id)) {
+            objectId = objectIdCreator(id);
+        }
+        else {
+            objectId = id;
+        }
+    }
+    else {
+        if (createIfNil) {
+            objectId = objectIdCreator();
+        }
+        else {
+            if (_.isNull(id) || _.isString(id)) {
+                objectId = null;
+            }
+            else {
+                // leave `objectID` as undefined
+            }
+        }
+    }
+    return objectId;
+}
+exports.parseObjectId = parseObjectId;
 __export(require("./lodash-wrapper"));
 //# sourceMappingURL=utilities.js.map

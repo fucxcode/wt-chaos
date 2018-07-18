@@ -25,7 +25,7 @@ interface IContainer {
     registerInstance(type: Symbol, instance: any): IContainer;
     unregister(type: Type): boolean;
     clear(): void;
-    resolve<T extends object>(type: Type, throwErrorUnregister?: boolean, ...params: any[]): T;
+    resolve<T extends object>(type: Type, throwErrorUnregister?: boolean, ...params: any[]): T | undefined;
 }
 export { IContainer, lifecycles, Type, ParamType, PropertyType };
 //# sourceMappingURL=i-container.d.ts.map

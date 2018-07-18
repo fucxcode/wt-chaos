@@ -24,5 +24,15 @@ export declare function project<T extends object>(object: T, projection?: Projec
 export declare function toSafeDateTimeNumber(date: number): number;
 export declare function formatFromAndToTimeToTimestampSeconds(from?: string | number, to?: string | number, timezone?: string, unitOfTime?: any): Array<number>;
 export declare function getIdFromObjectOrId<T>(objectOrId: ObjectOrId<T>, idResolver: (obj: T) => mongodb.ObjectId): mongodb.ObjectId;
+export declare function tryParseObjectId(id?: ObjectID | null | undefined, createIfNil?: boolean, objectIdCreator?: (id?: string | number | mongodb.ObjectId) => mongodb.ObjectId): [boolean, mongodb.ObjectId | null | undefined];
+/**
+ * parse ObjectId from null, undefined, string or an existing ObjectId
+ * it will throw exception when input `id` cannot be parsed
+ * if `createIfNil = true` it will create a new ObjectId if `id` is falsy
+ * otherwise it will return null or undefined based on input parameter `id`
+ * especially, when input `id = ''` and `createIfNil = false` it will return null
+ * the 3rd argument `objectIdCreator` should NOT be specified unless in unit test
+ */
+export declare function parseObjectId(id?: ObjectID | null | undefined, createIfNil?: boolean, objectIdCreator?: (id?: string | number | mongodb.ObjectId) => mongodb.ObjectId): mongodb.ObjectId | null | undefined;
 export * from "./lodash-wrapper";
 //# sourceMappingURL=utilities.d.ts.map

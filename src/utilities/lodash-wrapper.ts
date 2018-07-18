@@ -52,7 +52,7 @@ type MemoListIterator<T, TResult, TList> = (prev: TResult, curr: T, index: numbe
 type PartialObject<T> = Partial<T>;
 
 export function keyBy<T>(collection: List<T> | null | undefined, iteratee: any): Dictionary<T> {
-    return (_ as any).indexBy(collection, iteratee);
+    return (_ as any).keyBy(collection, iteratee);
 }
 
 export function filter<T>(collection: List<T> | null | undefined, predicate: ListIterateeCustom<T, boolean>): T[] {

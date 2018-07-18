@@ -242,5 +242,47 @@ export function getIdFromObjectOrId<T>(objectOrId: ObjectOrId<T>, idResolver: (o
     return isObjectId(objectOrId) ? objectOrId as mongodb.ObjectId : idResolver(objectOrId as T);
 }
 
+export function tryParseObjectId(id?: ObjectID | null | undefined, createIfNil: boolean = true, objectIdCreator: (id?: string | number | mongodb.ObjectId) => mongodb.ObjectId = (id) => new mongodb.ObjectId(id)): [boolean, mongodb.ObjectId | null | undefined] {
+    try {
+        return [true, parseObjectId(id, createIfNil, objectIdCreator)];
+    }
+    catch {
+        return [false, undefined];
+    }
+}
+
+/**
+ * parse ObjectId from null, undefined, string or an existing ObjectId
+ * it will throw exception when input `id` cannot be parsed
+ * if `createIfNil = true` it will create a new ObjectId if `id` is falsy
+ * otherwise it will return null or undefined based on input parameter `id`
+ * especially, when input `id = ''` and `createIfNil = false` it will return null
+ * the 3rd argument `objectIdCreator` should NOT be specified unless in unit test
+ */
+export function parseObjectId(id?: ObjectID | null | undefined, createIfNil: boolean = true, objectIdCreator: (id?: string | number | mongodb.ObjectId) => mongodb.ObjectId = (id) => new mongodb.ObjectId(id)): mongodb.ObjectId | null | undefined {
+    let objectId: mongodb.ObjectId | null | undefined;
+    if (id) {
+        if (_.isString(id)) {
+            objectId = objectIdCreator(id);
+        }
+        else {
+            objectId = id;
+        }
+    }
+    else {
+        if (createIfNil) {
+            objectId = objectIdCreator();
+        }
+        else {
+            if (_.isNull(id) || _.isString(id)) {
+                objectId = null;
+            }
+            else {
+                // leave `objectID` as undefined
+            }
+        }
+    }
+    return objectId;
+}
 
 export * from "./lodash-wrapper";

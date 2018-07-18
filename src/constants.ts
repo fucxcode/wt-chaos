@@ -37,3 +37,7 @@ export type Composite<T, S> = T | S;
 export type ObjectOrId<T> = Composite<mongodb.ObjectId, T>;
 
 export type Projection<T> = (keyof T)[] | { [key in keyof T]?: is; };
+
+export type Nullable<T> = T | null;
+
+export type Nilable<T> = Nullable<T> | undefined;

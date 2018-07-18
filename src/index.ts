@@ -1,8 +1,12 @@
 import * as _ from "./utilities";
 import * as constants from "./constants";
+import { WTError, WTErrorResponse, code } from "./errors";
 
 export {
     _,
-    constants
+    constants,
+    WTError,
+    WTErrorResponse,
+    code
 };
 

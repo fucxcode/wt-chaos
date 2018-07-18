@@ -46,5 +46,8 @@
     "mongodb": "^3.1.1",
     "mongoose": "^5.2.4",
     "reflect-metadata": "^0.1.12"
-  }
+  },
+  "files": [
+    "src/**/*"
+  ]
 }

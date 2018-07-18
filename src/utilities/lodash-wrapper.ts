@@ -67,7 +67,7 @@ export function forEach<T>(collection: T[], iteratee: ListIterator<T, any>): Lis
     return _.forEach<T>(collection, iteratee);
 }
 
-export function find<T, S extends T>(collection: List<T> | null | undefined, predicate: ListIteratorTypeGuard<T, S>, fromIndex?: number): S | undefined {
+export function find<T>(collection: List<T> | null | undefined, predicate?: ListIterateeCustom<T, boolean>, fromIndex?: number): T | undefined {
     return _.find(collection, predicate, fromIndex);
 }
 

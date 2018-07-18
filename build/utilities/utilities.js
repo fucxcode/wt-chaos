@@ -1,41 +1,50 @@
-import "reflect-metadata";
-import * as _ from "./lodash-wrapper";
-import moment from "moment";
-import { ObjectID, is, Projection, ObjectOrId } from "../constants";
-import * as mongodb from "mongodb";
-
+"use strict";
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+require("reflect-metadata");
+const _ = __importStar(require("./lodash-wrapper"));
+const moment_1 = __importDefault(require("moment"));
+const constants_1 = require("../constants");
 const REGEX_OBJECT_ID = new RegExp("^[0-9a-fA-F]{24}$");
-
-export function wait(milliseconds: number): Promise<void> {
-    return new Promise<void>((resolve) => {
+function wait(milliseconds) {
+    return new Promise((resolve) => {
         setTimeout(() => {
             return resolve();
         }, milliseconds);
     });
 }
-
-export function isNil(value: any): boolean {
+exports.wait = wait;
+function isNil(value) {
     return _.isNull(value) || _.isUndefined(value);
 }
-
-export function isNilOrWriteSpaces(value: string): boolean {
+exports.isNil = isNil;
+function isNilOrWriteSpaces(value) {
     return isNil(value) || _.trim(value) === ``;
 }
-
-export function findEnumByValue(enums: any, value: any): {
-    key: string,
-    value: any
-} | undefined {
-    const key = _.findKey(enums, (x: any) => x === value);
+exports.isNilOrWriteSpaces = isNilOrWriteSpaces;
+function findEnumByValue(enums, value) {
+    const key = _.findKey(enums, (x) => x === value);
     if (!_.isEmpty(key)) {
         return {
-            key: key as string,
+            key: key,
             value: value
         };
     }
 }
-
-export function isObjectId(id: any): id is mongodb.ObjectId {
+exports.findEnumByValue = findEnumByValue;
+function isObjectId(id) {
     if (_.isEmpty(id)) {
         return false;
     }
@@ -45,17 +54,17 @@ export function isObjectId(id: any): id is mongodb.ObjectId {
     const value = id.toString();
     if (value.length === 24 && REGEX_OBJECT_ID.test(value)) {
         return true;
-    } else {
+    }
+    else {
         return false;
     }
 }
-
-export function mapKeys(object: any, iteratee: (sourceValue: any, sourceKey: string) => string, thisArg?: any): any {
-    let target: any;
-    let sourceKey: string;
-    let sourceValue: any;
-    let targetKey: string;
-
+exports.isObjectId = isObjectId;
+function mapKeys(object, iteratee, thisArg) {
+    let target;
+    let sourceKey;
+    let sourceValue;
+    let targetKey;
     if (_.isArray(object)) {
         target = [];
         object.forEach(function (element) {
@@ -78,43 +87,44 @@ export function mapKeys(object: any, iteratee: (sourceValue: any, sourceKey: str
     else {
         target = object;
     }
-
     return target;
 }
-
-export function updateMetadata<TValue, TUpdate>(metadataKey: string, metadataUpdateValue: TUpdate, target: Object, initializer: () => TValue, updater: (value: TValue, update: TUpdate) => TValue, thisArg?: any): TValue {
-    const existingValue: TValue = Reflect.getMetadata(metadataKey, target) || initializer.call(thisArg);
+exports.mapKeys = mapKeys;
+function updateMetadata(metadataKey, metadataUpdateValue, target, initializer, updater, thisArg) {
+    const existingValue = Reflect.getMetadata(metadataKey, target) || initializer.call(thisArg);
     const newValue = updater.call(thisArg, existingValue, metadataUpdateValue);
     Reflect.defineMetadata(metadataKey, newValue, target);
     return newValue;
 }
-
-export function convertToRegExp(keyword: any): RegExp {
+exports.updateMetadata = updateMetadata;
+function convertToRegExp(keyword) {
     return new RegExp(keyword, "i");
 }
-
-export function objectIdEquals(x: ObjectID, y: ObjectID): boolean {
+exports.convertToRegExp = convertToRegExp;
+function objectIdEquals(x, y) {
     return (x && y) ? (x.toString() === y.toString()) : false;
 }
-
+exports.objectIdEquals = objectIdEquals;
 /**
  *  return unique Id in nested array, mostly used for get ids for db query
  */
-export function flattenId(array: Array<any>, path: string, prev: ObjectID[] = []): Array<ObjectID> {
+function flattenId(array, path, prev = []) {
     const keys = path.split(".");
     const depth = keys.length;
-    let result: ObjectID[] = [];
-
-    const build = function (array: Array<any>, keyIndex: number) {
-        if (!array) return;
+    let result = [];
+    const build = function (array, keyIndex) {
+        if (!array)
+            return;
         if (!_.isArray(array)) {
             if (keyIndex === depth - 1) {
                 result = result.concat(_.get(array, keys[keyIndex]));
-            } else {
+            }
+            else {
                 const newKey = keyIndex + 1;
                 build(_.get(array, keys[keyIndex]), newKey);
             }
-        } else {
+        }
+        else {
             for (let i = 0; i < array.length; i++) {
                 let element = array[i];
                 element = element[keys[keyIndex]];
@@ -123,7 +133,8 @@ export function flattenId(array: Array<any>, path: string, prev: ObjectID[] = []
                 }
                 if (keyIndex === depth - 1) {
                     result = result.concat(element);
-                } else {
+                }
+                else {
                     const newKey = keyIndex + 1;
                     build(element, newKey);
                 }
@@ -133,18 +144,18 @@ export function flattenId(array: Array<any>, path: string, prev: ObjectID[] = []
     build(array, 0);
     return _.uniqBy(_.compact(result), x => x && x.toString());
 }
-
-export function toMap<T, TKey, TValue>(arr: T[], keyResolver: (elem: T) => TKey, valueResolver: (elem: T) => TValue): Map<TKey, TValue> {
-    const map = new Map<TKey, TValue>();
+exports.flattenId = flattenId;
+function toMap(arr, keyResolver, valueResolver) {
+    const map = new Map();
     for (const elem of arr) {
         map.set(keyResolver(elem), valueResolver(elem));
     }
     return map;
 }
-
-export function censor(censor: any): any {
+exports.toMap = toMap;
+function censor(censor) {
     let i = 0;
-    return function (key: any, value: any): any {
+    return function (key, value) {
         if (i !== 0 && typeof (censor) !== `object` && typeof (value) === `object` && censor === value) {
             return `[Circular]`;
         }
@@ -155,35 +166,34 @@ export function censor(censor: any): any {
         return value;
     };
 }
-
-export async function nextTick(): Promise<void> {
-    return new Promise<void>(resolve => {
+exports.censor = censor;
+async function nextTick() {
+    return new Promise(resolve => {
         process.nextTick(() => {
             return resolve();
         });
     });
 }
-
-export function project<T extends object>(object: T, projection: Projection<T> = [], defaultPicks: string[] = ["_id"]): T {
+exports.nextTick = nextTick;
+function project(object, projection = [], defaultPicks = ["_id"]) {
     // just return "null" or "undefined" if input "object" is is nil
     // this is because the code below will invoke "_.pick" and "_.omit" on "object" which will be changed to "{}"
     if (isNil(object)) {
         return object;
     }
-
     // collect properties into picked and omits
     // we will clone the object if nothing to pick or omit
     // otherwise, pick operation has higher priority than omit
-    let picks: (keyof T)[] = [];
-    let omits: (keyof T)[] = [];
+    let picks = [];
+    let omits = [];
     if (_.isArray(projection)) {
-        picks = _.filter(projection as (keyof T)[], x => !_.isEmpty(x));
+        picks = _.filter(projection, x => !_.isEmpty(x));
     }
     else {
-        for (const key in projection as { [key in keyof T]: is; }) {
+        for (const key in projection) {
             const value = projection[key];
             if (!_.isEmpty(key)) {
-                if (value === is.yes) {
+                if (value === constants_1.is.yes) {
                     picks.push(key);
                 }
                 else {
@@ -198,7 +208,7 @@ export function project<T extends object>(object: T, projection: Projection<T> =
     picks = _.chain(picks).filter(x => !_.isEmpty(x)).uniq().valueOf();
     omits = _.chain(omits).filter(x => !_.isEmpty(x)).uniq().valueOf();
     // map object properties based on picks and omits
-    let output: T;
+    let output;
     if (_.some(picks)) {
         output = _.pick(object, picks);
     }
@@ -216,8 +226,8 @@ export function project<T extends object>(object: T, projection: Projection<T> =
     }
     return output;
 }
-
-export function toSafeDateTimeNumber(date: number): number {
+exports.project = project;
+function toSafeDateTimeNumber(date) {
     date = _.isNumber(date) ? date : Number(date);
     if (date.toString().length > 10) {
         return Math.round(date / 1000);
@@ -226,21 +236,21 @@ export function toSafeDateTimeNumber(date: number): number {
         return date;
     }
 }
-
-export function formatFromAndToTimeToTimestampSeconds(from?: string | number, to?: string | number, timezone: string = "Asia/Shanghai", unitOfTime: any = "day"): Array<number> {
+exports.toSafeDateTimeNumber = toSafeDateTimeNumber;
+function formatFromAndToTimeToTimestampSeconds(from, to, timezone = "Asia/Shanghai", unitOfTime = "day") {
     if (!from && !to) {
-        const initFromTimeSeconds = moment().tz(timezone).startOf(unitOfTime).unix();
-        const initToTimeSeconds = moment().tz(timezone).endOf(unitOfTime).unix();
+        const initFromTimeSeconds = moment_1.default().tz(timezone).startOf(unitOfTime).unix();
+        const initToTimeSeconds = moment_1.default().tz(timezone).endOf(unitOfTime).unix();
         return [initFromTimeSeconds, initToTimeSeconds];
     }
-    from = moment(toSafeDateTimeNumber(parseInt(<string>from)), "X").tz(timezone).startOf(unitOfTime).unix();
-    to = moment(toSafeDateTimeNumber(parseInt(<string>to)), "X").tz(timezone).endOf(unitOfTime).unix();
+    from = moment_1.default(toSafeDateTimeNumber(parseInt(from)), "X").tz(timezone).startOf(unitOfTime).unix();
+    to = moment_1.default(toSafeDateTimeNumber(parseInt(to)), "X").tz(timezone).endOf(unitOfTime).unix();
     return [from, to];
 }
-
-export function getIdFromObjectOrId<T>(objectOrId: ObjectOrId<T>, idResolver: (obj: T) => mongodb.ObjectId): mongodb.ObjectId {
-    return isObjectId(objectOrId) ? objectOrId as mongodb.ObjectId : idResolver(objectOrId as T);
+exports.formatFromAndToTimeToTimestampSeconds = formatFromAndToTimeToTimestampSeconds;
+function getIdFromObjectOrId(objectOrId, idResolver) {
+    return isObjectId(objectOrId) ? objectOrId : idResolver(objectOrId);
 }
-
-
-export * from "./lodash-wrapper";
+exports.getIdFromObjectOrId = getIdFromObjectOrId;
+__export(require("./lodash-wrapper"));
+//# sourceMappingURL=utilities.js.map

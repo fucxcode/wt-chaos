@@ -8,3 +8,5 @@ npm run-script rebuild
 npm test
 npm test -- [-s SPEC_NAME] [-s SPEC_NAME] ...
 ```
+
+run `npm run-script rebuild` before push a new version

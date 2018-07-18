@@ -47,8 +47,5 @@
     "mongoose": "^5.2.4",
     "reflect-metadata": "^0.1.12",
     "typescript": "^2.9.2"
-  },
-  "files": [
-    "build/**/*"
-  ]
+  }
 }

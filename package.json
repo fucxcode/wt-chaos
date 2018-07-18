@@ -2,12 +2,13 @@
   "name": "wt-chaos",
   "version": "1.0.0",
   "description": "",
-  "main": "src/index.js",
+  "main": "index.js",
   "scripts": {
     "clean": "rm -rf ./build",
     "build": "tsc",
     "rebuild": "npm run-script clean && npm run-script build",
-    "test": "node --require ts-node/register/transpile-only test/bootstrap.ts"
+    "test": "node --require ts-node/register/transpile-only test/bootstrap.ts",
+    "install": "mv src/* . && rmdir src"
   },
   "repository": {
     "type": "git",

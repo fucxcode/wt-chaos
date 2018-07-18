@@ -8,7 +8,7 @@ const ASYNC_FUNCTION_TAG = "[object AsyncFunction]";
 const GENERATOR_FUNCTION_TAG = "[object GeneratorFunction]";
 const PROXY_TAG = "[object Proxy]";
 function keyBy(collection, iteratee) {
-    return lodash_1.default.indexBy(collection, iteratee);
+    return lodash_1.default.keyBy(collection, iteratee);
 }
 exports.keyBy = keyBy;
 function filter(collection, predicate) {

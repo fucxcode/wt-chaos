@@ -22,6 +22,7 @@ declare type ListIteratee<T> = ListIterator<T, NotVoid> | string | [string, any]
 declare type ValueIteratee<T> = ((value: T) => NotVoid) | string | [string, any] | PartialDeep<T>;
 declare type Many<T> = T | T[];
 declare type MemoListIterator<T, TResult, TList> = (prev: TResult, curr: T, index: number, list: TList) => TResult;
+declare type ObjectIterateeCustom<TObject, TResult> = ObjectIterator<TObject, TResult> | string | [string, any] | PartialDeep<TObject[keyof TObject]>;
 export declare function keyBy<T>(collection: List<T> | null | undefined, iteratee: any): Dictionary<T>;
 export declare function filter<T>(collection: List<T> | null | undefined, predicate: ListIterateeCustom<T, boolean>): T[];
 export declare function map<T, TResult>(collection: List<T> | null | undefined, iteratee: ListIterator<T, TResult>): TResult[];
@@ -39,7 +40,7 @@ export declare function isEmpty(value: any): boolean;
 export declare function trim(value: string): string;
 export declare function sample<T>(collection: List<T> | Dictionary<T> | NumericDictionary<T> | null | undefined): T | undefined;
 export declare function sampleSize<T>(collection: List<T> | Dictionary<T> | NumericDictionary<T> | null | undefined, n?: number): T[];
-export declare function some<T>(collection: List<T> | null | undefined, predicate?: ListIterateeCustom<T, boolean>): boolean;
+export declare function some<T extends object>(collection: T | null | undefined, predicate?: ObjectIterateeCustom<T, boolean>): boolean;
 export declare function uniqBy<T>(collection: List<T> | null | undefined, iteratee: ValueIteratee<T>): T[];
 export declare function uniq<T>(collection: List<T> | null | undefined): T[];
 export declare function keys(object?: any): string[];

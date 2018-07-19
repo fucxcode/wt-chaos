@@ -51,6 +51,8 @@ type MemoListIterator<T, TResult, TList> = (prev: TResult, curr: T, index: numbe
 
 type PartialObject<T> = Partial<T>;
 
+type ObjectIterateeCustom<TObject, TResult> = ObjectIterator<TObject, TResult> | string | [string, any] | PartialDeep<TObject[keyof TObject]>;
+
 export function keyBy<T>(collection: List<T> | null | undefined, iteratee: any): Dictionary<T> {
     return _.keyBy(collection, iteratee);
 }
@@ -126,6 +128,7 @@ export function sampleSize<T>(collection: List<T> | Dictionary<T> | NumericDicti
     return _.sampleSize(collection, n);
 }
 
+export function some<T extends object>(collection: T | null | undefined, predicate?: ObjectIterateeCustom<T, boolean> ): boolean;
 export function some<T>(collection: List<T> | null | undefined, predicate?: ListIterateeCustom<T, boolean>): boolean {
     return _.some(collection, predicate);
 }

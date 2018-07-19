@@ -48,6 +48,17 @@ describe("utilities", () => {
             assert.isTrue(_.some(collection, x => x === 3));
         });
 
+        it("_.some support mongodb.ObjectId[]", () => {
+            const id = new mongodb.ObjectId();
+            const collection = [
+                new mongodb.ObjectId(),
+                new mongodb.ObjectId(),
+                id,
+                new mongodb.ObjectId()
+            ];
+            assert.isTrue(_.some(collection, x => _.objectIdEquals(x, id)));
+        });
+
     });
 
     describe("object projection", () => {

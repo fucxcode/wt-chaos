@@ -128,8 +128,9 @@ export function sampleSize<T>(collection: List<T> | Dictionary<T> | NumericDicti
     return _.sampleSize(collection, n);
 }
 
-function some<T extends object>(collection: T | null | undefined, predicate?: ObjectIterateeCustom<T, boolean> ): boolean;
+// function some<T>(collection: T[], predicate?: (value: T) => boolean): boolean;
 function some<T>(collection: List<T> | null | undefined, predicate?: ListIterateeCustom<T, boolean>): boolean;
+function some<T extends object>(collection: T | null | undefined, predicate?: ObjectIterateeCustom<T, boolean> ): boolean;
 function some(collection: any, predicate?: any): boolean {
     return _.some(collection, predicate);
 }

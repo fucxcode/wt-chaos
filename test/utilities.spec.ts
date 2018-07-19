@@ -34,6 +34,20 @@ describe("utilities", () => {
             assert.equal(result[0], 2);
         });
 
+        it("_.some support arraylike", () => {
+            const collection = [1, 2, 3, 4, 5];
+            assert.isTrue(_.some(collection, x => x > 3));
+        });
+
+        it("_.some support object", () => {
+            const collection = {
+                one: 1,
+                two: 2,
+                three: 3
+            };
+            assert.isTrue(_.some(collection, x => x === 3));
+        });
+
     });
 
     describe("object projection", () => {

@@ -40,7 +40,9 @@ export declare function isEmpty(value: any): boolean;
 export declare function trim(value: string): string;
 export declare function sample<T>(collection: List<T> | Dictionary<T> | NumericDictionary<T> | null | undefined): T | undefined;
 export declare function sampleSize<T>(collection: List<T> | Dictionary<T> | NumericDictionary<T> | null | undefined, n?: number): T[];
-export declare function some<T extends object>(collection: T | null | undefined, predicate?: ObjectIterateeCustom<T, boolean>): boolean;
+declare function some<T extends object>(collection: T | null | undefined, predicate?: ObjectIterateeCustom<T, boolean>): boolean;
+declare function some<T>(collection: List<T> | null | undefined, predicate?: ListIterateeCustom<T, boolean>): boolean;
+export { some };
 export declare function uniqBy<T>(collection: List<T> | null | undefined, iteratee: ValueIteratee<T>): T[];
 export declare function uniq<T>(collection: List<T> | null | undefined): T[];
 export declare function keys(object?: any): string[];
@@ -95,5 +97,4 @@ export declare function noop(...args: any[]): void;
 export declare function toPairs<T>(value: Dictionary<T>): Array<[string, T]>;
 export declare function fromPairs<T>(value: Array<[string, T]>): Dictionary<T>;
 export declare function isEqual(value: any, other: any): boolean;
-export {};
 //# sourceMappingURL=lodash-wrapper.d.ts.map

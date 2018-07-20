@@ -10,4 +10,3 @@ interface ICache {
     clear(): Promise<void>;
 }
 export { ICache };
-//# sourceMappingURL=i-cache.d.ts.map

@@ -5,4 +5,3 @@ declare const unregisterContainer: (key: Symbol) => boolean;
 declare const clearContainers: () => void;
 declare const resolveContainer: (key: Symbol) => IContainer | undefined;
 export { registerContainer, unregisterContainer, clearContainers, resolveContainer };
-//# sourceMappingURL=container.d.ts.map

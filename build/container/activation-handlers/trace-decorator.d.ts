@@ -10,4 +10,3 @@ declare class TraceOptions {
 }
 declare const trace: (enabled?: boolean, oidResolver?: ((...args: any[]) => string) | undefined, teamIdResolver?: ((...args: any[]) => string | mongodb.ObjectID) | undefined, uidResolver?: ((...args: any[]) => string) | undefined) => (target: any, propertyKey: string, value: any) => void;
 export { trace, TraceOptions };
-//# sourceMappingURL=trace-decorator.d.ts.map

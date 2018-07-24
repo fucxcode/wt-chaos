@@ -22,7 +22,9 @@
   },
   "homepage": "https://github.com/atinc/wt-chaos#readme",
   "devDependencies": {
+    "@types/bson": "^1.0.10",
     "@types/chai": "^4.1.4",
+    "@types/ioredis": "^3.2.13",
     "@types/lodash": "^4.14.112",
     "@types/minimist": "^1.2.0",
     "@types/mocha": "^5.2.5",
@@ -40,9 +42,12 @@
     "randomstring": "^1.1.5",
     "ts-node": "^7.0.0",
     "tslint": "^5.11.0",
+    "typemoq": "^2.1.0",
     "typescript": "^2.9.2"
   },
   "dependencies": {
+    "bson": "^3.0.2",
+    "ioredis": "^3.2.2",
     "lodash": "^4.17.10",
     "moment": "^2.22.2",
     "moment-timezone": "^0.5.21",

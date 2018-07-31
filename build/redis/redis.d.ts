@@ -27,3 +27,4 @@ interface Pipeline {
     exec(): Promise<any>;
 }
 export { Redis, Pipeline, ScanOptions };
+//# sourceMappingURL=redis.d.ts.map

@@ -35,3 +35,4 @@ declare class IORedisPipeline implements Pipeline {
     exec(): Promise<any>;
 }
 export { IORedis, IORedisPipeline, RedisHelpers };
+//# sourceMappingURL=ioredis.d.ts.map

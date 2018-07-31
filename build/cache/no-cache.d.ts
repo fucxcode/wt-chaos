@@ -11,3 +11,4 @@ export default class NoCache implements ICache {
     deleteByPattern(pattern: CacheKey): Promise<void>;
     clear(): Promise<void>;
 }
+//# sourceMappingURL=no-cache.d.ts.map

@@ -26,3 +26,4 @@ export declare type ObjectOrId<T> = Composite<mongodb.ObjectId, T>;
 export declare type Projection<T> = (keyof T)[] | {
     [key in keyof T]?: is;
 };
+//# sourceMappingURL=constants.d.ts.map

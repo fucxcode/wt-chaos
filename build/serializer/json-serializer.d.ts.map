@@ -1,0 +1,1 @@
+{"version":3,"file":"json-serializer.d.ts","sourceRoot":"","sources":["../../src/serializer/json-serializer.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,UAAU,EAAE,MAAM,cAAc,CAAC;AAE1C,cAAM,cAAe,YAAW,UAAU,CAAC,MAAM,CAAC;IAEvC,SAAS,CAAC,CAAC,EAAE,KAAK,EAAE,CAAC,GAAG,MAAM;IAI9B,WAAW,CAAC,CAAC,EAAE,GAAG,CAAC,EAAE,MAAM,GAAG,SAAS,GAAG,CAAC,GAAG,SAAS;CAIjE;AAED,OAAO,EAAE,cAAc,EAAE,CAAC"}

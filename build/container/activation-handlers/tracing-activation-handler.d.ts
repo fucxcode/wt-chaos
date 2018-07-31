@@ -18,3 +18,4 @@ declare class ActivityTracingActivationHandler implements IActivationHandler {
     handle<T extends object>(instance: T): T;
 }
 export { ActivityTracingActivationHandler };
+//# sourceMappingURL=tracing-activation-handler.d.ts.map

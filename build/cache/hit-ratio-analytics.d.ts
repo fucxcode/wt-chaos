@@ -17,3 +17,4 @@ export declare class CacheHitRatioAnalytics {
     bingo(key: CacheKey): Promise<void>;
     miss(key: CacheKey): Promise<void>;
 }
+//# sourceMappingURL=hit-ratio-analytics.d.ts.map

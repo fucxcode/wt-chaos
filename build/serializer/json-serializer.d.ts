@@ -4,3 +4,4 @@ declare class JSONSerializer implements Serializer<string> {
     deserialize<T>(buf?: string | undefined): T | undefined;
 }
 export { JSONSerializer };
+//# sourceMappingURL=json-serializer.d.ts.map

@@ -35,3 +35,4 @@ export declare function tryParseObjectId(id?: ObjectID | null | undefined, creat
  */
 export declare function parseObjectId(id?: ObjectID | null | undefined, createIfNil?: boolean, objectIdCreator?: (id?: string | number | mongodb.ObjectId) => mongodb.ObjectId): mongodb.ObjectId | null | undefined;
 export * from "./lodash-wrapper";
+//# sourceMappingURL=utilities.d.ts.map

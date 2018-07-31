@@ -97,3 +97,4 @@ export declare function noop(...args: any[]): void;
 export declare function toPairs<T>(value: Dictionary<T>): Array<[string, T]>;
 export declare function fromPairs<T>(value: Array<[string, T]>): Dictionary<T>;
 export declare function isEqual(value: any, other: any): boolean;
+//# sourceMappingURL=lodash-wrapper.d.ts.map

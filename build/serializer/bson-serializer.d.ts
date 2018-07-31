@@ -7,3 +7,4 @@ declare class BSONSerializer implements Serializer<Buffer> {
     deserialize<T>(buf?: Buffer | undefined): T | undefined;
 }
 export { BSONSerializer };
+//# sourceMappingURL=bson-serializer.d.ts.map

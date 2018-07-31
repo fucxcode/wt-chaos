@@ -6,3 +6,4 @@ declare enum code {
     internalError = 500
 }
 export default code;
+//# sourceMappingURL=code.d.ts.map

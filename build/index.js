@@ -18,4 +18,6 @@ const container = __importStar(require("./container"));
 exports.container = container;
 const cache = __importStar(require("./cache"));
 exports.cache = cache;
+const serializer = __importStar(require("./serializer"));
+exports.serializer = serializer;
 //# sourceMappingURL=index.js.map

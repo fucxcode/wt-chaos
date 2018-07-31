@@ -22,16 +22,16 @@
   },
   "homepage": "https://github.com/atinc/wt-chaos#readme",
   "devDependencies": {
-    "@types/bson": "^1.0.10",
+    "@types/bson": "^1.0.11",
     "@types/chai": "^4.1.4",
     "@types/ioredis": "^3.2.13",
-    "@types/lodash": "^4.14.112",
+    "@types/lodash": "^4.14.115",
     "@types/minimist": "^1.2.0",
     "@types/mocha": "^5.2.5",
     "@types/moment": "^2.13.0",
-    "@types/moment-timezone": "^0.5.6",
-    "@types/mongodb": "^3.1.1",
-    "@types/mongoose": "^5.2.0",
+    "@types/moment-timezone": "^0.5.7",
+    "@types/mongodb": "^3.1.2",
+    "@types/mongoose": "^5.2.3",
     "@types/node-uuid": "0.0.28",
     "@types/randomstring": "^1.1.6",
     "@types/reflect-metadata": "^0.1.0",
@@ -43,7 +43,7 @@
     "ts-node": "^7.0.0",
     "tslint": "^5.11.0",
     "typemoq": "^2.1.0",
-    "typescript": "^2.9.2"
+    "typescript": "^3.0.1"
   },
   "dependencies": {
     "bson": "^3.0.2",
@@ -52,7 +52,7 @@
     "moment": "^2.22.2",
     "moment-timezone": "^0.5.21",
     "mongodb": "^3.1.1",
-    "mongoose": "^5.2.4",
+    "mongoose": "^5.2.6",
     "reflect-metadata": "^0.1.12"
   },
   "files": [

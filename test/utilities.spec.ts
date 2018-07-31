@@ -63,23 +63,6 @@ describe("utilities", () => {
 
     describe("object projection", () => {
 
-        const createObject = (): any => {
-            return {
-                _id: new mongodb.ObjectId(),
-                string_prop: $.randomString(),
-                number_prop: _.random(0, 100),
-                object_prop: {
-                    string_prop: $.randomString(),
-                    number_prop: _.random(0, 100),
-                },
-                array_prop: [
-                    $.randomString(),
-                    $.randomString(),
-                    $.randomString()
-                ]
-            };
-        };
-
         it(`input: undefined. output: undefined`, () => {
             const output = _.project(undefined);
             assert.strictEqual(output, undefined);

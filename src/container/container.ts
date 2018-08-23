@@ -132,6 +132,7 @@ class Container implements IContainer {
 }
 
 const containers: Map<Symbol, IContainer> = new Map<Symbol, IContainer>();
+let defaultContainerKey: Symbol | null = null;
 
 const registerContainer = function (key: Symbol, activationHandler: IActivationHandler): IContainer {
     const container = new Container(key, activationHandler);
@@ -140,24 +141,51 @@ const registerContainer = function (key: Symbol, activationHandler: IActivationH
     }
     else {
         containers.set(key, container);
+        // set this container as default is there's no default container
+        if (!defaultContainerKey) {
+            defaultContainerKey = key;
+        }
         return container;
     }
 };
 
-const unregisterContainer = function (key: Symbol): boolean {
-    return containers.delete(key);
+const unregisterContainer = function (key: Symbol, newDefaultContainerKey?: Symbol): boolean {
+    if (defaultContainerKey === key) {
+        if (newDefaultContainerKey) {
+            setDefaultContainer(newDefaultContainerKey);
+            return containers.delete(key);
+        }
+        else {
+            throw new Error(`Cannot delete default container ${key} due to 'newDefaultContainerKey' is null.`);
+        }
+    }
+    else {
+        return containers.delete(key);
+    }
 };
 
 const clearContainers = function (): void {
     containers.clear();
+    defaultContainerKey = null;
 };
 
 const resolveContainer = function (key: Symbol): IContainer | undefined {
     return containers.get(key);
 };
 
-// const defaultContainerKey = Symbol.for(`default`);
-// const defaultContainer = registerContainer(defaultContainerKey, new ActivityTracingActivationHandler());
-// const defaultContainer = registerContainer(defaultContainerKey, new BypassActivationHandler());
+const getDefaultContainer = function (): IContainer | undefined {
+    if (defaultContainerKey) {
+        return containers.get(defaultContainerKey);
+    }
+};
 
-export { registerContainer, unregisterContainer, clearContainers, resolveContainer };
+const setDefaultContainer = function (key: Symbol): void {
+    if (containers.has(key)) {
+        defaultContainerKey = key;
+    }
+    else {
+        throw new Error(`Cannot find container with key ${key}.`);
+    }
+};
+
+export { registerContainer, unregisterContainer, clearContainers, resolveContainer, getDefaultContainer, setDefaultContainer };

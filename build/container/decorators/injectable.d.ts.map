@@ -1,1 +1,1 @@
-{"version":3,"file":"injectable.d.ts","sourceRoot":"","sources":["../../../src/container/decorators/injectable.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,UAAU,EAAE,UAAU,EAAmB,MAAM,gBAAgB,CAAC;AAEzE,QAAA,MAAM,UAAU,+GAkBf,CAAC;AAEF,OAAO,EAAE,UAAU,EAAE,CAAC"}
+{"version":3,"file":"injectable.d.ts","sourceRoot":"","sources":["../../../src/container/decorators/injectable.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,UAAU,EAAE,UAAU,EAAmB,MAAM,gBAAgB,CAAC;AAGzE,QAAA,MAAM,UAAU,+GA2Bf,CAAC;AAEF,OAAO,EAAE,UAAU,EAAE,CAAC"}

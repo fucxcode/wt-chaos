@@ -1,7 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const i_container_1 = require("../i-container");
+const container_1 = require("../container");
 const inject = function (container, throwErrorUnregister = true, type, lazy = false) {
+    if (!container) {
+        const dc = container_1.getDefaultContainer();
+        if (dc) {
+            container = dc;
+        }
+        else {
+            throw new Error("You must specify 'container' or has 'defaultContainer' registered.");
+        }
+    }
     return function (...args) {
         if (args.length < 3 || typeof args[2] === `undefined`) {
             // mark properties and members which will be injected in `Resolver.resolveInternal`

@@ -106,6 +106,7 @@ class Container {
     }
 }
 const containers = new Map();
+let defaultContainerKey = null;
 const registerContainer = function (key, activationHandler) {
     const container = new Container(key, activationHandler);
     if (containers.has(key)) {
@@ -113,20 +114,51 @@ const registerContainer = function (key, activationHandler) {
     }
     else {
         containers.set(key, container);
+        // set this container as default is there's no default container
+        if (!defaultContainerKey) {
+            defaultContainerKey = key;
+        }
         return container;
     }
 };
 exports.registerContainer = registerContainer;
-const unregisterContainer = function (key) {
-    return containers.delete(key);
+const unregisterContainer = function (key, newDefaultContainerKey) {
+    if (defaultContainerKey === key) {
+        if (newDefaultContainerKey) {
+            setDefaultContainer(newDefaultContainerKey);
+            return containers.delete(key);
+        }
+        else {
+            throw new Error(`Cannot delete default container ${key} due to 'newDefaultContainerKey' is null.`);
+        }
+    }
+    else {
+        return containers.delete(key);
+    }
 };
 exports.unregisterContainer = unregisterContainer;
 const clearContainers = function () {
     containers.clear();
+    defaultContainerKey = null;
 };
 exports.clearContainers = clearContainers;
 const resolveContainer = function (key) {
     return containers.get(key);
 };
 exports.resolveContainer = resolveContainer;
+const getDefaultContainer = function () {
+    if (defaultContainerKey) {
+        return containers.get(defaultContainerKey);
+    }
+};
+exports.getDefaultContainer = getDefaultContainer;
+const setDefaultContainer = function (key) {
+    if (containers.has(key)) {
+        defaultContainerKey = key;
+    }
+    else {
+        throw new Error(`Cannot find container with key ${key}.`);
+    }
+};
+exports.setDefaultContainer = setDefaultContainer;
 //# sourceMappingURL=container.js.map

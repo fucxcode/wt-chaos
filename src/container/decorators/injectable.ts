@@ -1,6 +1,16 @@
 import { IContainer, lifecycles, Type, ParamType } from "../i-container";
+import { getDefaultContainer } from "../container";
 
 const injectable = function (container: IContainer, lifecycle: lifecycles = lifecycles.singleton, type?: Type) {
+    if (!container) {
+        const dc = getDefaultContainer();
+        if (dc) {
+            container = dc;
+        }
+        else {
+            throw new Error("You must specify 'container' or has 'defaultContainer' registered.");
+        }
+    }
     return function (target: any) {
         const paramTypes: ParamType[] = [];
         const designParamTypes: any[] = Reflect.getMetadata(`design:paramtypes`, target);

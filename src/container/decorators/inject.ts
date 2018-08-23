@@ -1,6 +1,16 @@
 import { IContainer, Type, PropertyType } from "../i-container";
+import { getDefaultContainer } from "../container";
 
 const inject = function (container: IContainer, throwErrorUnregister: boolean = true, type?: Type, lazy: boolean = false): (...args: any[]) => any {
+    if (!container) {
+        const dc = getDefaultContainer();
+        if (dc) {
+            container = dc;
+        }
+        else {
+            throw new Error("You must specify 'container' or has 'defaultContainer' registered.");
+        }
+    }
     return function (...args: any[]): any {
         if (args.length < 3 || typeof args[2] === `undefined`) {
             // mark properties and members which will be injected in `Resolver.resolveInternal`

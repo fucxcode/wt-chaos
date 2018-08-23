@@ -1,7 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const i_container_1 = require("../i-container");
+const container_1 = require("../container");
 const injectable = function (container, lifecycle = i_container_1.lifecycles.singleton, type) {
+    if (!container) {
+        const dc = container_1.getDefaultContainer();
+        if (dc) {
+            container = dc;
+        }
+        else {
+            throw new Error("You must specify 'container' or has 'defaultContainer' registered.");
+        }
+    }
     return function (target) {
         const paramTypes = [];
         const designParamTypes = Reflect.getMetadata(`design:paramtypes`, target);

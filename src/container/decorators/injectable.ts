@@ -1,11 +1,15 @@
 import { IContainer, lifecycles, Type, ParamType } from "../i-container";
 import { getDefaultContainer } from "../container";
 
-const injectable = function (container: IContainer, lifecycle: lifecycles = lifecycles.singleton, type?: Type) {
-    if (!container) {
-        const dc = getDefaultContainer();
-        if (dc) {
-            container = dc;
+const injectable = function (container?: IContainer, lifecycle: lifecycles = lifecycles.singleton, type?: Type) {
+    let realContainer: IContainer;
+    if (container) {
+        realContainer = container;
+    }
+    else {
+        const defaultContainer = getDefaultContainer();
+        if (defaultContainer) {
+            realContainer = defaultContainer;
         }
         else {
             throw new Error("You must specify 'container' or has 'defaultContainer' registered.");
@@ -24,8 +28,7 @@ const injectable = function (container: IContainer, lifecycle: lifecycles = life
         }
 
         const propTypes = Reflect.getMetadata(`wt-injected-props`, target) || [];
-
-        container.registerType(type || target, target, lifecycle, paramTypes, propTypes);
+        realContainer.registerType(type || target, target, lifecycle, paramTypes, propTypes);
         return target;
     };
 };

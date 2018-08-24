@@ -3,10 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const i_container_1 = require("../i-container");
 const container_1 = require("../container");
 const inject = function (container, throwErrorUnregister = true, type, lazy = false) {
-    if (!container) {
-        const dc = container_1.getDefaultContainer();
-        if (dc) {
-            container = dc;
+    let realContainer;
+    if (container) {
+        realContainer = container;
+    }
+    else {
+        const defaultContainer = container_1.getDefaultContainer();
+        if (defaultContainer) {
+            realContainer = defaultContainer;
         }
         else {
             throw new Error("You must specify 'container' or has 'defaultContainer' registered.");
@@ -27,7 +31,7 @@ const inject = function (container, throwErrorUnregister = true, type, lazy = fa
                             return Reflect.getMetadata(`wt-lazy-inject-value`, target, key);
                         }
                         else {
-                            return container.resolve(propertyType);
+                            return realContainer.resolve(propertyType);
                         }
                     },
                     set: (value) => {
@@ -39,7 +43,7 @@ const inject = function (container, throwErrorUnregister = true, type, lazy = fa
                 // since this metadata will be retrieved in class decorator @injectable and it can only contact the `target.constructor`
                 // so in this case we should save metadata in `target.constructor` rather than `target`
                 const injectedProperties = Reflect.getMetadata(`wt-injected-props`, target.constructor) || [];
-                injectedProperties.push(new i_container_1.PropertyType(key, propertyType, container));
+                injectedProperties.push(new i_container_1.PropertyType(key, propertyType, realContainer));
                 Reflect.defineMetadata(`wt-injected-props`, injectedProperties, target.constructor);
             }
         }
@@ -52,7 +56,7 @@ const inject = function (container, throwErrorUnregister = true, type, lazy = fa
                 const injectedParamIndexes = Reflect.getMetadata(`wt:injected-params-indexes`, target) || [];
                 injectedParamIndexes.push({
                     index: parameterIndex,
-                    container: container,
+                    container: realContainer,
                     type: type
                 });
                 Reflect.defineMetadata(`wt:injected-params-indexes`, injectedParamIndexes, target);

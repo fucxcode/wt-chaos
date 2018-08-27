@@ -76,4 +76,3 @@ const trace = function (enabled = true, oidResolver, teamIdResolver, uidResolver
     };
 };
 exports.trace = trace;
-//# sourceMappingURL=trace-decorator.js.map

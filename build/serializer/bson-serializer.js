@@ -13,4 +13,3 @@ class BSONSerializer {
     }
 }
 exports.BSONSerializer = BSONSerializer;
-//# sourceMappingURL=bson-serializer.js.map

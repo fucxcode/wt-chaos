@@ -5,4 +5,3 @@ function __export(m) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./bson-serializer"));
 __export(require("./json-serializer"));
-//# sourceMappingURL=index.js.map

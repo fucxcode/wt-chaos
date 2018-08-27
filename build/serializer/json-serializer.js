@@ -9,4 +9,3 @@ class JSONSerializer {
     }
 }
 exports.JSONSerializer = JSONSerializer;
-//# sourceMappingURL=json-serializer.js.map

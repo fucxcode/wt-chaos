@@ -29,3 +29,4 @@ const injectable = function (container, lifecycle = i_container_1.lifecycles.sin
     };
 };
 exports.injectable = injectable;
+//# sourceMappingURL=injectable.js.map

@@ -14,4 +14,3 @@ export default class InProcessCache implements ICache {
     deleteByPattern(pattern: CacheKey): Promise<void>;
     clear(): Promise<void>;
 }
-//# sourceMappingURL=in-process-cache.d.ts.map

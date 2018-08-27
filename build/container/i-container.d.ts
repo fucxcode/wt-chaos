@@ -28,4 +28,3 @@ interface IContainer {
     resolve<T extends object>(type: Type, throwErrorUnregister?: boolean, ...params: any[]): T | undefined;
 }
 export { IContainer, lifecycles, Type, ParamType, PropertyType };
-//# sourceMappingURL=i-container.d.ts.map

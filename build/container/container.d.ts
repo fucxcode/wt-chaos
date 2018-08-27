@@ -7,4 +7,3 @@ declare const resolveContainer: (key: Symbol) => IContainer | undefined;
 declare const getDefaultContainer: () => IContainer | undefined;
 declare const setDefaultContainer: (key: Symbol) => void;
 export { registerContainer, unregisterContainer, clearContainers, resolveContainer, getDefaultContainer, setDefaultContainer };
-//# sourceMappingURL=container.d.ts.map

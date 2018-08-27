@@ -29,3 +29,4 @@ class WTError extends Error {
     }
 }
 exports.default = WTError;
+//# sourceMappingURL=wt-error.js.map

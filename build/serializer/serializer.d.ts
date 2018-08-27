@@ -3,4 +3,3 @@ interface Serializer<S> {
     deserialize<T>(buf?: S): T | undefined;
 }
 export { Serializer };
-//# sourceMappingURL=serializer.d.ts.map

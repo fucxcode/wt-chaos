@@ -111,3 +111,4 @@ class IORedisPipeline {
     }
 }
 exports.IORedisPipeline = IORedisPipeline;
+//# sourceMappingURL=ioredis.js.map

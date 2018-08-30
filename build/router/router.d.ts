@@ -11,6 +11,7 @@ interface RouterHandler<TContext extends Context<TState>, TState> {
 declare abstract class Router<TContext extends Context<TState>, TState> {
     private _prefix;
     readonly prefix: string;
+    abstract proxy: boolean;
     constructor(prefix?: string);
     use(handler: RouterMiddleware<TContext, TState>): void;
     protected abstract onUse(handler: RouterMiddleware<TContext, TState>): void;

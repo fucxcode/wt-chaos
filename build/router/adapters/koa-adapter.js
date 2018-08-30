@@ -15,6 +15,7 @@ const router_1 = require("../router");
 const koa_router_1 = __importDefault(require("koa-router"));
 const _ = __importStar(require("../../utilities"));
 const uuid = __importStar(require("node-uuid"));
+const koa_bodyparser_1 = __importDefault(require("koa-bodyparser"));
 class KoaContext extends context_1.Context {
     constructor(ctx, next) {
         super(() => ctx.state, ctx.req, ctx.res, next, () => {
@@ -24,6 +25,18 @@ class KoaContext extends context_1.Context {
             return ctx.state.oid;
         });
         this._ctx = ctx;
+    }
+    get headers() {
+        return this._ctx.headers;
+    }
+    get query() {
+        return this._ctx.query;
+    }
+    get params() {
+        return this._ctx.params;
+    }
+    get body() {
+        return this._ctx.request.body;
     }
     json(data) {
         this._ctx.body = data;
@@ -35,9 +48,16 @@ class KoaRouter extends router_1.Router {
     constructor(app, prefix) {
         super(prefix);
         this._app = app;
+        this._app.use(koa_bodyparser_1.default());
         this._router = new koa_router_1.default();
         this._app.use(this._router.routes());
         this._app.use(this._router.allowedMethods());
+    }
+    get proxy() {
+        return this._app.proxy;
+    }
+    set proxy(value) {
+        this._app.proxy = value;
     }
     onUse(handler) {
         this._router.use(async (ctx, next) => {

@@ -4,6 +4,8 @@ import Koa from "koa";
 import KoaRouterRaw from "koa-router";
 import * as _ from "../../utilities";
 import * as uuid from "node-uuid";
+import { IncomingHttpHeaders } from "http";
+import bodyParser from "koa-bodyparser";
 
 class KoaContext<T> extends Context<T> {
 
@@ -18,6 +20,22 @@ class KoaContext<T> extends Context<T> {
         });
         this._ctx = ctx;
     }
+
+    public get headers(): IncomingHttpHeaders {
+        return this._ctx.headers;
+    }
+
+    public get query(): any {
+        return this._ctx.query;
+    }
+
+    public get params(): any {
+        return this._ctx.params;
+    }
+
+    public get body(): any {
+        return this._ctx.request.body;
+    }
     
     public json(data: any): KoaContext<T> {
         this._ctx.body = data;
@@ -31,9 +49,19 @@ class KoaRouter<T> extends Router<KoaContext<T>, T> {
 
     private _router: KoaRouterRaw;
 
+    public get proxy(): boolean {
+        return this._app.proxy;
+    }
+
+    public set proxy(value: boolean) {
+        this._app.proxy = value;
+    }
+
     constructor(app: Koa, prefix?: string) {
         super(prefix);
         this._app = app;
+        this._app.use(bodyParser());
+
         this._router = new KoaRouterRaw();
         this._app.use(this._router.routes());
         this._app.use(this._router.allowedMethods());

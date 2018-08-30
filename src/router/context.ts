@@ -1,7 +1,8 @@
-import http, { ServerResponse } from "http";
+import http, { ServerResponse, IncomingHttpHeaders } from "http";
 import * as uuid from "node-uuid";
 import { INextFunction } from "./router";
 import * as _ from "../utilities";
+import { ISomeObject } from "../constants";
 
 abstract class Context<T> {
 
@@ -38,6 +39,14 @@ abstract class Context<T> {
         this._response = response;
         this._next = next;
     }
+
+    public abstract get headers(): IncomingHttpHeaders;
+
+    public abstract get query(): any;
+
+    public abstract get params(): any;
+
+    public abstract get body(): any;
 
     public abstract json(data: any): Context<T>;
 

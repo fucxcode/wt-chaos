@@ -12,11 +12,13 @@ class State {
 
 }
 
-// const app = express();
-// const router: Router<ExpressContext<State>, State> = new ExpressRouter(app, "/api");
+const app = express();
+const router: Router<ExpressContext<State>, State> = new ExpressRouter(app, "/api");
 
-const app = new Koa();
-const router: Router<KoaContext<State>, State> = new KoaRouter(app, "/api");
+// const app = new Koa();
+// const router: Router<KoaContext<State>, State> = new KoaRouter(app, "/api");
+
+router.proxy = true;
 
 // router.use(async ctx => {
 //     console.log(`${Date.now()} in middleware1`);
@@ -62,15 +64,13 @@ router.route(`GET`, `/user`,
     },
 );
 
-// router.route(`POST`, `/user`, async ctx => {
-    // console.log(`${Date.now()} in handler`);
-    // await _.wait(2000);
-    // await ctx.json({
-    //     code: "OK"
-    // });
-    // await _.wait(2000);
-    // console.log(`${Date.now()} out handler`);
-// });
+router.route(`POST`, `/user`, async ctx => {
+    console.log(`${Date.now()} in handler`);
+    await _.wait(2000);
+    await ctx.json(ctx.body);
+    await _.wait(2000);
+    console.log(`${Date.now()} out handler`);
+});
 
 app.listen(22222, () => {
     console.log(`ready`);

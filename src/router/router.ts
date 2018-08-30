@@ -26,6 +26,9 @@ abstract class Router<TContext extends Context<TState>, TState> {
         return this._prefix;
     }
 
+    public abstract get proxy(): boolean;
+    public abstract set proxy(value: boolean);
+
     constructor(prefix: string = "") {
         this._prefix = prefix;
     }

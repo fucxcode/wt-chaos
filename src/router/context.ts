@@ -31,15 +31,15 @@ abstract class Context<T> {
         return this._next || Promise.resolve;
     }
 
-    constructor(state: T, request?: http.IncomingMessage, response?: http.ServerResponse, next?: INextFunction, oidResolver: () => string = uuid.v4) {
+    constructor(stateResolver: () => T, request?: http.IncomingMessage, response?: http.ServerResponse, next?: INextFunction, oidResolver: () => string = uuid.v4) {
         this._oid = oidResolver();
-        this._state = state;
+        this._state = stateResolver();
         this._request = request;
         this._response = response;
         this._next = next;
     }
 
-    public abstract async json(data: any): Promise<void>;
+    public abstract json(data: any): Context<T>;
 
 }
 

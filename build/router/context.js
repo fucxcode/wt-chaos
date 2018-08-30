@@ -9,9 +9,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const uuid = __importStar(require("node-uuid"));
 class Context {
-    constructor(state, request, response, next, oidResolver = uuid.v4) {
+    constructor(stateResolver, request, response, next, oidResolver = uuid.v4) {
         this._oid = oidResolver();
-        this._state = state;
+        this._state = stateResolver();
         this._request = request;
         this._response = response;
         this._next = next;

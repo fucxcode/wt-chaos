@@ -18,8 +18,8 @@ class Router {
     use(handler) {
         this.onUse(handler);
     }
-    route(method, path, handler) {
-        this.onRoute(method, $path.join(this._prefix, path), handler);
+    route(method, path, ...handlers) {
+        this.onRoute(method, $path.join(this._prefix, path), ...handlers);
     }
 }
 exports.Router = Router;

@@ -12,7 +12,7 @@ declare abstract class Context<T> {
     readonly response: http.ServerResponse | undefined;
     private _next?;
     readonly next: INextFunction;
-    constructor(state: T, request?: http.IncomingMessage, response?: http.ServerResponse, next?: INextFunction, oidResolver?: () => string);
-    abstract json(data: any): Promise<void>;
+    constructor(stateResolver: () => T, request?: http.IncomingMessage, response?: http.ServerResponse, next?: INextFunction, oidResolver?: () => string);
+    abstract json(data: any): Context<T>;
 }
 export { Context };

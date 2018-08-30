@@ -6,13 +6,15 @@ interface ExpressRequest extends express.Request {
     state?: any;
 }
 declare class ExpressContext<T> extends Context<T> {
+    private _req;
+    private _res;
     constructor(request: ExpressRequest, response: express.Response, next?: express.NextFunction);
-    json(data: any): Promise<void>;
+    json(data: any): ExpressContext<T>;
 }
 declare class ExpressRouter<T> extends Router<ExpressContext<T>, T> {
     private _app;
     constructor(app: express.Express, prefix?: string);
     onUse(handler: RouterMiddleware<ExpressContext<T>, T>): void;
-    onRoute(method: string, path: string | RegExp, handler: RouterHandler<ExpressContext<T>, T>): void;
+    onRoute(method: string, path: string | RegExp, ...handlers: RouterHandler<ExpressContext<T>, T>[]): void;
 }
 export { ExpressContext, ExpressRouter };

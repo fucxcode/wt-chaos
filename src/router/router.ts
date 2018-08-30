@@ -36,11 +36,11 @@ abstract class Router<TContext extends Context<TState>, TState> {
 
     protected abstract onUse(handler: RouterMiddleware<TContext, TState>): void;
 
-    public route(method: string, path: string, handler: RouterHandler<TContext, TState>): void {
-        this.onRoute(method, $path.join(this._prefix, path), handler);
+    public route(method: string, path: string, ...handlers: RouterHandler<TContext, TState>[]): void {
+        this.onRoute(method, $path.join(this._prefix, path), ...handlers);
     }
 
-    protected abstract onRoute(method: string, path: string, handler: RouterHandler<TContext, TState>): void;
+    protected abstract onRoute(method: string, path: string, ...handlers: RouterHandler<TContext, TState>[]): void;
 
 }
 

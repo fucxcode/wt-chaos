@@ -14,8 +14,17 @@ interface ExpressRequest extends express.Request {
 
 class ExpressContext<T> extends Context<T> {
 
+    private _req: ExpressRequest;
+
+    private _res: express.Response;
+
     constructor(request: ExpressRequest, response: express.Response, next?: express.NextFunction) {
-        super(_.assign({}, request.state), request, response, (error?: any) => {
+        super(() => {
+            if (!request.state) {
+                request.state = {};
+            }
+            return request.state;
+        }, request, response, (error?: any) => {
             if (next) {
                 return new Promise<void>((resolve, reject) => {
                     if (error) {
@@ -34,18 +43,18 @@ class ExpressContext<T> extends Context<T> {
             }
             // return Promise.resolve(next && next(error));
         }, () => {
-            let oid = request.oid;
-            if (_.isNilOrWriteSpaces(oid)) {
-                oid = uuid.v4();
-                request.oid = oid;
+            if (!request.oid) {
+                request.oid = uuid.v4();
             }
-            return oid as string;
+            return request.oid;
         });
+        this._req = request;
+        this._res = response;
     }
 
-    public async json(data: any): Promise<void> {
-        const res = this.response as express.Response;
-        await res.json(data);
+    public json(data: any): ExpressContext<T> {
+        this._res.json(data);
+        return this;
     }
 
 }
@@ -65,11 +74,17 @@ class ExpressRouter<T> extends Router<ExpressContext<T>, T> {
         }));
     }
 
-    public onRoute(method: string, path: string | RegExp, handler: RouterHandler<ExpressContext<T>, T>): void {
+    public onRoute(method: string, path: string | RegExp, ...handlers: RouterHandler<ExpressContext<T>, T>[]): void {
         const fn = (this._app as any)[method.toLowerCase()] as Function;
         if (_.isFunction(fn)) {
-            fn.call(this._app, path, _.asyncify((req: ExpressRequest, res: express.Response) => {
-                handler(new ExpressContext<T>(req, res));
+            fn.call(this._app, path, ..._.map(handlers, handler => {
+                return (req: ExpressRequest, res: express.Response, next: express.NextFunction) => {
+                    Promise.resolve(handler(new ExpressContext<T>(req, res, next))).then(() => {
+                        next();
+                    }).catch(error => {
+                        next(error);
+                    });
+                };
             }));
         }
         else {

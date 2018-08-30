@@ -17,18 +17,17 @@ const _ = __importStar(require("../../utilities"));
 const uuid = __importStar(require("node-uuid"));
 class KoaContext extends context_1.Context {
     constructor(ctx, next) {
-        super(ctx.state, ctx.req, ctx.res, next, () => {
-            let oid = ctx.state.oid;
-            if (_.isNilOrWriteSpaces(oid)) {
-                oid = uuid.v4();
-                ctx.state.oid = oid;
+        super(() => ctx.state, ctx.req, ctx.res, next, () => {
+            if (!ctx.state.oid) {
+                ctx.state.oid = uuid.v4();
             }
-            return oid;
+            return ctx.state.oid;
         });
         this._ctx = ctx;
     }
-    async json(data) {
+    json(data) {
         this._ctx.body = data;
+        return this;
     }
 }
 exports.KoaContext = KoaContext;
@@ -45,12 +44,16 @@ class KoaRouter extends router_1.Router {
             await handler(new KoaContext(ctx, next));
         });
     }
-    onRoute(method, path, handler) {
+    onRoute(method, path, ...handlers) {
         const fn = this._router[method.toLowerCase()];
         if (_.isFunction(fn)) {
-            fn.call(this._router, path, async (ctx) => {
-                await handler(new KoaContext(ctx));
-            });
+            fn.call(this._router, path, ..._.map(handlers, handler => {
+                return async (ctx, next) => {
+                    await handler(new KoaContext(ctx, next));
+                    // in koa we MUST invoke `await next()` regardless if multiple handlers registered
+                    await next();
+                };
+            }));
         }
         else {
             throw new Error(`Koa does not support method "${method}"`);

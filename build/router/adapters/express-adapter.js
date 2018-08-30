@@ -13,7 +13,12 @@ const _ = __importStar(require("../../utilities"));
 const uuid = __importStar(require("node-uuid"));
 class ExpressContext extends context_1.Context {
     constructor(request, response, next) {
-        super(_.assign({}, request.state), request, response, (error) => {
+        super(() => {
+            if (!request.state) {
+                request.state = {};
+            }
+            return request.state;
+        }, request, response, (error) => {
             if (next) {
                 return new Promise((resolve, reject) => {
                     if (error) {
@@ -32,17 +37,17 @@ class ExpressContext extends context_1.Context {
             }
             // return Promise.resolve(next && next(error));
         }, () => {
-            let oid = request.oid;
-            if (_.isNilOrWriteSpaces(oid)) {
-                oid = uuid.v4();
-                request.oid = oid;
+            if (!request.oid) {
+                request.oid = uuid.v4();
             }
-            return oid;
+            return request.oid;
         });
+        this._req = request;
+        this._res = response;
     }
-    async json(data) {
-        const res = this.response;
-        await res.json(data);
+    json(data) {
+        this._res.json(data);
+        return this;
     }
 }
 exports.ExpressContext = ExpressContext;
@@ -56,11 +61,17 @@ class ExpressRouter extends router_1.Router {
             handler(new ExpressContext(req, res, next));
         }));
     }
-    onRoute(method, path, handler) {
+    onRoute(method, path, ...handlers) {
         const fn = this._app[method.toLowerCase()];
         if (_.isFunction(fn)) {
-            fn.call(this._app, path, _.asyncify((req, res) => {
-                handler(new ExpressContext(req, res));
+            fn.call(this._app, path, ..._.map(handlers, handler => {
+                return (req, res, next) => {
+                    Promise.resolve(handler(new ExpressContext(req, res, next))).then(() => {
+                        next();
+                    }).catch(error => {
+                        next(error);
+                    });
+                };
             }));
         }
         else {

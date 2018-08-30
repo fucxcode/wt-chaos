@@ -18,7 +18,7 @@ export function isNil(value: any): boolean {
     return _.isNull(value) || _.isUndefined(value);
 }
 
-export function isNilOrWriteSpaces(value: string): boolean {
+export function isNilOrWriteSpaces(value: any): boolean {
     return isNil(value) || _.trim(value) === ``;
 }
 
@@ -283,6 +283,10 @@ export function parseObjectId(id?: ObjectID | null | undefined, createIfNil: boo
         }
     }
     return objectId;
+}
+
+export function asyncify(fn: (...args: any[]) => any): (...args: any[]) => Promise<any> {
+    return (...args: any[]): Promise<any> => Promise.resolve(fn(...args));
 }
 
 export * from "./lodash-wrapper";

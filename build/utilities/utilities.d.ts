@@ -3,7 +3,7 @@ import { ObjectID, Projection, ObjectOrId } from "../constants";
 import * as mongodb from "mongodb";
 export declare function wait(milliseconds: number): Promise<void>;
 export declare function isNil(value: any): boolean;
-export declare function isNilOrWriteSpaces(value: string): boolean;
+export declare function isNilOrWriteSpaces(value: any): boolean;
 export declare function findEnumByValue(enums: any, value: any): {
     key: string;
     value: any;
@@ -34,4 +34,5 @@ export declare function tryParseObjectId(id?: ObjectID | null | undefined, creat
  * the 3rd argument `objectIdCreator` should NOT be specified unless in unit test
  */
 export declare function parseObjectId(id?: ObjectID | null | undefined, createIfNil?: boolean, objectIdCreator?: (id?: string | number | mongodb.ObjectId) => mongodb.ObjectId): mongodb.ObjectId | null | undefined;
+export declare function asyncify(fn: (...args: any[]) => any): (...args: any[]) => Promise<any>;
 export * from "./lodash-wrapper";

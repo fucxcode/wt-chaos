@@ -5,6 +5,7 @@ import * as container from "./container";
 import * as cache from "./cache";
 import * as redis from "./redis";
 import * as serializer from "./serializer";
+import * as router from "./router";
 
 export {
     _,
@@ -15,6 +16,7 @@ export {
     WTErrorResponse,
     code,
     redis,
-    serializer
+    serializer,
+    router
 };
 

@@ -22,4 +22,6 @@ const redis = __importStar(require("./redis"));
 exports.redis = redis;
 const serializer = __importStar(require("./serializer"));
 exports.serializer = serializer;
+const router = __importStar(require("./router"));
+exports.router = router;
 //# sourceMappingURL=index.js.map

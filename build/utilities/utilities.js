@@ -296,5 +296,9 @@ function parseObjectId(id, createIfNil = true, objectIdCreator = (id) => new mon
     return objectId;
 }
 exports.parseObjectId = parseObjectId;
+function asyncify(fn) {
+    return (...args) => Promise.resolve(fn(...args));
+}
+exports.asyncify = asyncify;
 __export(require("./lodash-wrapper"));
 //# sourceMappingURL=utilities.js.map

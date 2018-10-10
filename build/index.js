@@ -24,4 +24,6 @@ const serializer = __importStar(require("./serializer"));
 exports.serializer = serializer;
 const router = __importStar(require("./router"));
 exports.router = router;
+const repository = __importStar(require("./repository"));
+exports.repository = repository;
 //# sourceMappingURL=index.js.map

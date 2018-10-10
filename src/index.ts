@@ -6,6 +6,7 @@ import * as cache from "./cache";
 import * as redis from "./redis";
 import * as serializer from "./serializer";
 import * as router from "./router";
+import * as repository from "./repository";
 
 export {
     _,
@@ -17,6 +18,7 @@ export {
     code,
     redis,
     serializer,
-    router
+    router,
+    repository
 };
 

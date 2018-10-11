@@ -54,12 +54,12 @@ class MongoDBDriver implements Driver<MongoDBSession, MongoDBId> {
 
     private _maxOpTimeMs: number;
 
-    constructor(client: mongodb.MongoClient, databaseName: string, defaultOpTimeMs: number = 30_000 /* 30 seconds */, maxOpTimeMs: number = 120_000 /* 2 minutes */) {
+    constructor(client: mongodb.MongoClient, databaseName: string, defaultOpTimeMs: number = 5_000 /* 5 seconds */, maxOpTimeMs: number = 60_000 /* 1 minute */) {
         this._client = client;
         this._databaseName = databaseName;
         this._db = this._client.db(this._databaseName);
         this._defaultOpTimeMs = defaultOpTimeMs;
-        this._maxOpTimeMs = Math.max(defaultOpTimeMs, maxOpTimeMs);
+        this._maxOpTimeMs = maxOpTimeMs;
     }
 
     private calculateOpTimeMs(options?: {
@@ -111,11 +111,11 @@ class MongoDBDriver implements Driver<MongoDBSession, MongoDBId> {
         return entities;
     }
 
-    public async count(collectionName: string, condition: any, options?: CountOptions<MongoDBSession>): Promise<number> {
+    public async count(collectionName: string, condition: any | undefined, options?: CountOptions<MongoDBSession>): Promise<number> {
         return await this._db.collection(collectionName).countDocuments(condition, this.mergeOptions(options));
     }
 
-    public async find<T extends Entity>(collectionName: string, condition: any, options?: FindOptions<T, MongoDBSession>): Promise<Partial<T>[]> {
+    public async find<T extends Entity>(collectionName: string, condition: any | undefined, options?: FindOptions<T, MongoDBSession>): Promise<Partial<T>[]> {
         let cursor = this._db.collection<Partial<T>>(collectionName).find(condition);
         if (options && options.projection) {
             cursor = cursor.project(options.projection);

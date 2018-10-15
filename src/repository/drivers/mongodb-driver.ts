@@ -62,15 +62,6 @@ class MongoDBDriver implements Driver<MongoDBSession, MongoDBId> {
         this._maxOpTimeMs = maxOpTimeMs;
     }
 
-    private calculateOpTimeMs(options?: {
-        maxTimeMS?: number
-    }) {
-        const opTimeMs = (options && options.maxTimeMS) ?
-            options.maxTimeMS :
-            this._defaultOpTimeMs;
-        return Math.min(opTimeMs, this._maxOpTimeMs);
-    }
-
     private mergeOptions<TOptions extends MaxTimeMsOptions & SessionOptions<MongoDBSession>>(options?: TOptions): {
         maxTimeMS: number,
         session?: mongodb.ClientSession
@@ -166,9 +157,6 @@ class MongoDBDriver implements Driver<MongoDBSession, MongoDBId> {
     }
 
     public async findOneAndUpdate<T extends Entity>(collectionName: string, condition: any, update: any, options?: FindOneAndUpdateOptions<T, MongoDBSession>): Promise<Partial<T> | undefined> {
-        options = _.assign({}, options, {
-            maxTimeMS: this.calculateOpTimeMs(options)
-        });
         const result = await this._db.collection<Partial<T>>(collectionName).findOneAndUpdate(condition, update, this.mergeOptions(options));
         return result.value;
     }

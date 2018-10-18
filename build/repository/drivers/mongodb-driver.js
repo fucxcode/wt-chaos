@@ -26,18 +26,12 @@ class MongoDBDriver {
     get databaseName() {
         return this._databaseName;
     }
-    constructor(client, databaseName, defaultOpTimeMs = 30000 /* 30 seconds */, maxOpTimeMs = 120000 /* 2 minutes */) {
+    constructor(client, databaseName, defaultOpTimeMs = 5000 /* 5 seconds */, maxOpTimeMs = 60000 /* 1 minute */) {
         this._client = client;
         this._databaseName = databaseName;
         this._db = this._client.db(this._databaseName);
         this._defaultOpTimeMs = defaultOpTimeMs;
-        this._maxOpTimeMs = Math.max(defaultOpTimeMs, maxOpTimeMs);
-    }
-    calculateOpTimeMs(options) {
-        const opTimeMs = (options && options.maxTimeMS) ?
-            options.maxTimeMS :
-            this._defaultOpTimeMs;
-        return Math.min(opTimeMs, this._maxOpTimeMs);
+        this._maxOpTimeMs = maxOpTimeMs;
     }
     mergeOptions(options) {
         const result = _.assign({}, options);
@@ -118,9 +112,6 @@ class MongoDBDriver {
         }, result.result);
     }
     async findOneAndUpdate(collectionName, condition, update, options) {
-        options = _.assign({}, options, {
-            maxTimeMS: this.calculateOpTimeMs(options)
-        });
         const result = await this._db.collection(collectionName).findOneAndUpdate(condition, update, this.mergeOptions(options));
         return result.value;
     }

@@ -1,2 +1,5 @@
 export * from "./redis";
-export * from "./ioredis";
+export * from "./redis-base";
+export * from "./redis-standalone";
+export * from "./redis-sentinel";
+export * from "./redis-cluster";

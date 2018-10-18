@@ -1,5 +1,5 @@
 declare class CacheKey {
-    static readonly wildcard: string;
+    static readonly wildcard = "*";
     private _team;
     readonly team: string;
     private _collectionName;

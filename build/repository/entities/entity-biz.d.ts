@@ -11,8 +11,8 @@ export interface BusinessEntity extends Entity {
     deleted_at?: Timestamp;
     deleted_by?: UID;
     deleted_op?: number;
-    is_archived: is;
-    archived_at: Timestamp;
-    archived_by: UID;
-    archived_op: number;
+    is_archived?: is;
+    archived_at?: Timestamp;
+    archived_by?: UID;
+    archived_op?: number;
 }

@@ -1,36 +1,27 @@
 import { Redis, Pipeline, ScanOptions } from "./redis";
-import * as ioredis from "ioredis";
+import IORedis from "ioredis";
 import { is } from "../constants";
 import * as _ from "../utilities";
+import { RedisHelper } from "./helper";
+import { Omit } from "lodash";
 
-class RedisHelpers {
+abstract class RedisBase implements Redis {
 
-    public static convertKeyValuePairsToFirstRest(keyValuePairs: [string, any][]): {
-        first: [string, any],
-        rest: any[]
-    } | undefined {
-        if (_.some(keyValuePairs)) {
-            const first = _.first(keyValuePairs) as [string, any];
-            const rest = _.chain(keyValuePairs)
-                .tail()
-                .map(x => [x["0"], x["1"]])
-                .flatten()
-                .valueOf();
-            return {
-                first: first,
-                rest: rest
-            };
-        }
+    private _redis: IORedis.Redis;
+    protected get redis(): IORedis.Redis {
+        return this._redis;
     }
-}
 
-class IORedis implements Redis {
-
-    private _redis: ioredis.Redis;
-
-
-    constructor(redis: ioredis.Redis) {
+    constructor(redis: IORedis.Redis) {
         this._redis = redis;
+    }
+
+    public async ping(): Promise<string> {
+        return await this._redis.ping();
+    }
+
+    public disconnect(): void {
+        this._redis.disconnect();
     }
 
     public async getBuffer(key: string): Promise<Buffer> {
@@ -53,7 +44,7 @@ class IORedis implements Redis {
     }
 
     public async mset(...keyValuePairs: [string, any][]): Promise<string> {
-        const result = RedisHelpers.convertKeyValuePairsToFirstRest(keyValuePairs);
+        const result = RedisHelper.convertKeyValuePairsToFirstRest(keyValuePairs);
         if (result) {
             return await this._redis.mset(result.first["0"], result.first["1"], ...result.rest);
         }
@@ -70,10 +61,10 @@ class IORedis implements Redis {
         return this._redis.scanStream(options);
     }
 
-    public scan(options?: ScanOptions): Promise<string[]> {
+    protected static scanInternal(redis: IORedis.Redis, options?: ScanOptions): Promise<string[]> {
         return new Promise<string[]>((resolve, reject) => {
             const keys: string[] = [];
-            const stream = this.scanStream(options);
+            const stream = redis.scanStream(options);
             stream.on("data", (data: string[]) => {
                 for (const key of data) {
                     keys.push(key);
@@ -88,12 +79,20 @@ class IORedis implements Redis {
         });
     }
 
+    public async scan(options?: ScanOptions): Promise<string[]> {
+        return RedisBase.scanInternal(this._redis, options);
+    }
+
+    protected static async clearInternal(redis: IORedis.Redis): Promise<string> {
+        return await redis.flushall();
+    }
+
     public async clear(): Promise<string> {
-        return await this._redis.flushall();
+        return await RedisBase.clearInternal(this._redis);
     }
 
     public multi(): Pipeline {
-        return new IORedisPipeline(this._redis.multi());
+        return new RedisPipeline(this._redis.multi());
     }
 
     public async sadd(key: string, ...members: any[]): Promise<number> {
@@ -109,11 +108,11 @@ class IORedis implements Redis {
     }
 }
 
-class IORedisPipeline implements Pipeline {
+class RedisPipeline implements Pipeline {
 
-    private _multi: ioredis.Pipeline;
+    private _multi: IORedis.Pipeline;
 
-    constructor(multi: ioredis.Pipeline) {
+    constructor(multi: IORedis.Pipeline) {
         this._multi = multi;
     }
 
@@ -123,7 +122,7 @@ class IORedisPipeline implements Pipeline {
     }
     
     public mset(...keyValuePairs: [string, any][]): void {
-        const result = RedisHelpers.convertKeyValuePairsToFirstRest(keyValuePairs);
+        const result = RedisHelper.convertKeyValuePairsToFirstRest(keyValuePairs);
         if (result) {
             this._multi.mset(result.first["0"], result.first["1"], ...result.rest);
         }
@@ -136,4 +135,4 @@ class IORedisPipeline implements Pipeline {
 
 }
 
-export { IORedis, IORedisPipeline, RedisHelpers };
+export { RedisBase, RedisPipeline, };

@@ -342,3 +342,7 @@ export function fromPairs<T>(value: Array<[string, T]>): Dictionary<T> {
 export function isEqual(value: any, other: any): boolean {
     return _.isEqual(value, other);
 }
+
+export function chunk<T>(arr?: T[], size?: number): T[][] {
+    return _.chunk<T>(arr, size);
+}

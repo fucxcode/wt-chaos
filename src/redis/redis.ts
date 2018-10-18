@@ -7,6 +7,10 @@ type ScanOptions = {
 
 interface Redis {
 
+    ping(): Promise<string>;
+
+    disconnect(): void;
+
     getBuffer(key: string): Promise<Buffer>;
 
     pexpire(key: string, milliseconds: number): Promise<is>;

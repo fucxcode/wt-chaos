@@ -27,13 +27,12 @@ declare class MongoDBDriver implements Driver<MongoDBSession, MongoDBId> {
     private _defaultOpTimeMs;
     private _maxOpTimeMs;
     constructor(client: mongodb.MongoClient, databaseName: string, defaultOpTimeMs?: number, maxOpTimeMs?: number);
-    private calculateOpTimeMs;
     private mergeOptions;
     parseId(id?: Id): MongoDBId;
     insertOne<T extends Entity>(collectionName: string, entity: T, options?: InsertOneOptions<MongoDBSession>): Promise<Partial<T>>;
     insertMany<T extends Entity>(collectionName: string, entities: T[], options?: InsertManyOptions<MongoDBSession>): Promise<Partial<T>[]>;
-    count(collectionName: string, condition: any, options?: CountOptions<MongoDBSession>): Promise<number>;
-    find<T extends Entity>(collectionName: string, condition: any, options?: FindOptions<T, MongoDBSession>): Promise<Partial<T>[]>;
+    count(collectionName: string, condition: any | undefined, options?: CountOptions<MongoDBSession>): Promise<number>;
+    find<T extends Entity>(collectionName: string, condition: any | undefined, options?: FindOptions<T, MongoDBSession>): Promise<Partial<T>[]>;
     updateOne(collectionName: string, condition: any, update: any, options?: UpdateOptions<MongoDBSession>): Promise<UpdateResult>;
     updateMany(collectionName: string, condition: any, update: any, options?: UpdateOptions<MongoDBSession>): Promise<UpdateResult>;
     deleteOne(collectionName: string, condition: any, options?: DeleteOptions<MongoDBSession>): Promise<DeleteResult>;

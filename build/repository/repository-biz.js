@@ -85,6 +85,17 @@ class BusinessRepository extends repository_1.Repository {
         condition = this.combineCondition(condition, operationDescription.team, options);
         return await super.onFind(operationDescription, condition, options);
     }
+    removeTeamPropertyInUpdate(update) {
+        if (update.team) {
+            delete update.team;
+        }
+        if (update.$set && update.$set.team) {
+            delete update.$set.team;
+        }
+        if (update.$unset && update.$unset.team) {
+            delete update.$unset.team;
+        }
+    }
     async onUpdate(operationDescription, condition, update, multi = false, options) {
         if (!operationDescription.team) {
             throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke onUpdate when operationDescription.team is nil", undefined, operationDescription);
@@ -102,6 +113,7 @@ class BusinessRepository extends repository_1.Repository {
             updated_at: now,
             updated_by: uid
         });
+        this.removeTeamPropertyInUpdate(update);
         return await super.onUpdate(operationDescription, condition, update, multi, options);
     }
     async onErase(context, multi) {
@@ -130,7 +142,27 @@ class BusinessRepository extends repository_1.Repository {
             updated_at: now,
             updated_by: uid
         });
+        this.removeTeamPropertyInUpdate(update);
         return await super.onFindOneAndUpdate(operationDescription, condition, update, options);
+    }
+    getDeleteConditionAndUpdate(team, uid, deletedOp, condition) {
+        const now = moment_1.default().unix();
+        return {
+            c: _.assign({}, condition, {
+                team: team,
+                is_deleted: {
+                    $ne: constants_1.is.yes
+                }
+            }),
+            u: {
+                is_deleted: constants_1.is.yes,
+                deleted_by: uid,
+                deleted_at: now,
+                deleted_op: deletedOp,
+                updated_by: uid,
+                updated_at: now
+            }
+        };
     }
     async delete(operationDescription, deletedOp, condition, multi = false, options) {
         if (!operationDescription.team) {
@@ -139,24 +171,49 @@ class BusinessRepository extends repository_1.Repository {
         if (!operationDescription.uid) {
             throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke delete when operationDescription.uid is nil", undefined, operationDescription);
         }
-        const team = operationDescription.team;
-        const uid = operationDescription.uid;
+        const { c, u } = this.getDeleteConditionAndUpdate(operationDescription.team, operationDescription.uid, deletedOp, condition);
+        return await this.update(operationDescription, c, u, multi, options);
+    }
+    async deleteById(operationDescription, id, deletedOp, condition, options) {
+        if (!operationDescription.team) {
+            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke deleteById when operationDescription.team is nil", undefined, operationDescription);
+        }
+        if (!operationDescription.uid) {
+            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke deleteById when operationDescription.uid is nil", undefined, operationDescription);
+        }
+        const { c, u } = this.getDeleteConditionAndUpdate(operationDescription.team, operationDescription.uid, deletedOp, condition);
+        return await this.updateById(operationDescription, id, c, u, options);
+    }
+    async deleteByIds(operationDescription, ids, deletedOp, condition, options) {
+        if (!operationDescription.team) {
+            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke deleteById when operationDescription.team is nil", undefined, operationDescription);
+        }
+        if (!operationDescription.uid) {
+            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke deleteById when operationDescription.uid is nil", undefined, operationDescription);
+        }
+        const { c, u } = this.getDeleteConditionAndUpdate(operationDescription.team, operationDescription.uid, deletedOp, condition);
+        return await this.updateByIds(operationDescription, ids, c, u, options);
+    }
+    getRestoreConditionAndUpdate(team, uid, condition) {
         const now = moment_1.default().unix();
-        condition = _.assign({}, condition, {
-            team: team,
-            is_deleted: {
-                $ne: constants_1.is.yes
+        return {
+            c: _.assign({}, condition, {
+                team: team,
+                is_deleted: constants_1.is.yes
+            }),
+            u: {
+                $set: {
+                    is_deleted: constants_1.is.no,
+                    updated_by: uid,
+                    updated_at: now
+                },
+                $unset: {
+                    deleted_by: 1,
+                    deleted_at: 1,
+                    deleted_op: 1,
+                }
             }
-        });
-        const update = {
-            is_deleted: constants_1.is.yes,
-            deleted_by: uid,
-            deleted_at: now,
-            deleted_op: deletedOp,
-            updated_by: uid,
-            updated_at: now
         };
-        return await this.update(operationDescription, condition, update, multi, options);
     }
     async restore(operationDescription, condition, multi = false, options) {
         if (!operationDescription.team) {
@@ -165,26 +222,47 @@ class BusinessRepository extends repository_1.Repository {
         if (!operationDescription.uid) {
             throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke restore when operationDescription.uid is nil", undefined, operationDescription);
         }
-        const team = operationDescription.team;
-        const uid = operationDescription.uid;
+        const { c, u } = this.getRestoreConditionAndUpdate(operationDescription.team, operationDescription.uid, condition);
+        return await this.update(operationDescription, c, u, multi, options);
+    }
+    async restoreById(operationDescription, id, condition, options) {
+        if (!operationDescription.team) {
+            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke restoreById when operationDescription.team is nil", undefined, operationDescription);
+        }
+        if (!operationDescription.uid) {
+            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke restoreById when operationDescription.uid is nil", undefined, operationDescription);
+        }
+        const { c, u } = this.getRestoreConditionAndUpdate(operationDescription.team, operationDescription.uid, condition);
+        return await this.updateById(operationDescription, id, c, u, options);
+    }
+    async restoreByIds(operationDescription, ids, condition, options) {
+        if (!operationDescription.team) {
+            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke restoreByIds when operationDescription.team is nil", undefined, operationDescription);
+        }
+        if (!operationDescription.uid) {
+            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke restoreByIds when operationDescription.uid is nil", undefined, operationDescription);
+        }
+        const { c, u } = this.getRestoreConditionAndUpdate(operationDescription.team, operationDescription.uid, condition);
+        return await this.updateById(operationDescription, ids, c, u, options);
+    }
+    getArchiveConditionAndUpdate(team, uid, archivedOp, condition) {
         const now = moment_1.default().unix();
-        condition = _.assign({}, condition, {
-            team: team,
-            is_deleted: constants_1.is.yes
-        });
-        const update = {
-            $set: {
-                is_deleted: constants_1.is.no,
+        return {
+            c: _.assign({}, condition, {
+                team: team,
+                is_archived: {
+                    $ne: constants_1.is.yes
+                }
+            }),
+            u: {
+                is_archived: constants_1.is.yes,
+                archived_by: uid,
+                archived_at: now,
+                archived_op: archivedOp,
                 updated_by: uid,
                 updated_at: now
-            },
-            $unset: {
-                deleted_by: 1,
-                deleted_at: 1,
-                deleted_op: 1,
             }
         };
-        return await this.update(operationDescription, condition, update, multi, options);
     }
     async archive(operationDescription, archivedOp, condition, multi = false, options) {
         if (!operationDescription.team) {
@@ -193,24 +271,49 @@ class BusinessRepository extends repository_1.Repository {
         if (!operationDescription.uid) {
             throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke archive when operationDescription.uid is nil", undefined, operationDescription);
         }
-        const team = operationDescription.team;
-        const uid = operationDescription.uid;
+        const { c, u } = this.getArchiveConditionAndUpdate(operationDescription.team, operationDescription.uid, archivedOp, condition);
+        return await this.update(operationDescription, c, u, multi, options);
+    }
+    async archiveById(operationDescription, id, archivedOp, condition, options) {
+        if (!operationDescription.team) {
+            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke archiveById when operationDescription.team is nil", undefined, operationDescription);
+        }
+        if (!operationDescription.uid) {
+            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke archiveById when operationDescription.uid is nil", undefined, operationDescription);
+        }
+        const { c, u } = this.getArchiveConditionAndUpdate(operationDescription.team, operationDescription.uid, archivedOp, condition);
+        return await this.updateById(operationDescription, id, c, u, options);
+    }
+    async archiveByIds(operationDescription, ids, archivedOp, condition, options) {
+        if (!operationDescription.team) {
+            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke archiveByIds when operationDescription.team is nil", undefined, operationDescription);
+        }
+        if (!operationDescription.uid) {
+            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke archiveByIds when operationDescription.uid is nil", undefined, operationDescription);
+        }
+        const { c, u } = this.getArchiveConditionAndUpdate(operationDescription.team, operationDescription.uid, archivedOp, condition);
+        return await this.updateByIds(operationDescription, ids, c, u, options);
+    }
+    getUnarchiveConditionAndUpdate(team, uid, condition) {
         const now = moment_1.default().unix();
-        condition = _.assign({}, condition, {
-            team: team,
-            is_archived: {
-                $ne: constants_1.is.yes
+        return {
+            c: _.assign({}, condition, {
+                team: team,
+                is_archived: constants_1.is.yes
+            }),
+            u: {
+                $set: {
+                    is_archived: constants_1.is.no,
+                    updated_by: uid,
+                    updated_at: now
+                },
+                $unset: {
+                    archived_by: 1,
+                    archived_at: 1,
+                    archived_op: 1,
+                }
             }
-        });
-        const update = {
-            is_archived: constants_1.is.yes,
-            archived_by: uid,
-            archived_at: now,
-            archived_op: archivedOp,
-            updated_by: uid,
-            updated_at: now
         };
-        return await this.update(operationDescription, condition, update, multi, options);
     }
     async unarchive(operationDescription, condition, multi = false, options) {
         if (!operationDescription.team) {
@@ -219,26 +322,28 @@ class BusinessRepository extends repository_1.Repository {
         if (!operationDescription.uid) {
             throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke unarchive when operationDescription.uid is nil", undefined, operationDescription);
         }
-        const team = operationDescription.team;
-        const uid = operationDescription.uid;
-        const now = moment_1.default().unix();
-        condition = _.assign({}, condition, {
-            team: team,
-            is_archived: constants_1.is.yes
-        });
-        const update = {
-            $set: {
-                is_archived: constants_1.is.no,
-                updated_by: uid,
-                updated_at: now
-            },
-            $unset: {
-                archived_by: 1,
-                archived_at: 1,
-                archived_op: 1,
-            }
-        };
-        return await this.update(operationDescription, condition, update, multi, options);
+        const { c, u } = this.getUnarchiveConditionAndUpdate(operationDescription.team, operationDescription.uid, condition);
+        return await this.update(operationDescription, c, u, multi, options);
+    }
+    async unarchiveById(operationDescription, id, condition, options) {
+        if (!operationDescription.team) {
+            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke unarchiveById when operationDescription.team is nil", undefined, operationDescription);
+        }
+        if (!operationDescription.uid) {
+            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke unarchiveById when operationDescription.uid is nil", undefined, operationDescription);
+        }
+        const { c, u } = this.getUnarchiveConditionAndUpdate(operationDescription.team, operationDescription.uid, condition);
+        return await this.updateById(operationDescription, id, c, u, options);
+    }
+    async unarchiveByIds(operationDescription, ids, condition, options) {
+        if (!operationDescription.team) {
+            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke unarchiveByIds when operationDescription.team is nil", undefined, operationDescription);
+        }
+        if (!operationDescription.uid) {
+            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke unarchiveByIds when operationDescription.uid is nil", undefined, operationDescription);
+        }
+        const { c, u } = this.getUnarchiveConditionAndUpdate(operationDescription.team, operationDescription.uid, condition);
+        return await this.updateByIds(operationDescription, ids, c, u, options);
     }
 }
 exports.BusinessRepository = BusinessRepository;

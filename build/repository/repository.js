@@ -159,7 +159,8 @@ class Repository {
                 })),
                 this.count(operationDescription, context.condition, {
                     hint: context.options.hint,
-                    readPreference: context.options.readPreference
+                    readPreference: context.options.readPreference,
+                    includes: context.options.includes
                 })
             ]);
             context.result = new find_by_page_index_result_1.FindByPageIndexResult(entities, context.pageIndex, context.pageSize, count);

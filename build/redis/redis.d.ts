@@ -6,6 +6,8 @@ declare type ScanOptions = {
     count?: number;
 };
 interface Redis {
+    ping(): Promise<string>;
+    disconnect(): void;
     getBuffer(key: string): Promise<Buffer>;
     pexpire(key: string, milliseconds: number): Promise<is>;
     mgetBuffer(...keys: string[]): Promise<Buffer[]>;

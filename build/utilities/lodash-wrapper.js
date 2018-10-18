@@ -274,4 +274,8 @@ function isEqual(value, other) {
     return lodash_1.default.isEqual(value, other);
 }
 exports.isEqual = isEqual;
+function chunk(arr, size) {
+    return lodash_1.default.chunk(arr, size);
+}
+exports.chunk = chunk;
 //# sourceMappingURL=lodash-wrapper.js.map

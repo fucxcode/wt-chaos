@@ -26,14 +26,15 @@ class MongoDBDriver {
     get databaseName() {
         return this._databaseName;
     }
-    constructor(client, databaseName, defaultOpTimeMs = 5000 /* 5 seconds */, maxOpTimeMs = 60000 /* 1 minute */) {
+    constructor(client, databaseName, defaultOpTimeMs = 5000 /* 5 seconds */, maxOpTimeMs = 60000 /* 1 minute */, readWriteStrategy) {
         this._client = client;
         this._databaseName = databaseName;
         this._db = this._client.db(this._databaseName);
         this._defaultOpTimeMs = defaultOpTimeMs;
         this._maxOpTimeMs = maxOpTimeMs;
+        this._readWriteStrategy = readWriteStrategy;
     }
-    mergeOptions(options) {
+    mergeOptions(options, readPreferenceResolver) {
         const result = _.assign({}, options);
         // calculate max time ms
         if (options && options.maxTimeMS) {
@@ -45,6 +46,10 @@ class MongoDBDriver {
         // merge session
         if (options && options.session) {
             result.session = options.session.session;
+        }
+        // merge read write strategy
+        if (!result.readPreference && this._readWriteStrategy) {
+            result.readPreference = readPreferenceResolver && readPreferenceResolver(this._readWriteStrategy);
         }
         return result;
     }
@@ -64,7 +69,7 @@ class MongoDBDriver {
         return entities;
     }
     async count(collectionName, condition, options) {
-        return await this._db.collection(collectionName).countDocuments(condition, this.mergeOptions(options));
+        return await this._db.collection(collectionName).countDocuments(condition, this.mergeOptions(options, strategy => strategy.findStrategy));
     }
     async find(collectionName, condition, options) {
         let cursor = this._db.collection(collectionName).find(condition);
@@ -83,10 +88,11 @@ class MongoDBDriver {
         if (options && options.hint) {
             cursor = cursor.hint(options.hint);
         }
-        if (options && options.readPreference) {
-            cursor = cursor.setReadPreference(options.readPreference);
+        const mergedOptions = this.mergeOptions(options, strategy => strategy.findStrategy);
+        cursor = cursor.maxTimeMS(mergedOptions.maxTimeMS);
+        if (mergedOptions.readPreference) {
+            cursor = cursor.setReadPreference(mergedOptions.readPreference);
         }
-        cursor = cursor.maxTimeMS(this.mergeOptions(options).maxTimeMS);
         // in current version of mongodb node.js driver there's no property we can specify `session` when perform `find`
         // but in case it might be added in the future we had added generic type argument in `FindOptions`
         return await cursor.toArray();
@@ -121,11 +127,11 @@ class MongoDBDriver {
             this._db.collection(collectionName).initializeUnorderedBulkOp();
     }
     async aggregate(collectionName, pipeline, options) {
-        const cursor = this._db.collection(collectionName).aggregate(pipeline, this.mergeOptions(options));
+        const cursor = this._db.collection(collectionName).aggregate(pipeline, this.mergeOptions(options, strategy => strategy.aggregateStrategy));
         return await cursor.toArray();
     }
     async mapReduce(collectionName, map, reduce, options) {
-        return await this._db.collection(collectionName).mapReduce(map, reduce, this.mergeOptions(options));
+        return await this._db.collection(collectionName).mapReduce(map, reduce, this.mergeOptions(options, strategy => strategy.mapReduceStrategy));
     }
     async beginTransaction(action, thisArg, auto = true) {
         const session = this._client.startSession();

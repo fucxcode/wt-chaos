@@ -11,55 +11,53 @@ const plugin_1 = require("./plugin");
 const drivers_1 = require("../drivers");
 const _ = __importStar(require("../../utilities"));
 class ReadWriteStrategyPlugin extends plugin_1.Plugin {
-    constructor(findStrategy, aggregateStrategy, mapReduceStrategy) {
+    constructor(strategy) {
         super("read-write-strategy");
-        this._findStrategy = findStrategy;
-        this._aggregateStrategy = aggregateStrategy;
-        this._mapReduceStrategy = mapReduceStrategy;
+        this._strategy = strategy;
     }
     async beforeCount(context) {
-        context.options = _.assign({}, context.options, {
-            readPreference: this._findStrategy
-        });
+        context.options = _.assign({}, {
+            readPreference: this._strategy.findStrategy
+        }, context.options);
     }
     async beforeFindOne(context) {
-        context.options = _.assign({}, context.options, {
-            readPreference: this._findStrategy
-        });
+        context.options = _.assign({}, {
+            readPreference: this._strategy.findStrategy
+        }, context.options);
     }
     async beforeFindOneById(context) {
-        context.options = _.assign({}, context.options, {
-            readPreference: this._findStrategy
-        });
+        context.options = _.assign({}, {
+            readPreference: this._strategy.findStrategy
+        }, context.options);
     }
     async beforeFindByIds(context) {
-        context.options = _.assign({}, context.options, {
-            readPreference: this._findStrategy
-        });
+        context.options = _.assign({}, {
+            readPreference: this._strategy.findStrategy
+        }, context.options);
     }
     async beforeFindByPageIndex(context) {
-        context.options = _.assign({}, context.options, {
-            readPreference: this._findStrategy
-        });
+        context.options = _.assign({}, {
+            readPreference: this._strategy.findStrategy
+        }, context.options);
     }
     async beforeFindByPageNext(context) {
-        context.options = _.assign({}, context.options, {
-            readPreference: this._findStrategy
-        });
+        context.options = _.assign({}, {
+            readPreference: this._strategy.findStrategy
+        }, context.options);
     }
     async beforeAggregate(context) {
-        context.options = _.assign({}, context.options, {
-            readPreference: this._aggregateStrategy
-        });
+        context.options = _.assign({}, {
+            readPreference: this._strategy.aggregateStrategy
+        }, context.options);
     }
     async beforeMapReduce(context) {
-        context.options = _.assign({}, context.options, {
-            readPreference: this._mapReduceStrategy
-        });
+        context.options = _.assign({}, {
+            readPreference: this._strategy.mapReduceStrategy
+        }, context.options);
     }
 }
-ReadWriteStrategyPlugin.PRIMARY = new ReadWriteStrategyPlugin(drivers_1.ReadPreference.primary, drivers_1.ReadPreference.primary, drivers_1.ReadPreference.primary);
-ReadWriteStrategyPlugin.READ_SECONDARY = new ReadWriteStrategyPlugin(drivers_1.ReadPreference.secondaryPreferred, drivers_1.ReadPreference.secondary, drivers_1.ReadPreference.secondary);
-ReadWriteStrategyPlugin.AGGREGATE_SECONDARY = new ReadWriteStrategyPlugin(drivers_1.ReadPreference.primary, drivers_1.ReadPreference.secondary, drivers_1.ReadPreference.secondary);
+ReadWriteStrategyPlugin.PRIMARY = new ReadWriteStrategyPlugin(drivers_1.ReadWriteStrategy.PRIMARY);
+ReadWriteStrategyPlugin.READ_SECONDARY = new ReadWriteStrategyPlugin(drivers_1.ReadWriteStrategy.READ_SECONDARY);
+ReadWriteStrategyPlugin.AGGREGATE_SECONDARY = new ReadWriteStrategyPlugin(drivers_1.ReadWriteStrategy.AGGREGATE_SECONDARY);
 exports.ReadWriteStrategyPlugin = ReadWriteStrategyPlugin;
 //# sourceMappingURL=plugin-read-write-strategy.js.map

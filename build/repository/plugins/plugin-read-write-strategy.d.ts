@@ -1,5 +1,5 @@
 import { Plugin } from "./plugin";
-import { ReadPreference, Session } from "../drivers";
+import { Session, ReadWriteStrategy } from "../drivers";
 import { Entity } from "../entities";
 import { CountPluginContext } from "./contexts/plugin-context-count";
 import { FindOnePluginContext } from "./contexts/plugin-context-find-one";
@@ -10,13 +10,11 @@ import { FindByPageNextPluginContext } from "./contexts/plugin-context-find-by-p
 import { AggregatePluginContext } from "./contexts/plugin-context-aggregate";
 import { MapReducePluginContext } from "./contexts/plugin-context-map-reduce";
 declare class ReadWriteStrategyPlugin extends Plugin {
-    private _findStrategy;
-    private _aggregateStrategy;
-    private _mapReduceStrategy;
+    private _strategy;
     static readonly PRIMARY: ReadWriteStrategyPlugin;
     static readonly READ_SECONDARY: ReadWriteStrategyPlugin;
     static readonly AGGREGATE_SECONDARY: ReadWriteStrategyPlugin;
-    constructor(findStrategy: ReadPreference, aggregateStrategy: ReadPreference, mapReduceStrategy: ReadPreference);
+    constructor(strategy: ReadWriteStrategy);
     beforeCount<TSession extends Session>(context: CountPluginContext<TSession>): Promise<void>;
     beforeFindOne<T extends Entity, TSession extends Session>(context: FindOnePluginContext<T, TSession>): Promise<void>;
     beforeFindOneById<T extends Entity, TSession extends Session>(context: FindOneByIdPluginContext<T, TSession>): Promise<void>;

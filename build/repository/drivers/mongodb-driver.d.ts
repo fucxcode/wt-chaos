@@ -13,6 +13,7 @@ import { BulkOperation } from "./bulk-operation";
 import { AggregateOptions } from "./aggregate-options";
 import { MapReduceOptions } from "./map-reduce-options";
 import * as mongodb from "mongodb";
+import { ReadWriteStrategy } from "./read-preference";
 import { Session } from "./session";
 declare class MongoDBId extends mongodb.ObjectId implements Id {
     constructor(id?: string | number | mongodb.ObjectId);
@@ -26,7 +27,8 @@ declare class MongoDBDriver implements Driver<MongoDBSession, MongoDBId> {
     readonly databaseName: string;
     private _defaultOpTimeMs;
     private _maxOpTimeMs;
-    constructor(client: mongodb.MongoClient, databaseName: string, defaultOpTimeMs?: number, maxOpTimeMs?: number);
+    private _readWriteStrategy?;
+    constructor(client: mongodb.MongoClient, databaseName: string, defaultOpTimeMs?: number, maxOpTimeMs?: number, readWriteStrategy?: ReadWriteStrategy);
     private mergeOptions;
     parseId(id?: Id): MongoDBId;
     insertOne<T extends Entity>(collectionName: string, entity: T, options?: InsertOneOptions<MongoDBSession>): Promise<Partial<T>>;

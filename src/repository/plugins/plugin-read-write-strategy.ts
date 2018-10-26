@@ -1,5 +1,5 @@
 import { Plugin } from "./plugin";
-import { ReadPreference, Session } from "../drivers";
+import { ReadPreference, Session, ReadWriteStrategy } from "../drivers";
 import { Entity } from "../entities";
 import * as _ from "../../utilities";
 import { CountPluginContext } from "./contexts/plugin-context-count";
@@ -13,72 +13,66 @@ import { MapReducePluginContext } from "./contexts/plugin-context-map-reduce";
 
 class ReadWriteStrategyPlugin extends Plugin {
 
-    private _findStrategy: ReadPreference;
+    private _strategy: ReadWriteStrategy;
 
-    private _aggregateStrategy: ReadPreference;
+    public static readonly PRIMARY: ReadWriteStrategyPlugin = new ReadWriteStrategyPlugin(ReadWriteStrategy.PRIMARY);
 
-    private _mapReduceStrategy: ReadPreference;
+    public static readonly READ_SECONDARY: ReadWriteStrategyPlugin = new ReadWriteStrategyPlugin(ReadWriteStrategy.READ_SECONDARY);
 
-    public static readonly PRIMARY: ReadWriteStrategyPlugin = new ReadWriteStrategyPlugin(ReadPreference.primary, ReadPreference.primary, ReadPreference.primary);
+    public static readonly AGGREGATE_SECONDARY: ReadWriteStrategyPlugin = new ReadWriteStrategyPlugin(ReadWriteStrategy.AGGREGATE_SECONDARY);
 
-    public static readonly READ_SECONDARY: ReadWriteStrategyPlugin = new ReadWriteStrategyPlugin(ReadPreference.secondaryPreferred, ReadPreference.secondary, ReadPreference.secondary);
-
-    public static readonly AGGREGATE_SECONDARY: ReadWriteStrategyPlugin = new ReadWriteStrategyPlugin(ReadPreference.primary, ReadPreference.secondary, ReadPreference.secondary);
-
-    constructor(findStrategy: ReadPreference, aggregateStrategy: ReadPreference, mapReduceStrategy: ReadPreference) {
+    constructor(strategy: ReadWriteStrategy) {
         super("read-write-strategy");
 
-        this._findStrategy = findStrategy;
-        this._aggregateStrategy = aggregateStrategy;
-        this._mapReduceStrategy = mapReduceStrategy;
+        this._strategy = strategy;
     }
 
     public async beforeCount<TSession extends Session>(context: CountPluginContext<TSession>): Promise<void> {
-        context.options = _.assign({}, context.options, {
-            readPreference: this._findStrategy
-        });
+        context.options = _.assign({}, {
+            readPreference: this._strategy.findStrategy
+        }, context.options);
     }
 
     public async beforeFindOne<T extends Entity, TSession extends Session>(context: FindOnePluginContext<T, TSession>): Promise<void> {
-        context.options = _.assign({}, context.options, {
-            readPreference: this._findStrategy
-        });
+        context.options = _.assign({}, {
+            readPreference: this._strategy.findStrategy
+        }, context.options);
     }
 
     public async beforeFindOneById<T extends Entity, TSession extends Session>(context: FindOneByIdPluginContext<T, TSession>): Promise<void> {
-        context.options = _.assign({}, context.options, {
-            readPreference: this._findStrategy
-        });
+        context.options = _.assign({}, {
+            readPreference: this._strategy.findStrategy
+        }, context.options);
     }
 
     public async beforeFindByIds<T extends Entity, TSession extends Session>(context: FindByIdsPluginContext<T, TSession>): Promise<void> {
-        context.options = _.assign({}, context.options, {
-            readPreference: this._findStrategy
-        });
+        context.options = _.assign({}, {
+            readPreference: this._strategy.findStrategy
+        }, context.options);
     }
 
     public async beforeFindByPageIndex<T extends Entity, TSession extends Session>(context: FindByPageIndexPluginContext<T, TSession>): Promise<void> {
-        context.options = _.assign({}, context.options, {
-            readPreference: this._findStrategy
-        });
+        context.options = _.assign({}, {
+            readPreference: this._strategy.findStrategy
+        }, context.options);
     }
 
     public async beforeFindByPageNext<T extends Entity, TSession extends Session>(context: FindByPageNextPluginContext<T, TSession>): Promise<void> {
-        context.options = _.assign({}, context.options, {
-            readPreference: this._findStrategy
-        });
+        context.options = _.assign({}, {
+            readPreference: this._strategy.findStrategy
+        }, context.options);
     }
 
     public async beforeAggregate<T, TSession extends Session>(context: AggregatePluginContext<T, TSession>): Promise<void> {
-        context.options = _.assign({}, context.options, {
-            readPreference: this._aggregateStrategy
-        });
+        context.options = _.assign({}, {
+            readPreference: this._strategy.aggregateStrategy
+        }, context.options);
     }
 
     public async beforeMapReduce<T, TSession extends Session>(context: MapReducePluginContext<T, TSession>): Promise<void> {
-        context.options = _.assign({}, context.options, {
-            readPreference: this._mapReduceStrategy
-        });
+        context.options = _.assign({}, {
+            readPreference: this._strategy.mapReduceStrategy
+        }, context.options);
     }
 
 }

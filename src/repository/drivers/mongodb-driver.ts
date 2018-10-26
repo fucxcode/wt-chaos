@@ -13,7 +13,7 @@ import { BulkOperation } from "./bulk-operation";
 import { AggregateOptions } from "./aggregate-options";
 import { MapReduceOptions } from "./map-reduce-options";
 import * as mongodb from "mongodb";
-import { ReadPreference } from "./read-preference";
+import { ReadPreference, ReadWriteStrategy } from "./read-preference";
 import * as _ from "../../utilities";
 import { is } from "../../constants";
 import { FSyncOptions } from "./fsync-options";
@@ -54,21 +54,28 @@ class MongoDBDriver implements Driver<MongoDBSession, MongoDBId> {
 
     private _maxOpTimeMs: number;
 
-    constructor(client: mongodb.MongoClient, databaseName: string, defaultOpTimeMs: number = 5_000 /* 5 seconds */, maxOpTimeMs: number = 60_000 /* 1 minute */) {
+    private _readWriteStrategy?: ReadWriteStrategy;
+
+    constructor(client: mongodb.MongoClient, databaseName: string,
+        defaultOpTimeMs: number = 5_000 /* 5 seconds */, maxOpTimeMs: number = 60_000 /* 1 minute */,
+        readWriteStrategy?: ReadWriteStrategy) {
         this._client = client;
         this._databaseName = databaseName;
         this._db = this._client.db(this._databaseName);
         this._defaultOpTimeMs = defaultOpTimeMs;
         this._maxOpTimeMs = maxOpTimeMs;
+        this._readWriteStrategy = readWriteStrategy;
     }
 
-    private mergeOptions<TOptions extends MaxTimeMsOptions & SessionOptions<MongoDBSession>>(options?: TOptions): {
+    private mergeOptions<TOptions extends MaxTimeMsOptions & SessionOptions<MongoDBSession>>(options?: TOptions, readPreferenceResolver?: (strategy: ReadWriteStrategy) => ReadPreference): {
         maxTimeMS: number,
-        session?: mongodb.ClientSession
+        session?: mongodb.ClientSession,
+        readPreference?: ReadPreference
     } {
         const result: {
             maxTimeMS: number,
-            session?: mongodb.ClientSession
+            session?: mongodb.ClientSession,
+            readPreference?: ReadPreference
         } = _.assign({}, options);
         // calculate max time ms
         if (options && options.maxTimeMS) {
@@ -80,6 +87,10 @@ class MongoDBDriver implements Driver<MongoDBSession, MongoDBId> {
         // merge session
         if (options && options.session) {
             result.session = options.session.session;
+        }
+        // merge read write strategy
+        if (!result.readPreference && this._readWriteStrategy) {
+            result.readPreference = readPreferenceResolver && readPreferenceResolver(this._readWriteStrategy);
         }
         return result;
     }
@@ -103,7 +114,7 @@ class MongoDBDriver implements Driver<MongoDBSession, MongoDBId> {
     }
 
     public async count(collectionName: string, condition: any | undefined, options?: CountOptions<MongoDBSession>): Promise<number> {
-        return await this._db.collection(collectionName).countDocuments(condition, this.mergeOptions(options));
+        return await this._db.collection(collectionName).countDocuments(condition, this.mergeOptions(options, strategy => strategy.findStrategy));
     }
 
     public async find<T extends Entity>(collectionName: string, condition: any | undefined, options?: FindOptions<T, MongoDBSession>): Promise<Partial<T>[]> {
@@ -123,10 +134,11 @@ class MongoDBDriver implements Driver<MongoDBSession, MongoDBId> {
         if (options && options.hint) {
             cursor = cursor.hint(options.hint);
         }
-        if (options && options.readPreference) {
-            cursor = cursor.setReadPreference(options.readPreference);
+        const mergedOptions = this.mergeOptions(options, strategy => strategy.findStrategy);
+        cursor = cursor.maxTimeMS(mergedOptions.maxTimeMS);
+        if (mergedOptions.readPreference) {
+            cursor = cursor.setReadPreference(mergedOptions.readPreference);
         }
-        cursor = cursor.maxTimeMS(this.mergeOptions(options).maxTimeMS);
         // in current version of mongodb node.js driver there's no property we can specify `session` when perform `find`
         // but in case it might be added in the future we had added generic type argument in `FindOptions`
         return await cursor.toArray();
@@ -168,12 +180,12 @@ class MongoDBDriver implements Driver<MongoDBSession, MongoDBId> {
     }
 
     public async aggregate<T>(collectionName: string, pipeline: any[], options?: AggregateOptions<MongoDBSession>): Promise<Partial<T>[]> {
-        const cursor = this._db.collection(collectionName).aggregate<Partial<T>>(pipeline, this.mergeOptions(options));
+        const cursor = this._db.collection(collectionName).aggregate<Partial<T>>(pipeline, this.mergeOptions(options, strategy => strategy.aggregateStrategy));
         return await cursor.toArray();
     }
 
     public async mapReduce<T>(collectionName: string, map: Function | string, reduce: Function | string, options?: MapReduceOptions<MongoDBSession>): Promise<Partial<T>[]> {
-        return await this._db.collection<T>(collectionName).mapReduce(map, reduce, this.mergeOptions(options));
+        return await this._db.collection<T>(collectionName).mapReduce(map, reduce, this.mergeOptions(options, strategy => strategy.mapReduceStrategy));
     }
 
     public async beginTransaction<TResult>(action: (session: Session) => Promise<TResult | undefined>, thisArg?: any, auto: boolean = true): Promise<TResult | undefined> {

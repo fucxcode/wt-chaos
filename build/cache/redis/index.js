@@ -3,8 +3,7 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 Object.defineProperty(exports, "__esModule", { value: true });
-__export(require("./contexts"));
-__export(require("./plugin"));
-__export(require("./read-write-strategy-plugin"));
-__export(require("./entity-cache-plugin"));
+__export(require("./redis-standalone"));
+__export(require("./redis-sentinel"));
+__export(require("./redis-cluster"));
 //# sourceMappingURL=index.js.map

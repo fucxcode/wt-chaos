@@ -3,9 +3,9 @@ import * as _ from "../src/utilities";
 import { is } from "../src/constants";
 import { $ } from "./$";
 import * as TypeMoq from "typemoq";
-import { Redis } from "../src/redis/index";
+import { Cache } from "../src/cache";
 import * as mongodb from "mongodb";
-import { CacheKey, RedisCache, Randomizer } from "../src/cache";
+import { EntityCacheKey, EntityCache, Randomizer } from "../src/repository/plugins/entity-cache-plugin";
 import { BSONSerializer } from "../src/serializer";
 
 class Entity {
@@ -17,7 +17,7 @@ class Entity {
     }
 }
 
-const keyResolver = (entity: Entity, collectionName: string) => new CacheKey(entity.team.toString(), collectionName, entity._id.toString());
+const keyResolver = (entity: Entity, collectionName: string) => new EntityCacheKey(entity.team.toString(), collectionName, entity._id.toString());
 
 describe("redis-cache", () => {
 
@@ -29,10 +29,10 @@ describe("redis-cache", () => {
         const expectKey = keyResolver(entity, collectionName);
         const expectValue = serializer.serialize(entity);
 
-        const redis = TypeMoq.Mock.ofType<Redis>(undefined, TypeMoq.MockBehavior.Strict);
+        const redis = TypeMoq.Mock.ofType<Cache>(undefined, TypeMoq.MockBehavior.Strict);
         redis.setup(x => x.getBuffer(expectKey.toString(prefix))).returns(async () => expectValue).verifiable();
 
-        const cache = new RedisCache(redis.object, prefix, serializer);
+        const cache = new EntityCache(redis.object, prefix, serializer);
         const actualValue = await cache.getByKey<Entity>(expectKey);
         redis.verifyAll();
         assert.strictEqual(JSON.stringify(actualValue), JSON.stringify(entity));
@@ -45,10 +45,10 @@ describe("redis-cache", () => {
         const entity = new Entity();
         const expectKey = keyResolver(entity, collectionName);
 
-        const redis = TypeMoq.Mock.ofType<Redis>(undefined, TypeMoq.MockBehavior.Strict);
+        const redis = TypeMoq.Mock.ofType<Cache>(undefined, TypeMoq.MockBehavior.Strict);
         redis.setup(x => x.getBuffer(expectKey.toString(prefix))).returns(async () => undefined).verifiable();
 
-        const cache = new RedisCache(redis.object, prefix, serializer);
+        const cache = new EntityCache(redis.object, prefix, serializer);
         const actualValue = await cache.getByKey<Entity>(expectKey);
         redis.verifyAll();
         assert.strictEqual(actualValue, undefined);
@@ -61,10 +61,10 @@ describe("redis-cache", () => {
         const entity = new Entity();
         const expectKey = keyResolver(entity, collectionName);
 
-        const redis = TypeMoq.Mock.ofType<Redis>(undefined, TypeMoq.MockBehavior.Strict);
+        const redis = TypeMoq.Mock.ofType<Cache>(undefined, TypeMoq.MockBehavior.Strict);
         redis.setup(x => x.getBuffer(expectKey.toString(prefix))).returns(async () => Buffer.from([])).verifiable();
 
-        const cache = new RedisCache(redis.object, prefix, serializer);
+        const cache = new EntityCache(redis.object, prefix, serializer);
         const actualValue = await cache.getByKey<Entity>(expectKey);
         redis.verifyAll();
         assert.strictEqual(actualValue, undefined);
@@ -83,11 +83,11 @@ describe("redis-cache", () => {
 
         const randomizer = TypeMoq.Mock.ofType<Randomizer>(undefined, TypeMoq.MockBehavior.Strict);
         randomizer.setup(x => x.random(0, jitter, false)).returns(() => expectExpire).verifiable();
-        const redis = TypeMoq.Mock.ofType<Redis>(undefined, TypeMoq.MockBehavior.Strict);
+        const redis = TypeMoq.Mock.ofType<Cache>(undefined, TypeMoq.MockBehavior.Strict);
         redis.setup(x => x.getBuffer(expectKey.toString(prefix))).returns(async () => expectValue).verifiable();
         redis.setup(x => x.pexpire(expectKey.toString(prefix), expire + expectExpire)).verifiable();
 
-        const cache = new RedisCache(redis.object, prefix, serializer, randomizer.object, jitter);
+        const cache = new EntityCache(redis.object, prefix, serializer, randomizer.object, jitter);
         const actualValue = await cache.getByKey<Entity>(expectKey, expire);
         redis.verifyAll();
         assert.strictEqual(JSON.stringify(actualValue), JSON.stringify(entity));
@@ -100,10 +100,10 @@ describe("redis-cache", () => {
         const entity = new Entity();
         const expectKey = keyResolver(entity, collectionName);
 
-        const redis = TypeMoq.Mock.ofType<Redis>(undefined, TypeMoq.MockBehavior.Strict);
+        const redis = TypeMoq.Mock.ofType<Cache>(undefined, TypeMoq.MockBehavior.Strict);
         redis.setup(x => x.getBuffer(expectKey.toString(prefix))).returns(async () => undefined).verifiable();
 
-        const cache = new RedisCache(redis.object, prefix, serializer);
+        const cache = new EntityCache(redis.object, prefix, serializer);
         const actualValue = await cache.getByKey<Entity>(expectKey, _.random(100, 200));
         redis.verifyAll();
         assert.strictEqual(actualValue, undefined);
@@ -117,10 +117,10 @@ describe("redis-cache", () => {
         const expectKey = keyResolver(entity, collectionName);
         const expectValue = serializer.serialize(entity);
 
-        const redis = TypeMoq.Mock.ofType<Redis>(undefined, TypeMoq.MockBehavior.Strict);
+        const redis = TypeMoq.Mock.ofType<Cache>(undefined, TypeMoq.MockBehavior.Strict);
         redis.setup(x => x.set(expectKey.toString(prefix), expectValue)).verifiable();
         
-        const cache = new RedisCache(redis.object, prefix, serializer);
+        const cache = new EntityCache(redis.object, prefix, serializer);
         const result = await cache.setByEntity(entity, v => keyResolver(v, collectionName));
 
         redis.verifyAll();

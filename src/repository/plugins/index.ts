@@ -1,3 +1,4 @@
 export * from "./contexts";
 export * from "./plugin";
-export * from "./plugin-read-write-strategy";
+export * from "./read-write-strategy-plugin";
+export * from "./entity-cache-plugin";

@@ -2,6 +2,7 @@ import * as mongodb from "mongodb";
 
 import * as _ from "../../utilities";
 import * as constants from "../../constants";
+import { Id } from "../../repository";
 
 const defaultOIDResolver = function (args: any[]): string | undefined {
     if (args[0]) {
@@ -14,16 +15,16 @@ const defaultOIDResolver = function (args: any[]): string | undefined {
     }
 };
 
-const defaultTeamIdResolver = function (args: any[]): mongodb.ObjectId | null | undefined {
+const defaultTeamIdResolver = function (args: any[]): Id | undefined {
     if (args[0]) {
         if (args[0].context) {
             if (args[0].context.team) {
-                return _.parseObjectId(args[0].context.team._id || args[0].context.team);
+                return args[0].context.team._id || args[0].context.team;
             }
         }
         else {
             if (args[0].team) {
-                return _.parseObjectId(args[0].team._id || args[0].team);
+                return args[0].team._id || args[0].team;
             }
         }
     }
@@ -64,7 +65,7 @@ class TraceOptions {
     constructor(
         public enabled: boolean = true,
         public oidResolver: (args: any[]) => string | undefined = defaultOIDResolver,
-        public teamIdResolver: (args: any[]) => constants.ObjectID | null | undefined = defaultTeamIdResolver,
+        public teamIdResolver: (args: any[]) => Id | undefined = defaultTeamIdResolver,
         public uidResolver: (args: any[]) => string | undefined = defaultUIDResolver,
         public pathResolver: (args: any[]) => string = defaultPathResolver
     ) { }

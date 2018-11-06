@@ -5,5 +5,5 @@ function __export(m) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./bypass-activation-handler"));
 __export(require("./trace-decorator"));
-// export * from "./tracing-activation-handler";
+__export(require("./tracing-activation-handler"));
 //# sourceMappingURL=index.js.map

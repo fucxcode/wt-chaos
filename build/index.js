@@ -16,7 +16,6 @@ exports.WTError = errors_1.WTError;
 exports.code = errors_1.code;
 const container = __importStar(require("./container"));
 exports.container = container;
-// import * as cache from "./cache-tmp";
 const cache = __importStar(require("./cache"));
 exports.cache = cache;
 const serializer = __importStar(require("./serializer"));

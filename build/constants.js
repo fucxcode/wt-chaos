@@ -25,4 +25,11 @@ exports.ME = {
 exports.DEFAULT_PAGE_SIZE = 20;
 exports.DEFAULT_PAGE_SIZE_LIMIT = 500;
 exports.POSITION_STEP = 65536;
+var HttpMethod;
+(function (HttpMethod) {
+    HttpMethod["GET"] = "GET";
+    HttpMethod["POST"] = "POST";
+    HttpMethod["PUT"] = "PUT";
+    HttpMethod["DELETE"] = "DELETE";
+})(HttpMethod = exports.HttpMethod || (exports.HttpMethod = {}));
 //# sourceMappingURL=constants.js.map

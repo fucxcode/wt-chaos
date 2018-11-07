@@ -39,3 +39,10 @@ export type ObjectOrId<T> = Composite<mongodb.ObjectId, T>;
 export type Projection<T> = (keyof T)[] | { [key in keyof T]?: is; };
 
 export type Constructor<T> = new (...args: any[]) => T;
+
+export enum HttpMethod {
+    GET = "GET",
+    POST = "POST",
+    PUT = "PUT",
+    DELETE = "DELETE"
+}

@@ -1,8 +1,6 @@
 import * as _ from "../utilities";
 import { IContainer, lifecycles, Type, ParamType, PropertyType } from "./i-container";
 import { IActivationHandler } from "./activation-handlers/i-activation-handler";
-// import { BypassActivationHandler } from "./activation-handlers/bypass-activation-handler";
-// import { ActivityTracingActivationHandler } from "./activation-handlers/tracing-activation-handler";
 
 class Resolver {
 

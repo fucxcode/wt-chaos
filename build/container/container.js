@@ -9,8 +9,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const _ = __importStar(require("../utilities"));
 const i_container_1 = require("./i-container");
-// import { BypassActivationHandler } from "./activation-handlers/bypass-activation-handler";
-// import { ActivityTracingActivationHandler } from "./activation-handlers/tracing-activation-handler";
 class Resolver {
     get lifecycle() {
         return this._lifecycle;

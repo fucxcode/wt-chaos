@@ -50,7 +50,12 @@ const route = function (path: string, method?: HttpMethod) {
         }
         else if (args.length === 3 && typeof args[2] !== "number") {
             // method decorator
-            setMethodRoute(args[0], args[1], path, method);
+            if (method) {
+                setMethodRoute(args[0], args[1], path, method);
+            }
+            else {
+                throw new Error("route decorator on method must specify 'method' parameter");
+            }
         }
         else {
             throw new Error("route decorator only support on class and method");

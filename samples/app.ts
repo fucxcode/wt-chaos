@@ -76,21 +76,24 @@ router.proxy = true;
 
 @facade(router)
 @route("sys/internal")
-@middlewares((ctx: Context<State>) => {
+@middlewares(async (ctx: Context<State>) => {
     ctx.state.uid = "123";
 })
-@middlewares((ctx: Context<State>) => {
+@middlewares(async (ctx: Context<State>) => {
     ctx.state.role = "NB";
 })
+// @ts-ignore
 class MyFacade {
 
 
     @route("ping", HttpMethod.GET)
+    // @ts-ignore
     public async ping(ctx: Context<State>): Promise<void> {
         await ctx.json("PONG!");
     }
 
     @route("say", HttpMethod.POST)
+    // @ts-ignore
     public async say(ctx: Context<State>): Promise<void> {
         await ctx.json({
             oid: ctx.oid,

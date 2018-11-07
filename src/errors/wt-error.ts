@@ -1,6 +1,6 @@
-import code from "./code";
+import { code } from "./code";
 
-export default class WTError extends Error {
+export class WTError extends Error {
 
     private _code: code | number;
     public get code(): code | number {
@@ -16,7 +16,7 @@ export default class WTError extends Error {
     public get actualValue(): any {
         return this._actualValue;
     }
-    
+
     constructor(code: code | number, message: string, expectValue?: any, actualValue?: any) {
         super(message);
 

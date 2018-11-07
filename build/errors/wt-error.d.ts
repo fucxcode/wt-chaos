@@ -1,5 +1,5 @@
-import code from "./code";
-export default class WTError extends Error {
+import { code } from "./code";
+export declare class WTError extends Error {
     private _code;
     readonly code: code | number;
     private _expectValue?;

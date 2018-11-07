@@ -4,7 +4,7 @@ function __export(m) {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./contexts"));
+__export(require("./entity-cache-plugin"));
 __export(require("./plugin"));
 __export(require("./read-write-strategy-plugin"));
-__export(require("./entity-cache-plugin"));
 //# sourceMappingURL=index.js.map

@@ -28,5 +28,5 @@ class WTError extends Error {
         return JSON.stringify(this.toHttpResponseValue(), null, 2);
     }
 }
-exports.default = WTError;
+exports.WTError = WTError;
 //# sourceMappingURL=wt-error.js.map

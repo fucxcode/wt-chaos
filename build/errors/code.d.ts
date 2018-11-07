@@ -5,4 +5,4 @@ declare enum code {
     forbidden = 403,
     internalError = 500
 }
-export default code;
+export { code };

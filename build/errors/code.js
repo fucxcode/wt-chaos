@@ -8,5 +8,5 @@ var code;
     code[code["forbidden"] = 403] = "forbidden";
     code[code["internalError"] = 500] = "internalError";
 })(code || (code = {}));
-exports.default = code;
+exports.code = code;
 //# sourceMappingURL=code.js.map

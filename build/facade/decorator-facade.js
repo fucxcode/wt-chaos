@@ -11,27 +11,6 @@ const decorator_middlewares_1 = require("./decorator-middlewares");
 const decorator_route_1 = require("./decorator-route");
 const $path = __importStar(require("path"));
 const facade = function (router) {
-    // return function (target: any) {
-    //     const original = target;
-    //     const ctor = function (constructor: any, args: any[]) {
-    //         const c: any = function () {
-    //             return (new Proxy(constructor, {
-    //                 apply(target: any, thisArg: any, argumentsList: any) {
-    //                     return new target(...argumentsList);
-    //                 }
-    //             }))(...args);
-    //         };
-    //         c.prototype = constructor.prototype;
-    //         return new c();
-    //     };
-    //     const f: any = function (...args: any[]) {
-    //         const obj = ctor(original, args);
-    //         console.log(`facade decorator`);
-    //         return obj;
-    //     };
-    //     f.prototype = original.prototype;
-    //     return f;
-    // };
     return function (target) {
         // save a reference to the original constructor
         const origin = target;

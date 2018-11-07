@@ -6,4 +6,4 @@ enum code {
     internalError = 500
 }
 
-export default code;
+export { code };

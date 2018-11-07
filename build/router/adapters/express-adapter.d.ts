@@ -3,6 +3,7 @@ import { Context } from "../context";
 import { Router, RouterMiddleware, RouterHandler } from "../router";
 import * as express from "express";
 import { IncomingHttpHeaders } from "http";
+import { HttpMethod } from "../../constants";
 interface ExpressRequest extends express.Request {
     oid?: string;
     state?: any;
@@ -22,6 +23,6 @@ declare class ExpressRouter<T> extends Router<ExpressContext<T>, T> {
     proxy: boolean;
     constructor(app: express.Express, prefix?: string);
     onUse(handler: RouterMiddleware<ExpressContext<T>, T>): void;
-    onRoute(method: string, path: string | RegExp, ...handlers: RouterHandler<ExpressContext<T>, T>[]): void;
+    onRoute(method: HttpMethod, path: string | RegExp, ...handlers: RouterHandler<ExpressContext<T>, T>[]): void;
 }
 export { ExpressContext, ExpressRouter };

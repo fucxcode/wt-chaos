@@ -6,6 +6,7 @@ import * as _ from "../../utilities";
 import * as uuid from "node-uuid";
 import { IncomingHttpHeaders } from "http";
 import bodyParser from "koa-bodyparser";
+import { HttpMethod } from "../../constants";
 
 class KoaContext<T> extends Context<T> {
 
@@ -73,7 +74,7 @@ class KoaRouter<T> extends Router<KoaContext<T>, T> {
         });
     }
 
-    public onRoute(method: string, path: string | RegExp, ...handlers: RouterHandler<KoaContext<T>, T>[]): void {
+    public onRoute(method: HttpMethod, path: string | RegExp, ...handlers: RouterHandler<KoaContext<T>, T>[]): void {
         const fn = (this._router as any)[method.toLowerCase()] as Function;
         if (_.isFunction(fn)) {
             fn.call(this._router, path, ..._.map(handlers, handler => {

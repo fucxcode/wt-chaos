@@ -6,8 +6,8 @@ const METADATA_KEY_ROUTES = "wt-routes";
 
 class RouteOptions {
 
-    private _method?: string;
-    public get method(): string | undefined {
+    private _method?: HttpMethod;
+    public get method(): HttpMethod | undefined {
         return this._method;
     }
 
@@ -16,7 +16,7 @@ class RouteOptions {
         return this._path;
     }
 
-    constructor(path: string, method?: string) {
+    constructor(path: string, method?: HttpMethod) {
         this._path = path;
         this._method = method;
     }

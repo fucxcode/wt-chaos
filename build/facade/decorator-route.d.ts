@@ -1,10 +1,10 @@
 import { HttpMethod } from "../constants";
 declare class RouteOptions {
     private _method?;
-    readonly method: string | undefined;
+    readonly method: HttpMethod | undefined;
     private _path;
     readonly path: string;
-    constructor(path: string, method?: string);
+    constructor(path: string, method?: HttpMethod);
 }
 declare const setRoutePrefix: (target: any, path: string) => void;
 declare const getRoutePrefixes: (target: any) => string[];

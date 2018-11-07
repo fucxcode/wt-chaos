@@ -1,4 +1,5 @@
 import { Context } from "./context";
+import { HttpMethod } from "../constants";
 interface INextFunction {
     (error?: any): Promise<void>;
 }
@@ -15,7 +16,7 @@ declare abstract class Router<TContext extends Context<TState>, TState> {
     constructor(prefix?: string);
     use(handler: RouterMiddleware<TContext, TState>): void;
     protected abstract onUse(handler: RouterMiddleware<TContext, TState>): void;
-    route(method: string, path: string, ...handlers: RouterHandler<TContext, TState>[]): void;
-    protected abstract onRoute(method: string, path: string, ...handlers: RouterHandler<TContext, TState>[]): void;
+    route(method: HttpMethod, path: string, ...handlers: RouterHandler<TContext, TState>[]): void;
+    protected abstract onRoute(method: HttpMethod, path: string, ...handlers: RouterHandler<TContext, TState>[]): void;
 }
 export { Router, INextFunction, RouterMiddleware, RouterHandler };

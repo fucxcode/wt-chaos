@@ -1,5 +1,6 @@
 import { Context } from "./context";
 import * as $path from "path";
+import { HttpMethod } from "../constants";
 
 interface INextFunction {
 
@@ -39,11 +40,11 @@ abstract class Router<TContext extends Context<TState>, TState> {
 
     protected abstract onUse(handler: RouterMiddleware<TContext, TState>): void;
 
-    public route(method: string, path: string, ...handlers: RouterHandler<TContext, TState>[]): void {
+    public route(method: HttpMethod, path: string, ...handlers: RouterHandler<TContext, TState>[]): void {
         this.onRoute(method, $path.join(this._prefix, path), ...handlers);
     }
 
-    protected abstract onRoute(method: string, path: string, ...handlers: RouterHandler<TContext, TState>[]): void;
+    protected abstract onRoute(method: HttpMethod, path: string, ...handlers: RouterHandler<TContext, TState>[]): void;
 
 }
 

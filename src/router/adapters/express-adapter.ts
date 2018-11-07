@@ -5,6 +5,7 @@ import * as _ from "../../utilities";
 import * as uuid from "node-uuid";
 import { IncomingHttpHeaders } from "http";
 import bodyParser from "body-parser";
+import { HttpMethod } from "../../constants";
 
 interface ExpressRequest extends express.Request {
 
@@ -110,7 +111,7 @@ class ExpressRouter<T> extends Router<ExpressContext<T>, T> {
         }));
     }
 
-    public onRoute(method: string, path: string | RegExp, ...handlers: RouterHandler<ExpressContext<T>, T>[]): void {
+    public onRoute(method: HttpMethod, path: string | RegExp, ...handlers: RouterHandler<ExpressContext<T>, T>[]): void {
         const fn = (this._app as any)[method.toLowerCase()] as Function;
         if (_.isFunction(fn)) {
             fn.call(this._app, path, ..._.map(handlers, handler => {

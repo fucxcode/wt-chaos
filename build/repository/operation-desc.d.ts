@@ -9,6 +9,6 @@ declare class OperationDescription {
     readonly uid: UID | undefined;
     private _path?;
     readonly path: string | undefined;
-    constructor(oid: string, team?: Id, uid?: UID, path?: string);
+    constructor(oid?: string, team?: Id, uid?: UID, path?: string);
 }
 export { OperationDescription };

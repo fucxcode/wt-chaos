@@ -1,5 +1,6 @@
 import { Id } from "./entities";
 import { UID } from "../constants";
+import * as uuid from "node-uuid";
 
 class OperationDescription {
 
@@ -23,7 +24,7 @@ class OperationDescription {
         return this._path;
     }
 
-    constructor(oid: string, team?: Id, uid?: UID, path?: string) {
+    constructor(oid: string = uuid.v4(), team?: Id, uid?: UID, path?: string) {
         this._oid = oid;
         this._team = team;
         this._uid = uid;

@@ -63,7 +63,7 @@ class ActivityTracingActivationHandler<TSession extends Session, TID extends Id,
     private async trace(target: any, propertyKey: any, args: any[], options: TraceOptions): Promise<void> {
         if (options.enabled) {
             const oid = options.oidResolver(args) as string;
-            const team = this._driver.parseId(options.teamIdResolver(args));
+            const team = this._driver.parseId(options.teamIdResolver(args)) as TID;
             const uid = options.uidResolver(args) as string;
             const path = options.pathResolver(args);
             if (!_.isEmpty(oid) && !_.isEmpty(team) && !_.isEmpty(uid)) {

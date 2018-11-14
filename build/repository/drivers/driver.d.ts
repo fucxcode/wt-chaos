@@ -14,7 +14,7 @@ import { MapReduceOptions } from "./map-reduce-options";
 import { Session } from "./session";
 interface Driver<TSession extends Session, TID extends Id> {
     name: string;
-    parseId(id?: Id): TID;
+    parseId(id?: Id, createWhenNil?: boolean): TID | null | undefined;
     insertOne<T extends Entity>(collectionName: string, entity: T, options?: InsertOneOptions<TSession>): Promise<Partial<T>>;
     insertMany<T extends Entity>(collectionName: string, entities: T[], options?: InsertManyOptions<TSession>): Promise<Partial<T>[]>;
     count(collectionName: string, condition: any, options?: CountOptions<TSession>): Promise<number>;

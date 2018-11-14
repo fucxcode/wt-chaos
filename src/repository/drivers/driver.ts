@@ -17,7 +17,7 @@ interface Driver<TSession extends Session, TID extends Id> {
 
     name: string;
 
-    parseId(id?: Id): TID;
+    parseId(id?: Id, createWhenNil?: boolean): TID | null | undefined;
 
     insertOne<T extends Entity>(collectionName: string, entity: T, options?: InsertOneOptions<TSession>): Promise<Partial<T>>;
 

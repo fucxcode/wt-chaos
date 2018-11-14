@@ -3,6 +3,7 @@ import * as _ from "./lodash-wrapper";
 import moment from "moment";
 import { ObjectID, is, Projection, ObjectOrId } from "../constants";
 import * as mongodb from "mongodb";
+import { Id } from "../repository";
 
 const REGEX_OBJECT_ID = new RegExp("^[0-9a-fA-F]{24}$");
 
@@ -93,7 +94,7 @@ export function convertToRegExp(keyword: any): RegExp {
     return new RegExp(keyword, "i");
 }
 
-export function objectIdEquals(x: ObjectID, y: ObjectID): boolean {
+export function objectIdEquals<TID extends Id>(x: TID, y: TID): boolean {
     return (x && y) ? (x.toString() === y.toString()) : false;
 }
 

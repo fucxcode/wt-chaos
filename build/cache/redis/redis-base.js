@@ -14,6 +14,9 @@ class RedisBase {
     disconnect() {
         this._redis.disconnect();
     }
+    async get(key) {
+        return await this._redis.get(key);
+    }
     async getBuffer(key) {
         return await this._redis.getBuffer(key);
     }

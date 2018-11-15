@@ -11,6 +11,8 @@ interface Cache {
 
     disconnect(): void;
 
+    get(key: string): Promise<string | null | undefined>;
+
     getBuffer(key: string): Promise<Buffer>;
 
     pexpire(key: string, milliseconds: number): Promise<is>;

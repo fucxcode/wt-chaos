@@ -24,6 +24,10 @@ abstract class RedisBase implements Cache {
         this._redis.disconnect();
     }
 
+    public async get(key: string): Promise<string | null | undefined> {
+        return await this._redis.get(key);
+    }
+
     public async getBuffer(key: string): Promise<Buffer> {
         return await this._redis.getBuffer(key);
     }

@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import { ObjectID, Projection, ObjectOrId } from "../constants";
 import * as mongodb from "mongodb";
+import { Id } from "../repository";
 export declare function wait(milliseconds: number): Promise<void>;
 export declare function isNil(value: any): boolean;
 export declare function isNilOrWriteSpaces(value: any): boolean;
@@ -12,7 +13,7 @@ export declare function isObjectId(id: any): id is mongodb.ObjectId;
 export declare function mapKeys(object: any, iteratee: (sourceValue: any, sourceKey: string) => string, thisArg?: any): any;
 export declare function updateMetadata<TValue, TUpdate>(metadataKey: string, metadataUpdateValue: TUpdate, target: Object, initializer: () => TValue, updater: (value: TValue, update: TUpdate) => TValue, thisArg?: any): TValue;
 export declare function convertToRegExp(keyword: any): RegExp;
-export declare function objectIdEquals(x: ObjectID, y: ObjectID): boolean;
+export declare function objectIdEquals<TID extends Id>(x: TID, y: TID): boolean;
 /**
  *  return unique Id in nested array, mostly used for get ids for db query
  */
@@ -35,4 +36,5 @@ export declare function tryParseObjectId(id?: ObjectID | null | undefined, creat
  */
 export declare function parseObjectId(id?: ObjectID | null | undefined, createIfNil?: boolean, objectIdCreator?: (id?: string | number | mongodb.ObjectId) => mongodb.ObjectId): mongodb.ObjectId | null | undefined;
 export declare function asyncify(fn: (...args: any[]) => any): (...args: any[]) => Promise<any>;
+export declare function randomString(length?: number, charset?: "alphanumeric" | "alphabetic" | "numeric" | "hex"): string;
 export * from "./lodash-wrapper";

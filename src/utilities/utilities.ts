@@ -3,6 +3,8 @@ import * as _ from "./lodash-wrapper";
 import moment from "moment";
 import { ObjectID, is, Projection, ObjectOrId } from "../constants";
 import * as mongodb from "mongodb";
+import { Id } from "../repository";
+import * as randomstring from "randomstring";
 
 const REGEX_OBJECT_ID = new RegExp("^[0-9a-fA-F]{24}$");
 
@@ -93,7 +95,7 @@ export function convertToRegExp(keyword: any): RegExp {
     return new RegExp(keyword, "i");
 }
 
-export function objectIdEquals(x: ObjectID, y: ObjectID): boolean {
+export function objectIdEquals<TID extends Id>(x: TID, y: TID): boolean {
     return (x && y) ? (x.toString() === y.toString()) : false;
 }
 
@@ -287,6 +289,13 @@ export function parseObjectId(id?: ObjectID | null | undefined, createIfNil: boo
 
 export function asyncify(fn: (...args: any[]) => any): (...args: any[]) => Promise<any> {
     return (...args: any[]): Promise<any> => Promise.resolve(fn(...args));
+}
+
+export function randomString(length: number = 32, charset: "alphanumeric" | "alphabetic" | "numeric" | "hex" = "alphabetic"): string {
+    return randomstring.generate({
+        length: length,
+        charset: charset
+    });
 }
 
 export * from "./lodash-wrapper";

@@ -4,6 +4,7 @@ import moment from "moment";
 import { ObjectID, is, Projection, ObjectOrId } from "../constants";
 import * as mongodb from "mongodb";
 import { Id } from "../repository";
+import * as randomstring from "randomstring";
 
 const REGEX_OBJECT_ID = new RegExp("^[0-9a-fA-F]{24}$");
 
@@ -288,6 +289,13 @@ export function parseObjectId(id?: ObjectID | null | undefined, createIfNil: boo
 
 export function asyncify(fn: (...args: any[]) => any): (...args: any[]) => Promise<any> {
     return (...args: any[]): Promise<any> => Promise.resolve(fn(...args));
+}
+
+export function randomString(length: number = 32, charset: "alphanumeric" | "alphabetic" | "numeric" | "hex" = "alphabetic"): string {
+    return randomstring.generate({
+        length: length,
+        charset: charset
+    });
 }
 
 export * from "./lodash-wrapper";

@@ -18,6 +18,7 @@ const _ = __importStar(require("./lodash-wrapper"));
 const moment_1 = __importDefault(require("moment"));
 const constants_1 = require("../constants");
 const mongodb = __importStar(require("mongodb"));
+const randomstring = __importStar(require("randomstring"));
 const REGEX_OBJECT_ID = new RegExp("^[0-9a-fA-F]{24}$");
 function wait(milliseconds) {
     return new Promise((resolve) => {
@@ -300,5 +301,12 @@ function asyncify(fn) {
     return (...args) => Promise.resolve(fn(...args));
 }
 exports.asyncify = asyncify;
+function randomString(length = 32, charset = "alphabetic") {
+    return randomstring.generate({
+        length: length,
+        charset: charset
+    });
+}
+exports.randomString = randomString;
 __export(require("./lodash-wrapper"));
 //# sourceMappingURL=utilities.js.map

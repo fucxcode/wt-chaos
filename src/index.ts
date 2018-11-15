@@ -7,6 +7,7 @@ import * as serializer from "./serializer";
 import * as router from "./router";
 import * as repository from "./repository";
 import * as facade from "./facade";
+import * as sms from "./sms";
 
 export {
     _,
@@ -19,6 +20,7 @@ export {
     serializer,
     router,
     repository,
-    facade
+    facade,
+    sms
 };
 

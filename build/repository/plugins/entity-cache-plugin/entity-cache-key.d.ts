@@ -1,5 +1,5 @@
 declare class EntityCacheKey {
-    static readonly wildcard = "*";
+    static readonly wildcard: string;
     private _team;
     readonly team: string;
     private _collectionName;

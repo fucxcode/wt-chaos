@@ -7,5 +7,6 @@ import * as serializer from "./serializer";
 import * as router from "./router";
 import * as repository from "./repository";
 import * as facade from "./facade";
+import * as sms from "./sms";
 import * as i18n from "./i18n";
-export { _, constants, WTError, WTErrorResponse, code, container, cache, serializer, router, repository, facade, i18n };
+export { _, constants, WTError, WTErrorResponse, code, container, cache, serializer, router, repository, facade, sms, i18n };

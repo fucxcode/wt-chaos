@@ -39,7 +39,8 @@ class YunPianSdk {
     async sendTemplateSMS(templateId, mobile, params) {
         const values = this._getSMSTemplateValue(params);
         const textResponse = await this._post(`/tpl/get.json`, { tpl_id: templateId });
-        let text = textResponse.body.tpl_content;
+        const body = JSON.parse(textResponse);
+        let text = body.tpl_content;
         _.forEach(_.keys(values), item => {
             text = (text || "").replace(item, values[item]);
         });

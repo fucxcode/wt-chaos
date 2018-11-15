@@ -2,18 +2,17 @@ export enum I18nAdapterType {
   koa = "koa"
 }
 
-export interface I18nLoaderConfig {
+export interface I18nConfig {
   defaultLocale?: string;
-  supportLocales?: string[];
+  locales?: string[]; // support locales
   directory: string;
   extension?: string;
   queryParameter?: string;
   domain: string;
+  devMode?: boolean;
 }
 
 export interface I18nTemplateLoaderConfig {
-  defaultLocale?: string;
-  supportLocales?: string[];
   cache?: boolean; // 是否缓存，默认 false
   directory?: string; // 指定整个目录
   extension?: string; // 配置文件后缀，默认是 json, 可以是 ts，js

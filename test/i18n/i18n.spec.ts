@@ -1,15 +1,5 @@
 import { assert } from "chai";
-import { I18nLoader, II18nAdapter } from "../../src/i18n";
-
-class TestII18nAdapter implements II18nAdapter {
-    __(key: string, locale?: string): string {
-        return "";
-    }
-    get(key: string, locale?: string): string {
-        return this.__(key, locale);
-    }
-    setLocale(locale: string): void {}
-}
+import { I18n } from "../../src/i18n";
 
 function _assertMissionFirstTask(
     mission: any,
@@ -24,10 +14,42 @@ function _assertMissionFirstTask(
     assert.equal(firstTask.name, equalFirstTask.name);
 }
 
+describe("i18n", () => {
+    let i18n: I18n;
+    before(() => {
+        i18n = new I18n(
+            {
+                directory: __dirname + "/locales",
+                domain: ".worktile.com",
+                locales: ["zh-cn", "en-us"]
+            },
+            null
+        );
+    });
+    it(`get zh-cn TITLE is 标题`, () => {
+        const title = i18n.__("TITLE", "zh-cn");
+        assert.equal(title, "标题");
+    });
+
+    it(`get en-us TITLE is Title`, () => {
+        const title = i18n.__("TITLE", "en-us");
+        assert.equal(title, "Title");
+    });
+
+    it(`get mission.NAME is 任务`, () => {
+        const title = i18n.__("mission.NAME", "zh-cn");
+        assert.equal(title, "任务");
+    });
+
+    it(`get mission.DESC with %s params`, () => {
+        const title = i18n.__("mission.DESC", "zh-cn", "参数");
+        assert.equal(title, "参数 任务");
+    });
+});
+
 describe("i18n template", () => {
     it(`load default locale mission template when directory = "{__dirname}/templates"`, () => {
-        const loader = new I18nLoader(
-            new TestII18nAdapter(),
+        const loader = new I18n(
             {
                 directory: __dirname + "/locales",
                 domain: ".worktile.com"
@@ -44,8 +66,7 @@ describe("i18n template", () => {
     });
 
     it(`load en-us locale mission template when directory = "{__dirname}/templates"`, () => {
-        const loader = new I18nLoader(
-            new TestII18nAdapter(),
+        const loader = new I18n(
             {
                 directory: __dirname + "/locales",
                 domain: ".worktile.com"
@@ -62,8 +83,7 @@ describe("i18n template", () => {
     });
 
     it(`load mission sub template mission.sub-module`, () => {
-        const loader = new I18nLoader(
-            new TestII18nAdapter(),
+        const loader = new I18n(
             {
                 directory: __dirname + "/locales",
                 domain: ".worktile.com"

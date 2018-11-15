@@ -1,6 +1,7 @@
 {
-    "TITLE": "标题",
-    "mission": {
-        "NAME": "任务"
-    }
+	"TITLE": "标题",
+	"mission": {
+		"NAME": "任务",
+		"DESC": "%s 任务"
+	}
 }

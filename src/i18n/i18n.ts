@@ -1,45 +1,28 @@
-import { I18nLoaderConfig, I18nTemplateLoaderConfig } from "./config";
-import { II18nAdapter, KoaI18nAdapter } from "./adapters";
+import { I18nConfig, I18nTemplateLoaderConfig } from "./config";
 import * as _ from "../utilities";
 import path from "path";
 import fs from "fs";
-import { DEFAULT_LOCALE, DEFAULT_EXTENSION } from "./constants";
+import {
+    DEFAULT_LOCALE,
+    DEFAULT_EXTENSION,
+    DEFAULT_I18N_CONFIG
+} from "./constants";
+const vsprintf = require("sprintf-js").vsprintf;
+const I18n2 = require("i18n-2");
 
-export class I18nLoader {
-    protected _locale: string = DEFAULT_LOCALE;
+export class I18n {
+    private _i18n2: any;
 
     protected _templateCache = new Map<string, object>();
 
-    protected _config: I18nLoaderConfig;
+    protected _config: I18nConfig;
 
     protected _templateConfig: I18nTemplateLoaderConfig;
-
-    protected _iI18nAdapter: II18nAdapter;
-
-    protected _getSupportLocales() {
-        return ["zh-cn", "en-us", "zh-tw'"];
-    }
-
-    protected _getDefaultI18nLoaderConfig(): I18nLoaderConfig {
-        return {
-            directory: "",
-            domain: ".worktile",
-            supportLocales: this._getSupportLocales(),
-            defaultLocale: "zh-cn"
-        };
-    }
-
-    protected _getDefaultI18nTemplateLoaderConfig(): I18nTemplateLoaderConfig {
-        return {};
-    }
 
     private _initializeTemplateConfig(
         templateConfig?: I18nTemplateLoaderConfig
     ) {
-        this._templateConfig = _.merge(
-            this._getDefaultI18nTemplateLoaderConfig,
-            templateConfig
-        );
+        this._templateConfig = _.merge({}, templateConfig);
         if (
             !this._templateConfig.directory &&
             !this._templateConfig.templates
@@ -51,39 +34,46 @@ export class I18nLoader {
         return this._templateConfig;
     }
 
-    get locale() {
-        return this._locale;
+    static instance(
+        config?: I18nConfig,
+        templateConfig?: I18nTemplateLoaderConfig
+    ) {
+        return new I18n(config, templateConfig);
     }
 
     constructor(
-        iI18nAdapter: II18nAdapter,
-        config?: I18nLoaderConfig,
+        config?: I18nConfig,
         templateConfig?: I18nTemplateLoaderConfig
     ) {
-        this._config = _.merge(this._getDefaultI18nLoaderConfig, config);
-        this._iI18nAdapter = iI18nAdapter;
-        this.setLocale(this._config.defaultLocale || DEFAULT_LOCALE);
-        this._templateConfig = this._initializeTemplateConfig(templateConfig);
+        this._config = _.merge({}, DEFAULT_I18N_CONFIG, config);
+        if (templateConfig) {
+            this._templateConfig = this._initializeTemplateConfig(
+                templateConfig
+            );
+        }
+        this._i18n2 = new I18n2(this._config);
     }
 
-    setLocale(locale: string) {
-        this._locale = locale;
-        this._iI18nAdapter.setLocale(locale);
+    translate(key: string, locale: string, ...args: string[]) {
+        let message = this._i18n2.translate(locale, key);
+        if (args && args.length > 0) {
+            message = vsprintf(message, args);
+        }
+        return message;
     }
 
-    get(key: string, locale?: string) {
-        return this._iI18nAdapter.get(key, locale || DEFAULT_LOCALE);
-    }
-
-    __(key: string, locale?: string) {
-        return this._iI18nAdapter.get(key, locale || DEFAULT_LOCALE);
+    __(key: string, locale: string, ...args: string[]) {
+        return this.translate(key, locale, ...args);
     }
 
     loadTemplate(moduleKey: string, locale: string = DEFAULT_LOCALE) {
-        const cacheKey = `${moduleKey}-${this.locale}`;
+        const cacheKey = `${moduleKey}-${locale}`;
 
         if (this._templateCache.has(cacheKey)) {
             return this._templateCache.get(cacheKey);
+        }
+        if (!this._templateConfig) {
+            throw new Error(`template config is null.`);
         }
         if (this._templateConfig.templates) {
             const moduleTemplates = this._templateConfig.templates[moduleKey];

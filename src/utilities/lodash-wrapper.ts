@@ -189,8 +189,14 @@ export function assign(object: any, ...otherArgs: any[]): any {
     return _.assign(object, ...otherArgs);
 }
 
-export function merge<TObject, TSource>(object: TObject, source: TSource): TObject & TSource {
-    return _.merge(object, source);
+export function merge<TObject, TSource1, TSource2>(
+    object: TObject,
+    source1: TSource1,
+    source2: TSource2
+): TObject & TSource1 & TSource2;
+export function merge<TObject, TSource>(object: TObject, source1: TSource): TObject & TSource;
+export function merge(object: any, ...otherArgs: any[]): any {
+    return _.merge(object, ...otherArgs);
 }
 
 export function includes<T>(collection: List<T> | Dictionary<T> | null | undefined, target: T, fromIndex?: number): boolean {

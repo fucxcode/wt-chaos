@@ -9,13 +9,11 @@ class SmsSender {
     constructor(service) {
         this.service = service;
     }
-    static getInstance(options) {
-        let smsSender;
-        if (!smsSender) {
-            const service = SmsSender.getService(options);
-            smsSender = new SmsSender(service);
+    static getInstance(options, service) {
+        if (!service) {
+            service = SmsSender.getService(options);
         }
-        return smsSender;
+        return new SmsSender(service);
     }
     static getService(options) {
         switch (options.appKey) {

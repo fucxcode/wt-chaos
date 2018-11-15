@@ -1,5 +1,4 @@
 import { SmsInterface } from "./base";
-import { WTError, code } from "../errors";
 import { YunPian } from "./adapters/yunpian";
 
 export interface SmsOptions {
@@ -23,8 +22,10 @@ export class SmsSender {
         this.service = service;
     }
 
-    public static getInstance(options: SmsOptions) {
-        const service = SmsSender.getService(options);
+    public static getInstance(options: SmsOptions, service?: SmsInterface) {
+        if (!service) {
+            service = SmsSender.getService(options);
+        }
         return new SmsSender(service);
     }
 

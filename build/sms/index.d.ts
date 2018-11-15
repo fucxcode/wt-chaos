@@ -1,3 +1,2 @@
-export * from "./adapters";
-export * from "./base";
+export { SmsInterface } from "./base";
 export * from "./sms-sender";

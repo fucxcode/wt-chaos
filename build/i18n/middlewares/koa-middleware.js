@@ -1,10 +1,16 @@
+"use strict";
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 const i18n = require("koa-i18n");
-import { I18nConfig } from "../config";
-import * as _ from "../../utilities";
-import { DEFAULT_I18N_CONFIG, DEFAULT_QUERY_PARAMETER } from "../constants";
-import { Context } from "koa";
-
-const _getLocaleFromUrl = function(url: string, locales: string[]) {
+const _ = __importStar(require("../../utilities"));
+const constants_1 = require("../constants");
+const _getLocaleFromUrl = function (url, locales) {
     const segIndex = 0;
     const parts = url.split("/");
     // Handle paths that start with a slash, i.e., '/foo' -> ['', 'foo']
@@ -16,20 +22,14 @@ const _getLocaleFromUrl = function(url: string, locales: string[]) {
         ? localeInUrl
         : null;
 };
-
-const _customModeFn = function(config: I18nConfig) {
-    return function(this: Context) {
-        const ctx = this as Context;
+const _customModeFn = function (config) {
+    return function () {
+        const ctx = this;
         //  optional custom function (will be bound to the koa context)
         // const ctx: ctx = <Context>this;
         // url locale ("/en-us/price") > cookie locale (lang) and set cookie locale as url local when url local has value
-        const urlLocale = _getLocaleFromUrl(
-            ctx.request.originalUrl,
-            config.locales || []
-        );
-        const cookieLocale = ctx.cookies.get(
-            config.queryParameter || DEFAULT_QUERY_PARAMETER
-        );
+        const urlLocale = _getLocaleFromUrl(ctx.request.originalUrl, config.locales || []);
+        const cookieLocale = ctx.cookies.get(config.queryParameter || constants_1.DEFAULT_QUERY_PARAMETER);
         const locale = urlLocale ? urlLocale : cookieLocale;
         if (!_.isEmpty(locale) && cookieLocale !== locale) {
             ctx.cookies.set("lang", locale, {
@@ -42,7 +42,6 @@ const _customModeFn = function(config: I18nConfig) {
         _.assign(ctx.state, {
             locale: locale || config.defaultLocale
         });
-
         // "/en-us" - > "/" and "/en-us/price" - > "/price"
         ctx.request.url = ((url, urlLocale) => {
             if (urlLocale) {
@@ -65,9 +64,8 @@ const _customModeFn = function(config: I18nConfig) {
         return locale || config.defaultLocale;
     };
 };
-
-export function koaI18nMiddleware(app: any, config: I18nConfig) {
-    const _config = _.merge({}, DEFAULT_I18N_CONFIG, config);
+function koaI18nMiddleware(app, config) {
+    const _config = _.merge({}, constants_1.DEFAULT_I18N_CONFIG, config);
     return i18n(app, {
         directory: _config.directory,
         defaultLocale: _config.defaultLocale,
@@ -75,7 +73,7 @@ export function koaI18nMiddleware(app: any, config: I18nConfig) {
         updateFiles: false,
         queryParameter: _config.queryParameter,
         extension: _config.extension,
-        locales: _config.locales, //  `zh-CN` defualtLocale, must match the locales to the filenames
+        locales: _config.locales,
         modes: [
             // "query",                //  optional detect querystring - `/?locale=en-US`
             // "subdomain",            //  optional detect subdomain   - `zh-CN.koajs.com`
@@ -87,3 +85,5 @@ export function koaI18nMiddleware(app: any, config: I18nConfig) {
         ]
     });
 }
+exports.koaI18nMiddleware = koaI18nMiddleware;
+//# sourceMappingURL=koa-middleware.js.map

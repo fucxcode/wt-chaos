@@ -17,21 +17,25 @@ export class I18n {
 
     protected _config: I18nConfig;
 
-    protected _templateConfig: I18nTemplateLoaderConfig;
+    protected _templateConfig?: I18nTemplateLoaderConfig;
 
     private _initializeTemplateConfig(
         templateConfig?: I18nTemplateLoaderConfig
     ) {
-        this._templateConfig = _.merge({}, templateConfig);
-        if (
-            !this._templateConfig.directory &&
-            !this._templateConfig.templates
-        ) {
-            throw new Error(
-                `Neither template config 's directory or templates been null`
-            );
+        if (templateConfig) {
+            this._templateConfig = _.merge({}, templateConfig);
+            if (
+                !this._templateConfig.directory &&
+                !this._templateConfig.templates
+            ) {
+                throw new Error(
+                    `Neither template config 's directory or templates been null`
+                );
+            }
+            return this._templateConfig;
+        } else {
+            return null;
         }
-        return this._templateConfig;
     }
 
     static instance(
@@ -46,11 +50,7 @@ export class I18n {
         templateConfig?: I18nTemplateLoaderConfig
     ) {
         this._config = _.merge({}, DEFAULT_I18N_CONFIG, config);
-        if (templateConfig) {
-            this._templateConfig = this._initializeTemplateConfig(
-                templateConfig
-            );
-        }
+        this._initializeTemplateConfig(templateConfig);
         this._i18n2 = new I18n2(this._config);
     }
 

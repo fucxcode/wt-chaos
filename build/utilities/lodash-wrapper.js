@@ -138,8 +138,8 @@ function assign(object, ...otherArgs) {
     return lodash_1.default.assign(object, ...otherArgs);
 }
 exports.assign = assign;
-function merge(object, source) {
-    return lodash_1.default.merge(object, source);
+function merge(object, ...otherArgs) {
+    return lodash_1.default.merge(object, ...otherArgs);
 }
 exports.merge = merge;
 function includes(collection, target, fromIndex) {

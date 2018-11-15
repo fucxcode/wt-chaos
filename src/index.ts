@@ -25,4 +25,3 @@ export {
     sms,
     i18n
 };
-

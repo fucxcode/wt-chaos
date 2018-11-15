@@ -9,6 +9,7 @@ declare abstract class RedisBase implements Cache {
     constructor(redis: IORedis.Redis);
     ping(): Promise<string>;
     disconnect(): void;
+    get(key: string): Promise<string | null | undefined>;
     getBuffer(key: string): Promise<Buffer>;
     pexpire(key: string, milliseconds: number): Promise<is>;
     mgetBuffer(...keys: string[]): Promise<Buffer[]>;

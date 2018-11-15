@@ -8,6 +8,7 @@ import * as router from "./router";
 import * as repository from "./repository";
 import * as facade from "./facade";
 import * as sms from "./sms";
+import * as i18n from "./i18n";
 
 export {
     _,
@@ -21,6 +22,7 @@ export {
     router,
     repository,
     facade,
-    sms
+    sms,
+    i18n
 };
 

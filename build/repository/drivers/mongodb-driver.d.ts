@@ -30,7 +30,7 @@ declare class MongoDBDriver implements Driver<MongoDBSession, MongoDBId> {
     private _readWriteStrategy?;
     constructor(client: mongodb.MongoClient, databaseName: string, defaultOpTimeMs?: number, maxOpTimeMs?: number, readWriteStrategy?: ReadWriteStrategy);
     private mergeOptions;
-    parseId(id?: Id): MongoDBId;
+    parseId(id?: Id, createWhenNil?: boolean): MongoDBId | null | undefined;
     insertOne<T extends Entity>(collectionName: string, entity: T, options?: InsertOneOptions<MongoDBSession>): Promise<Partial<T>>;
     insertMany<T extends Entity>(collectionName: string, entities: T[], options?: InsertManyOptions<MongoDBSession>): Promise<Partial<T>[]>;
     count(collectionName: string, condition: any | undefined, options?: CountOptions<MongoDBSession>): Promise<number>;

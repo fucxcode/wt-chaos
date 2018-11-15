@@ -95,19 +95,29 @@ class MongoDBDriver implements Driver<MongoDBSession, MongoDBId> {
         return result;
     }
 
-    public parseId(id?: Id): MongoDBId {
-        return new MongoDBId(id && id.toString());
+    public parseId(id?: Id, createWhenNil: boolean = false): MongoDBId | null | undefined {
+        if (id) {
+            return new MongoDBId(id && id.toString());
+        }
+        else {
+            if (createWhenNil) {
+                return new MongoDBId();
+            }
+            else {
+                return id;
+            }
+        }
     }
 
     public async insertOne<T extends Entity>(collectionName: string, entity: T, options?: InsertOneOptions<MongoDBSession>): Promise<Partial<T>> {
-        entity._id = this.parseId(entity._id);
+        entity._id = this.parseId(entity._id, true) as MongoDBId;
         await this._db.collection<T>(collectionName).insertOne(entity, this.mergeOptions(options));
         return entity;
     }
 
     public async insertMany<T extends Entity>(collectionName: string, entities: T[], options?: InsertManyOptions<MongoDBSession>): Promise<Partial<T>[]> {
         for (const entity of entities) {
-            entity._id = this.parseId(entity._id);
+            entity._id = this.parseId(entity._id) as MongoDBId;
         }
         await this._db.collection<T>(collectionName).insertMany(entities, this.mergeOptions(options));
         return entities;

@@ -26,4 +26,6 @@ const repository = __importStar(require("./repository"));
 exports.repository = repository;
 const facade = __importStar(require("./facade"));
 exports.facade = facade;
+const i18n = __importStar(require("./i18n"));
+exports.i18n = i18n;
 //# sourceMappingURL=index.js.map

@@ -53,11 +53,21 @@ class MongoDBDriver {
         }
         return result;
     }
-    parseId(id) {
-        return new MongoDBId(id && id.toString());
+    parseId(id, createWhenNil = false) {
+        if (id) {
+            return new MongoDBId(id && id.toString());
+        }
+        else {
+            if (createWhenNil) {
+                return new MongoDBId();
+            }
+            else {
+                return id;
+            }
+        }
     }
     async insertOne(collectionName, entity, options) {
-        entity._id = this.parseId(entity._id);
+        entity._id = this.parseId(entity._id, true);
         await this._db.collection(collectionName).insertOne(entity, this.mergeOptions(options));
         return entity;
     }

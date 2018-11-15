@@ -24,12 +24,8 @@ export class SmsSender {
     }
 
     public static getInstance(options: SmsOptions) {
-        let smsSender;
-        if (!smsSender) {
-            const service = SmsSender.getService(options);
-            smsSender = new SmsSender(service);
-        }
-        return smsSender;
+        const service = SmsSender.getService(options);
+        return new SmsSender(service);
     }
 
     private static getService(options: SmsOptions): SmsInterface {

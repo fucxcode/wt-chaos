@@ -1,0 +1,1 @@
+{"version":3,"file":"wt-forbidden-error.js","sourceRoot":"","sources":["../../src/errors/wt-forbidden-error.ts"],"names":[],"mappings":";;AAAA,yCAAqC;AACrC,iCAAgC;AAEhC,MAAa,gBAAiB,SAAQ,kBAAO;IACzC,YAAY,OAAe,EAAE,WAAiB,EAAE,WAAiB;QAC7D,KAAK,CAAC,aAAM,CAAC,SAAS,EAAE,OAAO,EAAE,WAAW,EAAE,WAAW,CAAC,CAAC;IAC/D,CAAC;CACJ;AAJD,4CAIC"}

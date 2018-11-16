@@ -38,6 +38,15 @@ class KoaContext extends context_1.Context {
     get body() {
         return this._ctx.request.body;
     }
+    set body(value) {
+        this._ctx.body = value;
+    }
+    get statusCode() {
+        return this._ctx.status;
+    }
+    set statusCode(value) {
+        this._ctx.status = value;
+    }
     json(data) {
         this._ctx.body = data;
         return this;

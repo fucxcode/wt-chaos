@@ -12,7 +12,8 @@ declare class KoaContext<T> extends Context<T> {
     readonly headers: IncomingHttpHeaders;
     readonly query: any;
     readonly params: any;
-    readonly body: any;
+    body: any;
+    statusCode: number;
     json(data: any): KoaContext<T>;
 }
 declare class KoaRouter<T> extends Router<KoaContext<T>, T> {

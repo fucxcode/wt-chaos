@@ -78,14 +78,12 @@ describe("#mailer", function () {
         const setting = new TemplateSetting($.randomString(), "template.html", "layout.html");
         await mailer.send(setting, { templateData: $.randomString() }, $.randomString());
         const options = testMail.mailOptions;
-        layoutKey;
         assert.equal(_.isNil(options.html.match(templateKey)), false);
     });
 
     it("#read layout", async () => {
         const setting = new TemplateSetting($.randomString(), "template.html", "layout.html");
         await mailer.send(setting, { templateData: $.randomString() }, $.randomString());
-
         const options = testMail.mailOptions;
 
         assert.equal(_.isNil(options.html.match(layoutKey)), false);

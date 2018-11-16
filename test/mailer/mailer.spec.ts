@@ -1,4 +1,4 @@
-import { MailConfig, IMail, Mailer, TemplateSetting } from "../../src/mailer";
+import { MailConfig, IMail, Mailer, TemplateSetting, IMailOptions } from "../../src/mailer";
 import { $ } from "../$";
 import * as fs from "fs";
 import * as assert from "assert";
@@ -11,12 +11,12 @@ class TestMail implements IMail {
         return this._invoked;
     }
 
-    private _mailOptions: any;
+    private _mailOptions: IMailOptions;
     public get mailOptions() {
         return this._mailOptions;
     }
 
-    public async sendMail(options: any) {
+    public async sendMail(options: IMailOptions) {
         this._invoked = true;
         this._mailOptions = options;
     }

@@ -1,6 +1,3 @@
-export declare enum I18nAdapterType {
-    koa = "koa"
-}
 export interface I18nConfig {
     defaultLocale?: string;
     locales?: string[];

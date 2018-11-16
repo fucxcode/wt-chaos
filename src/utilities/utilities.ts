@@ -5,6 +5,7 @@ import { ObjectID, is, Projection, ObjectOrId } from "../constants";
 import * as mongodb from "mongodb";
 import { Id } from "../repository";
 import * as randomstring from "randomstring";
+import crypto from "crypto";
 
 const REGEX_OBJECT_ID = new RegExp("^[0-9a-fA-F]{24}$");
 
@@ -296,6 +297,13 @@ export function randomString(length: number = 32, charset: "alphanumeric" | "alp
         length: length,
         charset: charset
     });
+}
+
+export function md5(input: string): string {
+    return crypto
+        .createHash("md5")
+        .update(input)
+        .digest("hex");
 }
 
 export * from "./lodash-wrapper";

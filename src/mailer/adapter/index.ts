@@ -1,1 +1,1 @@
-export * from "./iMail";
+export * from "./i-mail";

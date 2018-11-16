@@ -44,6 +44,7 @@
     "@types/supertest": "^2.0.6",
     "@types/request": "^2.48.1",
     "@types/request-promise": "^4.1.42",
+    "@types/mustache": "^0.8.32",
     "chai": "^4.2.0",
     "create-ts-index": "git+https://github.com/shaunxu/create-ts-index.git",
     "minimist": "^1.2.0",
@@ -72,7 +73,8 @@
     "randomstring": "^1.1.5",
     "reflect-metadata": "^0.1.12",
     "request": "^2.88.0",
-    "request-promise": "^4.2.2"
+    "request-promise": "^4.2.2",
+    "mustache": "^3.0.1"
   },
   "files": [
     "build/**/*"

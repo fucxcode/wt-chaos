@@ -48,7 +48,6 @@
     "create-ts-index": "git+https://github.com/shaunxu/create-ts-index.git",
     "minimist": "^1.2.0",
     "mocha": "^5.2.0",
-    "mongodb-memory-server": "^2.6.0",
     "randomstring": "^1.1.5",
     "supertest": "^3.3.0",
     "ts-node": "^7.0.1",

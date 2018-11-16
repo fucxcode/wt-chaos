@@ -63,7 +63,7 @@ describe("utilities", () => {
             const md51 = _.md5("111111");
             const md52 = _.md5("111111");
             assert.equal(md51, md52);
-            assert.equal(md51, "96e79218965eb72c92a549dd5a330112")
+            assert.equal(md51, "96e79218965eb72c92a549dd5a330112");
         });
 
     });

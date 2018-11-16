@@ -5,7 +5,7 @@ export interface SmsOptions {
     appSecret?: string;
     option?: any;
 }
-export declare enum platform {
+export declare enum Platform {
     yunPian = "yunpian"
 }
 export declare class SmsSender {

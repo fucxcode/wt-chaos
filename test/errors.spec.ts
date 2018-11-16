@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { WTError, code } from "../src/errors";
+import { WTError, WTCode } from "../src/errors";
 import { $ } from "./$";
 
 describe("errors", () => {
@@ -7,7 +7,7 @@ describe("errors", () => {
     it("error code [401]", () => {
         const expectValue = $.randomString();
         const actualValue = $.randomString();
-        const resCode = code.invalidInput;
+        const resCode = WTCode.invalidInput;
         const message = $.randomString();
         const error = new WTError(resCode, message, expectValue, actualValue);
         const response = error.toHttpResponseValue();

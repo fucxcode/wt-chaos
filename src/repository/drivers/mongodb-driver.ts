@@ -15,7 +15,7 @@ import { MapReduceOptions } from "./map-reduce-options";
 import * as mongodb from "mongodb";
 import { ReadPreference, ReadWriteStrategy } from "./read-preference";
 import * as _ from "../../utilities";
-import { is } from "../../constants";
+import { Is } from "../../constants";
 import { FSyncOptions } from "./fsync-options";
 import { BulkWriteResult } from "./bulk-write-result";
 import { FindOperators } from "./find-operators";
@@ -165,7 +165,7 @@ class MongoDBDriver implements Driver<MongoDBSession, MongoDBId> {
     public async deleteOne(collectionName: string, condition: any, options?: DeleteOptions<MongoDBSession>): Promise<DeleteResult> {
         const result = await this._db.collection(collectionName).deleteOne(condition, this.mergeOptions(options));
         return _.assign({
-            ok: is.no,
+            ok: Is.no,
             n: 0
         }, result.result);
     }
@@ -173,7 +173,7 @@ class MongoDBDriver implements Driver<MongoDBSession, MongoDBId> {
     public async deleteMany(collectionName: string, condition: any, options?: DeleteOptions<MongoDBSession>): Promise<DeleteResult> {
         const result = await this._db.collection(collectionName).deleteMany(condition, this.mergeOptions(options));
         return _.assign({
-            ok: is.no,
+            ok: Is.no,
             n: 0
         }, result.result);
     }

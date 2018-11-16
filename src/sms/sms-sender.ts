@@ -8,7 +8,7 @@ export interface SmsOptions {
     option?: any;
 }
 
-export enum platform {
+export enum Platform {
 
     yunPian = "yunpian"
 
@@ -31,7 +31,7 @@ export class SmsSender {
 
     private static getService(options: SmsOptions): SmsInterface {
         switch (options.appKey) {
-            case platform.yunPian:
+            case Platform.yunPian:
                 return new YunPian(options.appKey);
                 break;
             default:

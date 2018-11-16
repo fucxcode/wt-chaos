@@ -4,7 +4,7 @@ export interface ISomeObject<T> {
     [key: string]: T;
 }
 
-export enum is {
+export enum Is {
     yes = 1,
     no = 0
 }
@@ -36,7 +36,7 @@ export type Composite<T, S> = T | S;
 
 export type ObjectOrId<T> = Composite<mongodb.ObjectId, T>;
 
-export type Projection<T> = (keyof T)[] | { [key in keyof T]?: is; };
+export type Projection<T> = (keyof T)[] | { [key in keyof T]?: Is; };
 
 export type Constructor<T> = new (...args: any[]) => T;
 

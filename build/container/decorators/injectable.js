@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const i_container_1 = require("../i-container");
 const container_1 = require("../container");
-const injectable = function (container, lifecycle = i_container_1.lifecycles.singleton, type) {
+const injectable = function (container, lifecycle = i_container_1.Lifecycles.singleton, type) {
     let realContainer;
     if (container) {
         realContainer = container;

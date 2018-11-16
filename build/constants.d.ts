@@ -2,7 +2,7 @@ import * as mongodb from "mongodb";
 export interface ISomeObject<T> {
     [key: string]: T;
 }
-export declare enum is {
+export declare enum Is {
     yes = 1,
     no = 0
 }
@@ -24,7 +24,7 @@ export declare const POSITION_STEP = 65536;
 export declare type Composite<T, S> = T | S;
 export declare type ObjectOrId<T> = Composite<mongodb.ObjectId, T>;
 export declare type Projection<T> = (keyof T)[] | {
-    [key in keyof T]?: is;
+    [key in keyof T]?: Is;
 };
 export declare type Constructor<T> = new (...args: any[]) => T;
 export declare enum HttpMethod {

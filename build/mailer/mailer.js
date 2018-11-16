@@ -36,7 +36,7 @@ class Mailer {
     async sendInternal(templateSetting, renderData, from, to) {
         const templatePath = path.resolve(this.config.template, templateSetting.templatePath);
         if (!this.checkRenderData(renderData)) {
-            throw new __1.WTError(__1.code.invalidInput, "spam data");
+            throw new __1.WTError(__1.WTCode.invalidInput, "spam data");
         }
         const template = fs.readFileSync(templatePath, "utf-8");
         let html;

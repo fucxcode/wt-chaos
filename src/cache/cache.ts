@@ -1,4 +1,4 @@
-import { is } from "../constants";
+import { Is } from "../constants";
 
 type ScanOptions = {
     match?: string,
@@ -15,7 +15,7 @@ interface Cache {
 
     getBuffer(key: string): Promise<Buffer>;
 
-    pexpire(key: string, milliseconds: number): Promise<is>;
+    pexpire(key: string, milliseconds: number): Promise<Is>;
 
     mgetBuffer(...keys: string[]): Promise<Buffer[]>;
 

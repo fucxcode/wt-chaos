@@ -116,14 +116,14 @@ class MongoDBDriver {
     async deleteOne(collectionName, condition, options) {
         const result = await this._db.collection(collectionName).deleteOne(condition, this.mergeOptions(options));
         return _.assign({
-            ok: constants_1.is.no,
+            ok: constants_1.Is.no,
             n: 0
         }, result.result);
     }
     async deleteMany(collectionName, condition, options) {
         const result = await this._db.collection(collectionName).deleteMany(condition, this.mergeOptions(options));
         return _.assign({
-            ok: constants_1.is.no,
+            ok: constants_1.Is.no,
             n: 0
         }, result.result);
     }

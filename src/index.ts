@@ -1,6 +1,6 @@
 import * as _ from "./utilities";
 import * as constants from "./constants";
-import { WTError, WTErrorResponse, code } from "./errors";
+import { WTError, WTErrorResponse, WTCode } from "./errors";
 import * as container from "./container";
 import * as cache from "./cache";
 import * as serializer from "./serializer";
@@ -15,7 +15,7 @@ export {
     constants,
     WTError,
     WTErrorResponse,
-    code,
+    WTCode,
     container,
     cache,
     serializer,

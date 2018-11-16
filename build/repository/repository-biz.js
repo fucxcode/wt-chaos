@@ -21,10 +21,10 @@ class BusinessRepository extends repository_1.Repository {
     }
     async onSave(context) {
         if (!context.operationDescription.team) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke onSave when operationDescription.team is nil", undefined, context.operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke onSave when operationDescription.team is nil", undefined, context.operationDescription);
         }
         if (!context.operationDescription.uid) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke onSave when operationDescription.uid is nil", undefined, context.operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke onSave when operationDescription.uid is nil", undefined, context.operationDescription);
         }
         const team = context.operationDescription.team;
         const uid = context.operationDescription.uid;
@@ -36,8 +36,8 @@ class BusinessRepository extends repository_1.Repository {
                 entity.created_by = uid;
                 entity.updated_at = now;
                 entity.updated_by = uid;
-                entity.is_deleted = constants_1.is.no;
-                entity.is_archived = constants_1.is.no;
+                entity.is_deleted = constants_1.Is.no;
+                entity.is_archived = constants_1.Is.no;
             }
         }
         else {
@@ -46,8 +46,8 @@ class BusinessRepository extends repository_1.Repository {
             context.entityOrArray.created_by = uid;
             context.entityOrArray.updated_at = now;
             context.entityOrArray.updated_by = uid;
-            context.entityOrArray.is_deleted = constants_1.is.no;
-            context.entityOrArray.is_archived = constants_1.is.no;
+            context.entityOrArray.is_deleted = constants_1.Is.no;
+            context.entityOrArray.is_archived = constants_1.Is.no;
         }
         await super.onSave(context);
     }
@@ -55,17 +55,17 @@ class BusinessRepository extends repository_1.Repository {
         const cond = _.assign({}, condition, {
             team: team
         });
-        if (!options || !options.includes || options.includes.deleted !== constants_1.is.yes) {
+        if (!options || !options.includes || options.includes.deleted !== constants_1.Is.yes) {
             _.assign(cond, {
                 is_deleted: {
-                    $ne: constants_1.is.yes
+                    $ne: constants_1.Is.yes
                 }
             });
         }
-        if (!options || !options.includes || options.includes.archived !== constants_1.is.yes) {
+        if (!options || !options.includes || options.includes.archived !== constants_1.Is.yes) {
             _.assign(cond, {
                 is_archived: {
-                    $ne: constants_1.is.yes
+                    $ne: constants_1.Is.yes
                 }
             });
         }
@@ -73,14 +73,14 @@ class BusinessRepository extends repository_1.Repository {
     }
     async onCount(context) {
         if (!context.operationDescription.team) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke onCount when operationDescription.team is nil", undefined, context.operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke onCount when operationDescription.team is nil", undefined, context.operationDescription);
         }
         context.condition = this.combineCondition(context.condition, context.operationDescription.team, context.options);
         await super.onCount(context);
     }
     async onFind(operationDescription, condition, options) {
         if (!operationDescription.team) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke onFind when operationDescription.team is nil", undefined, operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke onFind when operationDescription.team is nil", undefined, operationDescription);
         }
         condition = this.combineCondition(condition, operationDescription.team, options);
         return await super.onFind(operationDescription, condition, options);
@@ -98,10 +98,10 @@ class BusinessRepository extends repository_1.Repository {
     }
     async onUpdate(operationDescription, condition, update, multi = false, options) {
         if (!operationDescription.team) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke onUpdate when operationDescription.team is nil", undefined, operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke onUpdate when operationDescription.team is nil", undefined, operationDescription);
         }
         if (!operationDescription.uid) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke onUpdate when operationDescription.uid is nil", undefined, operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke onUpdate when operationDescription.uid is nil", undefined, operationDescription);
         }
         const team = operationDescription.team;
         const uid = operationDescription.uid;
@@ -118,7 +118,7 @@ class BusinessRepository extends repository_1.Repository {
     }
     async onErase(context, multi) {
         if (!context.operationDescription.team) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke onErase when operationDescription.team is nil", undefined, context.operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke onErase when operationDescription.team is nil", undefined, context.operationDescription);
         }
         context.condition = _.assign({}, context.condition, {
             team: context.operationDescription.team
@@ -127,10 +127,10 @@ class BusinessRepository extends repository_1.Repository {
     }
     async onFindOneAndUpdate(operationDescription, condition, update, options) {
         if (!operationDescription.team) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke onFindOneAndUpdate when operationDescription.team is nil", undefined, operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke onFindOneAndUpdate when operationDescription.team is nil", undefined, operationDescription);
         }
         if (!operationDescription.uid) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke onFindOneAndUpdate when operationDescription.uid is nil", undefined, operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke onFindOneAndUpdate when operationDescription.uid is nil", undefined, operationDescription);
         }
         const team = operationDescription.team;
         const uid = operationDescription.uid;
@@ -151,11 +151,11 @@ class BusinessRepository extends repository_1.Repository {
             c: _.assign({}, condition, {
                 team: team,
                 is_deleted: {
-                    $ne: constants_1.is.yes
+                    $ne: constants_1.Is.yes
                 }
             }),
             u: {
-                is_deleted: constants_1.is.yes,
+                is_deleted: constants_1.Is.yes,
                 deleted_by: uid,
                 deleted_at: now,
                 deleted_op: deletedOp,
@@ -166,30 +166,30 @@ class BusinessRepository extends repository_1.Repository {
     }
     async delete(operationDescription, deletedOp, condition, multi = false, options) {
         if (!operationDescription.team) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke delete when operationDescription.team is nil", undefined, operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke delete when operationDescription.team is nil", undefined, operationDescription);
         }
         if (!operationDescription.uid) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke delete when operationDescription.uid is nil", undefined, operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke delete when operationDescription.uid is nil", undefined, operationDescription);
         }
         const { c, u } = this.getDeleteConditionAndUpdate(operationDescription.team, operationDescription.uid, deletedOp, condition);
         return await this.update(operationDescription, c, u, multi, options);
     }
     async deleteById(operationDescription, id, deletedOp, condition, options) {
         if (!operationDescription.team) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke deleteById when operationDescription.team is nil", undefined, operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke deleteById when operationDescription.team is nil", undefined, operationDescription);
         }
         if (!operationDescription.uid) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke deleteById when operationDescription.uid is nil", undefined, operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke deleteById when operationDescription.uid is nil", undefined, operationDescription);
         }
         const { c, u } = this.getDeleteConditionAndUpdate(operationDescription.team, operationDescription.uid, deletedOp, condition);
         return await this.updateById(operationDescription, id, c, u, options);
     }
     async deleteByIds(operationDescription, ids, deletedOp, condition, options) {
         if (!operationDescription.team) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke deleteById when operationDescription.team is nil", undefined, operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke deleteById when operationDescription.team is nil", undefined, operationDescription);
         }
         if (!operationDescription.uid) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke deleteById when operationDescription.uid is nil", undefined, operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke deleteById when operationDescription.uid is nil", undefined, operationDescription);
         }
         const { c, u } = this.getDeleteConditionAndUpdate(operationDescription.team, operationDescription.uid, deletedOp, condition);
         return await this.updateByIds(operationDescription, ids, c, u, options);
@@ -199,11 +199,11 @@ class BusinessRepository extends repository_1.Repository {
         return {
             c: _.assign({}, condition, {
                 team: team,
-                is_deleted: constants_1.is.yes
+                is_deleted: constants_1.Is.yes
             }),
             u: {
                 $set: {
-                    is_deleted: constants_1.is.no,
+                    is_deleted: constants_1.Is.no,
                     updated_by: uid,
                     updated_at: now
                 },
@@ -217,30 +217,30 @@ class BusinessRepository extends repository_1.Repository {
     }
     async restore(operationDescription, condition, multi = false, options) {
         if (!operationDescription.team) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke restore when operationDescription.team is nil", undefined, operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke restore when operationDescription.team is nil", undefined, operationDescription);
         }
         if (!operationDescription.uid) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke restore when operationDescription.uid is nil", undefined, operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke restore when operationDescription.uid is nil", undefined, operationDescription);
         }
         const { c, u } = this.getRestoreConditionAndUpdate(operationDescription.team, operationDescription.uid, condition);
         return await this.update(operationDescription, c, u, multi, options);
     }
     async restoreById(operationDescription, id, condition, options) {
         if (!operationDescription.team) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke restoreById when operationDescription.team is nil", undefined, operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke restoreById when operationDescription.team is nil", undefined, operationDescription);
         }
         if (!operationDescription.uid) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke restoreById when operationDescription.uid is nil", undefined, operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke restoreById when operationDescription.uid is nil", undefined, operationDescription);
         }
         const { c, u } = this.getRestoreConditionAndUpdate(operationDescription.team, operationDescription.uid, condition);
         return await this.updateById(operationDescription, id, c, u, options);
     }
     async restoreByIds(operationDescription, ids, condition, options) {
         if (!operationDescription.team) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke restoreByIds when operationDescription.team is nil", undefined, operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke restoreByIds when operationDescription.team is nil", undefined, operationDescription);
         }
         if (!operationDescription.uid) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke restoreByIds when operationDescription.uid is nil", undefined, operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke restoreByIds when operationDescription.uid is nil", undefined, operationDescription);
         }
         const { c, u } = this.getRestoreConditionAndUpdate(operationDescription.team, operationDescription.uid, condition);
         return await this.updateById(operationDescription, ids, c, u, options);
@@ -251,11 +251,11 @@ class BusinessRepository extends repository_1.Repository {
             c: _.assign({}, condition, {
                 team: team,
                 is_archived: {
-                    $ne: constants_1.is.yes
+                    $ne: constants_1.Is.yes
                 }
             }),
             u: {
-                is_archived: constants_1.is.yes,
+                is_archived: constants_1.Is.yes,
                 archived_by: uid,
                 archived_at: now,
                 archived_op: archivedOp,
@@ -266,30 +266,30 @@ class BusinessRepository extends repository_1.Repository {
     }
     async archive(operationDescription, archivedOp, condition, multi = false, options) {
         if (!operationDescription.team) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke archive when operationDescription.team is nil", undefined, operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke archive when operationDescription.team is nil", undefined, operationDescription);
         }
         if (!operationDescription.uid) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke archive when operationDescription.uid is nil", undefined, operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke archive when operationDescription.uid is nil", undefined, operationDescription);
         }
         const { c, u } = this.getArchiveConditionAndUpdate(operationDescription.team, operationDescription.uid, archivedOp, condition);
         return await this.update(operationDescription, c, u, multi, options);
     }
     async archiveById(operationDescription, id, archivedOp, condition, options) {
         if (!operationDescription.team) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke archiveById when operationDescription.team is nil", undefined, operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke archiveById when operationDescription.team is nil", undefined, operationDescription);
         }
         if (!operationDescription.uid) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke archiveById when operationDescription.uid is nil", undefined, operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke archiveById when operationDescription.uid is nil", undefined, operationDescription);
         }
         const { c, u } = this.getArchiveConditionAndUpdate(operationDescription.team, operationDescription.uid, archivedOp, condition);
         return await this.updateById(operationDescription, id, c, u, options);
     }
     async archiveByIds(operationDescription, ids, archivedOp, condition, options) {
         if (!operationDescription.team) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke archiveByIds when operationDescription.team is nil", undefined, operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke archiveByIds when operationDescription.team is nil", undefined, operationDescription);
         }
         if (!operationDescription.uid) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke archiveByIds when operationDescription.uid is nil", undefined, operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke archiveByIds when operationDescription.uid is nil", undefined, operationDescription);
         }
         const { c, u } = this.getArchiveConditionAndUpdate(operationDescription.team, operationDescription.uid, archivedOp, condition);
         return await this.updateByIds(operationDescription, ids, c, u, options);
@@ -299,11 +299,11 @@ class BusinessRepository extends repository_1.Repository {
         return {
             c: _.assign({}, condition, {
                 team: team,
-                is_archived: constants_1.is.yes
+                is_archived: constants_1.Is.yes
             }),
             u: {
                 $set: {
-                    is_archived: constants_1.is.no,
+                    is_archived: constants_1.Is.no,
                     updated_by: uid,
                     updated_at: now
                 },
@@ -317,30 +317,30 @@ class BusinessRepository extends repository_1.Repository {
     }
     async unarchive(operationDescription, condition, multi = false, options) {
         if (!operationDescription.team) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke unarchive when operationDescription.team is nil", undefined, operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke unarchive when operationDescription.team is nil", undefined, operationDescription);
         }
         if (!operationDescription.uid) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke unarchive when operationDescription.uid is nil", undefined, operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke unarchive when operationDescription.uid is nil", undefined, operationDescription);
         }
         const { c, u } = this.getUnarchiveConditionAndUpdate(operationDescription.team, operationDescription.uid, condition);
         return await this.update(operationDescription, c, u, multi, options);
     }
     async unarchiveById(operationDescription, id, condition, options) {
         if (!operationDescription.team) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke unarchiveById when operationDescription.team is nil", undefined, operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke unarchiveById when operationDescription.team is nil", undefined, operationDescription);
         }
         if (!operationDescription.uid) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke unarchiveById when operationDescription.uid is nil", undefined, operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke unarchiveById when operationDescription.uid is nil", undefined, operationDescription);
         }
         const { c, u } = this.getUnarchiveConditionAndUpdate(operationDescription.team, operationDescription.uid, condition);
         return await this.updateById(operationDescription, id, c, u, options);
     }
     async unarchiveByIds(operationDescription, ids, condition, options) {
         if (!operationDescription.team) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke unarchiveByIds when operationDescription.team is nil", undefined, operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke unarchiveByIds when operationDescription.team is nil", undefined, operationDescription);
         }
         if (!operationDescription.uid) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "cannot invoke unarchiveByIds when operationDescription.uid is nil", undefined, operationDescription);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "cannot invoke unarchiveByIds when operationDescription.uid is nil", undefined, operationDescription);
         }
         const { c, u } = this.getUnarchiveConditionAndUpdate(operationDescription.team, operationDescription.uid, condition);
         return await this.updateByIds(operationDescription, ids, c, u, options);

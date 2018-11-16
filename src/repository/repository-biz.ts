@@ -3,10 +3,10 @@ import { Repository } from "./repository";
 import { BusinessEntity, Id } from "./entities";
 import { Plugin, SavePluginContext, CountPluginContext, ErasePluginContext } from "./plugins";
 import * as _ from "../utilities";
-import { WTError, code } from "../errors";
+import { WTError, WTCode } from "../errors";
 import moment from "moment";
 import { OperationDescription } from "./operation-desc";
-import { is, UID } from "../constants";
+import { Is, UID } from "../constants";
 import { IncludesOptions } from "./drivers/includes-options";
 
 abstract class BusinessRepository<TSession extends Session, TID extends Id, TDriver extends Driver<TSession, TID>, TEntity extends BusinessEntity> extends Repository<TSession, TID, TDriver, TEntity> {
@@ -17,10 +17,10 @@ abstract class BusinessRepository<TSession extends Session, TID extends Id, TDri
 
     protected async onSave(context: SavePluginContext<TEntity, TSession>): Promise<void> {
         if (!context.operationDescription.team) {
-            throw new WTError(code.invalidInput, "cannot invoke onSave when operationDescription.team is nil", undefined, context.operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke onSave when operationDescription.team is nil", undefined, context.operationDescription);
         }
         if (!context.operationDescription.uid) {
-            throw new WTError(code.invalidInput, "cannot invoke onSave when operationDescription.uid is nil", undefined, context.operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke onSave when operationDescription.uid is nil", undefined, context.operationDescription);
         }
 
         const team = context.operationDescription.team;
@@ -33,8 +33,8 @@ abstract class BusinessRepository<TSession extends Session, TID extends Id, TDri
                 entity.created_by = uid;
                 entity.updated_at = now;
                 entity.updated_by = uid;
-                entity.is_deleted = is.no;
-                entity.is_archived = is.no;
+                entity.is_deleted = Is.no;
+                entity.is_archived = Is.no;
             }
         }
         else {
@@ -43,8 +43,8 @@ abstract class BusinessRepository<TSession extends Session, TID extends Id, TDri
             context.entityOrArray.created_by = uid;
             context.entityOrArray.updated_at = now;
             context.entityOrArray.updated_by = uid;
-            context.entityOrArray.is_deleted = is.no;
-            context.entityOrArray.is_archived = is.no;
+            context.entityOrArray.is_deleted = Is.no;
+            context.entityOrArray.is_archived = Is.no;
         }
         await super.onSave(context);
     }
@@ -54,17 +54,17 @@ abstract class BusinessRepository<TSession extends Session, TID extends Id, TDri
             team: team
         });
 
-        if (!options || !options.includes || options.includes.deleted !== is.yes) {
+        if (!options || !options.includes || options.includes.deleted !== Is.yes) {
             _.assign(cond, {
                 is_deleted: {
-                    $ne: is.yes
+                    $ne: Is.yes
                 }
             });
         }
-        if (!options || !options.includes || options.includes.archived !== is.yes) {
+        if (!options || !options.includes || options.includes.archived !== Is.yes) {
             _.assign(cond, {
                 is_archived: {
-                    $ne: is.yes
+                    $ne: Is.yes
                 }
             });
         }
@@ -74,7 +74,7 @@ abstract class BusinessRepository<TSession extends Session, TID extends Id, TDri
     
     protected async onCount(context: CountPluginContext<TSession>): Promise<void> {
         if (!context.operationDescription.team) {
-            throw new WTError(code.invalidInput, "cannot invoke onCount when operationDescription.team is nil", undefined, context.operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke onCount when operationDescription.team is nil", undefined, context.operationDescription);
         }
 
         context.condition = this.combineCondition(context.condition, context.operationDescription.team, context.options);
@@ -83,7 +83,7 @@ abstract class BusinessRepository<TSession extends Session, TID extends Id, TDri
     
     protected async onFind(operationDescription: OperationDescription, condition?: any, options?: FindOptions<TEntity, TSession>): Promise<Partial<TEntity>[]> {
         if (!operationDescription.team) {
-            throw new WTError(code.invalidInput, "cannot invoke onFind when operationDescription.team is nil", undefined, operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke onFind when operationDescription.team is nil", undefined, operationDescription);
         }
 
         condition = this.combineCondition(condition, operationDescription.team, options);
@@ -104,10 +104,10 @@ abstract class BusinessRepository<TSession extends Session, TID extends Id, TDri
     
     protected async onUpdate(operationDescription: OperationDescription, condition?: any, update?: any, multi: boolean = false, options?: UpdateOptions<TSession>): Promise<UpdateResult> {
         if (!operationDescription.team) {
-            throw new WTError(code.invalidInput, "cannot invoke onUpdate when operationDescription.team is nil", undefined, operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke onUpdate when operationDescription.team is nil", undefined, operationDescription);
         }
         if (!operationDescription.uid) {
-            throw new WTError(code.invalidInput, "cannot invoke onUpdate when operationDescription.uid is nil", undefined, operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke onUpdate when operationDescription.uid is nil", undefined, operationDescription);
         }
 
         const team = operationDescription.team;
@@ -127,7 +127,7 @@ abstract class BusinessRepository<TSession extends Session, TID extends Id, TDri
     
     protected async onErase(context: ErasePluginContext<TSession>, multi: boolean): Promise<void> {
         if (!context.operationDescription.team) {
-            throw new WTError(code.invalidInput, "cannot invoke onErase when operationDescription.team is nil", undefined, context.operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke onErase when operationDescription.team is nil", undefined, context.operationDescription);
         }
 
         context.condition = _.assign({}, context.condition, {
@@ -138,10 +138,10 @@ abstract class BusinessRepository<TSession extends Session, TID extends Id, TDri
     
     protected async onFindOneAndUpdate(operationDescription: OperationDescription, condition?: any, update?: any, options?: FindOneAndUpdateOptions<TEntity, TSession>): Promise<Partial<TEntity> | undefined> {
         if (!operationDescription.team) {
-            throw new WTError(code.invalidInput, "cannot invoke onFindOneAndUpdate when operationDescription.team is nil", undefined, operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke onFindOneAndUpdate when operationDescription.team is nil", undefined, operationDescription);
         }
         if (!operationDescription.uid) {
-            throw new WTError(code.invalidInput, "cannot invoke onFindOneAndUpdate when operationDescription.uid is nil", undefined, operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke onFindOneAndUpdate when operationDescription.uid is nil", undefined, operationDescription);
         }
 
         const team = operationDescription.team;
@@ -168,11 +168,11 @@ abstract class BusinessRepository<TSession extends Session, TID extends Id, TDri
             c: _.assign({}, condition, {
                 team: team,
                 is_deleted: {
-                    $ne: is.yes
+                    $ne: Is.yes
                 }
             }),
             u: {
-                is_deleted: is.yes,
+                is_deleted: Is.yes,
                 deleted_by: uid,
                 deleted_at: now,
                 deleted_op: deletedOp,
@@ -184,10 +184,10 @@ abstract class BusinessRepository<TSession extends Session, TID extends Id, TDri
     
     public async delete(operationDescription: OperationDescription, deletedOp: number, condition?: any, multi: boolean = false, options?: UpdateOptions<TSession>): Promise<UpdateResult> {
         if (!operationDescription.team) {
-            throw new WTError(code.invalidInput, "cannot invoke delete when operationDescription.team is nil", undefined, operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke delete when operationDescription.team is nil", undefined, operationDescription);
         }
         if (!operationDescription.uid) {
-            throw new WTError(code.invalidInput, "cannot invoke delete when operationDescription.uid is nil", undefined, operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke delete when operationDescription.uid is nil", undefined, operationDescription);
         }
 
         const { c, u } = this.getDeleteConditionAndUpdate(operationDescription.team, operationDescription.uid, deletedOp, condition);
@@ -196,10 +196,10 @@ abstract class BusinessRepository<TSession extends Session, TID extends Id, TDri
 
     public async deleteById(operationDescription: OperationDescription, id: Id, deletedOp: number, condition?: any, options?: UpdateOptions<TSession>): Promise<UpdateResult> {
         if (!operationDescription.team) {
-            throw new WTError(code.invalidInput, "cannot invoke deleteById when operationDescription.team is nil", undefined, operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke deleteById when operationDescription.team is nil", undefined, operationDescription);
         }
         if (!operationDescription.uid) {
-            throw new WTError(code.invalidInput, "cannot invoke deleteById when operationDescription.uid is nil", undefined, operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke deleteById when operationDescription.uid is nil", undefined, operationDescription);
         }
 
         const { c, u } = this.getDeleteConditionAndUpdate(operationDescription.team, operationDescription.uid, deletedOp, condition);
@@ -208,10 +208,10 @@ abstract class BusinessRepository<TSession extends Session, TID extends Id, TDri
 
     public async deleteByIds(operationDescription: OperationDescription, ids: Id[], deletedOp: number, condition?: any, options?: UpdateOptions<TSession>): Promise<UpdateResult> {
         if (!operationDescription.team) {
-            throw new WTError(code.invalidInput, "cannot invoke deleteById when operationDescription.team is nil", undefined, operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke deleteById when operationDescription.team is nil", undefined, operationDescription);
         }
         if (!operationDescription.uid) {
-            throw new WTError(code.invalidInput, "cannot invoke deleteById when operationDescription.uid is nil", undefined, operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke deleteById when operationDescription.uid is nil", undefined, operationDescription);
         }
 
         const { c, u } = this.getDeleteConditionAndUpdate(operationDescription.team, operationDescription.uid, deletedOp, condition);
@@ -226,11 +226,11 @@ abstract class BusinessRepository<TSession extends Session, TID extends Id, TDri
         return {
             c: _.assign({}, condition, {
                 team: team,
-                is_deleted: is.yes
+                is_deleted: Is.yes
             }),
             u: {
                 $set: {
-                    is_deleted: is.no,
+                    is_deleted: Is.no,
                     updated_by: uid,
                     updated_at: now
                 },
@@ -245,10 +245,10 @@ abstract class BusinessRepository<TSession extends Session, TID extends Id, TDri
 
     public async restore(operationDescription: OperationDescription, condition?: any, multi: boolean = false, options?: UpdateOptions<TSession>): Promise<UpdateResult> {
         if (!operationDescription.team) {
-            throw new WTError(code.invalidInput, "cannot invoke restore when operationDescription.team is nil", undefined, operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke restore when operationDescription.team is nil", undefined, operationDescription);
         }
         if (!operationDescription.uid) {
-            throw new WTError(code.invalidInput, "cannot invoke restore when operationDescription.uid is nil", undefined, operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke restore when operationDescription.uid is nil", undefined, operationDescription);
         }
 
         const { c, u } = this.getRestoreConditionAndUpdate(operationDescription.team, operationDescription.uid, condition);
@@ -258,10 +258,10 @@ abstract class BusinessRepository<TSession extends Session, TID extends Id, TDri
 
     public async restoreById(operationDescription: OperationDescription, id: Id, condition?: any, options?: UpdateOptions<TSession>): Promise<UpdateResult> {
         if (!operationDescription.team) {
-            throw new WTError(code.invalidInput, "cannot invoke restoreById when operationDescription.team is nil", undefined, operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke restoreById when operationDescription.team is nil", undefined, operationDescription);
         }
         if (!operationDescription.uid) {
-            throw new WTError(code.invalidInput, "cannot invoke restoreById when operationDescription.uid is nil", undefined, operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke restoreById when operationDescription.uid is nil", undefined, operationDescription);
         }
 
         const { c, u } = this.getRestoreConditionAndUpdate(operationDescription.team, operationDescription.uid, condition);
@@ -270,10 +270,10 @@ abstract class BusinessRepository<TSession extends Session, TID extends Id, TDri
 
     public async restoreByIds(operationDescription: OperationDescription, ids: Id[], condition?: any, options?: UpdateOptions<TSession>): Promise<UpdateResult> {
         if (!operationDescription.team) {
-            throw new WTError(code.invalidInput, "cannot invoke restoreByIds when operationDescription.team is nil", undefined, operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke restoreByIds when operationDescription.team is nil", undefined, operationDescription);
         }
         if (!operationDescription.uid) {
-            throw new WTError(code.invalidInput, "cannot invoke restoreByIds when operationDescription.uid is nil", undefined, operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke restoreByIds when operationDescription.uid is nil", undefined, operationDescription);
         }
 
         const { c, u } = this.getRestoreConditionAndUpdate(operationDescription.team, operationDescription.uid, condition);
@@ -289,11 +289,11 @@ abstract class BusinessRepository<TSession extends Session, TID extends Id, TDri
             c: _.assign({}, condition, {
                 team: team,
                 is_archived: {
-                    $ne: is.yes
+                    $ne: Is.yes
                 }
             }),
             u: {
-                is_archived: is.yes,
+                is_archived: Is.yes,
                 archived_by: uid,
                 archived_at: now,
                 archived_op: archivedOp,
@@ -305,10 +305,10 @@ abstract class BusinessRepository<TSession extends Session, TID extends Id, TDri
 
     public async archive(operationDescription: OperationDescription, archivedOp: number, condition?: any, multi: boolean = false, options?: UpdateOptions<TSession>): Promise<UpdateResult> {
         if (!operationDescription.team) {
-            throw new WTError(code.invalidInput, "cannot invoke archive when operationDescription.team is nil", undefined, operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke archive when operationDescription.team is nil", undefined, operationDescription);
         }
         if (!operationDescription.uid) {
-            throw new WTError(code.invalidInput, "cannot invoke archive when operationDescription.uid is nil", undefined, operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke archive when operationDescription.uid is nil", undefined, operationDescription);
         }
 
         const { c, u } = this.getArchiveConditionAndUpdate(operationDescription.team, operationDescription.uid, archivedOp, condition);
@@ -317,10 +317,10 @@ abstract class BusinessRepository<TSession extends Session, TID extends Id, TDri
 
     public async archiveById(operationDescription: OperationDescription, id: Id, archivedOp: number, condition?: any, options?: UpdateOptions<TSession>): Promise<UpdateResult> {
         if (!operationDescription.team) {
-            throw new WTError(code.invalidInput, "cannot invoke archiveById when operationDescription.team is nil", undefined, operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke archiveById when operationDescription.team is nil", undefined, operationDescription);
         }
         if (!operationDescription.uid) {
-            throw new WTError(code.invalidInput, "cannot invoke archiveById when operationDescription.uid is nil", undefined, operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke archiveById when operationDescription.uid is nil", undefined, operationDescription);
         }
 
         const { c, u } = this.getArchiveConditionAndUpdate(operationDescription.team, operationDescription.uid, archivedOp, condition);
@@ -329,10 +329,10 @@ abstract class BusinessRepository<TSession extends Session, TID extends Id, TDri
 
     public async archiveByIds(operationDescription: OperationDescription, ids: Id[], archivedOp: number, condition?: any, options?: UpdateOptions<TSession>): Promise<UpdateResult> {
         if (!operationDescription.team) {
-            throw new WTError(code.invalidInput, "cannot invoke archiveByIds when operationDescription.team is nil", undefined, operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke archiveByIds when operationDescription.team is nil", undefined, operationDescription);
         }
         if (!operationDescription.uid) {
-            throw new WTError(code.invalidInput, "cannot invoke archiveByIds when operationDescription.uid is nil", undefined, operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke archiveByIds when operationDescription.uid is nil", undefined, operationDescription);
         }
 
         const { c, u } = this.getArchiveConditionAndUpdate(operationDescription.team, operationDescription.uid, archivedOp, condition);
@@ -347,11 +347,11 @@ abstract class BusinessRepository<TSession extends Session, TID extends Id, TDri
         return {
             c: _.assign({}, condition, {
                 team: team,
-                is_archived: is.yes
+                is_archived: Is.yes
             }),
             u: {
                 $set: {
-                    is_archived: is.no,
+                    is_archived: Is.no,
                     updated_by: uid,
                     updated_at: now
                 },
@@ -366,10 +366,10 @@ abstract class BusinessRepository<TSession extends Session, TID extends Id, TDri
 
     public async unarchive(operationDescription: OperationDescription, condition?: any, multi: boolean = false, options?: UpdateOptions<TSession>): Promise<UpdateResult> {
         if (!operationDescription.team) {
-            throw new WTError(code.invalidInput, "cannot invoke unarchive when operationDescription.team is nil", undefined, operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke unarchive when operationDescription.team is nil", undefined, operationDescription);
         }
         if (!operationDescription.uid) {
-            throw new WTError(code.invalidInput, "cannot invoke unarchive when operationDescription.uid is nil", undefined, operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke unarchive when operationDescription.uid is nil", undefined, operationDescription);
         }
         const { c, u } = this.getUnarchiveConditionAndUpdate(operationDescription.team, operationDescription.uid, condition);
         return await this.update(operationDescription, c, u, multi, options);
@@ -377,10 +377,10 @@ abstract class BusinessRepository<TSession extends Session, TID extends Id, TDri
 
     public async unarchiveById(operationDescription: OperationDescription, id: Id, condition?: any, options?: UpdateOptions<TSession>): Promise<UpdateResult> {
         if (!operationDescription.team) {
-            throw new WTError(code.invalidInput, "cannot invoke unarchiveById when operationDescription.team is nil", undefined, operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke unarchiveById when operationDescription.team is nil", undefined, operationDescription);
         }
         if (!operationDescription.uid) {
-            throw new WTError(code.invalidInput, "cannot invoke unarchiveById when operationDescription.uid is nil", undefined, operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke unarchiveById when operationDescription.uid is nil", undefined, operationDescription);
         }
         const { c, u } = this.getUnarchiveConditionAndUpdate(operationDescription.team, operationDescription.uid, condition);
         return await this.updateById(operationDescription, id, c, u, options);
@@ -388,10 +388,10 @@ abstract class BusinessRepository<TSession extends Session, TID extends Id, TDri
 
     public async unarchiveByIds(operationDescription: OperationDescription, ids: Id[], condition?: any, options?: UpdateOptions<TSession>): Promise<UpdateResult> {
         if (!operationDescription.team) {
-            throw new WTError(code.invalidInput, "cannot invoke unarchiveByIds when operationDescription.team is nil", undefined, operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke unarchiveByIds when operationDescription.team is nil", undefined, operationDescription);
         }
         if (!operationDescription.uid) {
-            throw new WTError(code.invalidInput, "cannot invoke unarchiveByIds when operationDescription.uid is nil", undefined, operationDescription);
+            throw new WTError(WTCode.invalidInput, "cannot invoke unarchiveByIds when operationDescription.uid is nil", undefined, operationDescription);
         }
         const { c, u } = this.getUnarchiveConditionAndUpdate(operationDescription.team, operationDescription.uid, condition);
         return await this.updateByIds(operationDescription, ids, c, u, options);

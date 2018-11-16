@@ -1,9 +1,9 @@
-import { code } from "./code";
+import { WTCode } from "./code";
 
 export class WTError extends Error {
 
-    private _code: code | number;
-    public get code(): code | number {
+    private _code: WTCode | number;
+    public get code(): WTCode | number {
         return this._code;
     }
 
@@ -17,7 +17,7 @@ export class WTError extends Error {
         return this._actualValue;
     }
 
-    constructor(code: code | number, message: string, expectValue?: any, actualValue?: any) {
+    constructor(code: WTCode | number, message: string, expectValue?: any, actualValue?: any) {
         super(message);
 
         this._code = code;
@@ -40,7 +40,7 @@ export class WTError extends Error {
 }
 
 export type WTErrorResponse = {
-    code: code | number,
+    code: WTCode | number,
     expect_value: any,
     actual_value: any,
     message: string

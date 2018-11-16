@@ -5,7 +5,7 @@ const constants_1 = require("../../../constants");
 class UpdateByIdPluginContext extends plugin_context_1.PluginContext {
     constructor(operationDescription, collectionName, driverName, id, condition, update, options) {
         super(operationDescription, collectionName, driverName, "updateById", {
-            ok: constants_1.is.yes,
+            ok: constants_1.Is.yes,
             n: 0,
             nModified: 0
         });

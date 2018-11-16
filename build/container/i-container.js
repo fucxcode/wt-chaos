@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var lifecycles;
-(function (lifecycles) {
-    lifecycles[lifecycles["singleton"] = 1] = "singleton";
-    lifecycles[lifecycles["instantiate"] = 2] = "instantiate";
-})(lifecycles || (lifecycles = {}));
-exports.lifecycles = lifecycles;
+var Lifecycles;
+(function (Lifecycles) {
+    Lifecycles[Lifecycles["singleton"] = 1] = "singleton";
+    Lifecycles[Lifecycles["instantiate"] = 2] = "instantiate";
+})(Lifecycles || (Lifecycles = {}));
+exports.Lifecycles = Lifecycles;
 class ParamType {
     get type() {
         return this._type;

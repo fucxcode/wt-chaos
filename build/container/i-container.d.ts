@@ -1,5 +1,5 @@
 declare type Type = Function | Symbol;
-declare enum lifecycles {
+declare enum Lifecycles {
     singleton = 1,
     instantiate = 2
 }
@@ -21,10 +21,10 @@ declare class PropertyType {
 }
 interface IContainer {
     key: Symbol;
-    registerType(type: Type, ctor: Function, lifecycle?: lifecycles, paramTypes?: ParamType[], propTypes?: PropertyType[]): IContainer;
+    registerType(type: Type, ctor: Function, lifecycle?: Lifecycles, paramTypes?: ParamType[], propTypes?: PropertyType[]): IContainer;
     registerInstance(type: Symbol, instance: any): IContainer;
     unregister(type: Type): boolean;
     clear(): void;
     resolve<T extends object>(type: Type, throwErrorUnregister?: boolean, ...params: any[]): T | undefined;
 }
-export { IContainer, lifecycles, Type, ParamType, PropertyType };
+export { IContainer, Lifecycles, Type, ParamType, PropertyType };

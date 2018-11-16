@@ -92,7 +92,7 @@ class Repository {
             limit: limit
         }));
         if (entities.length > 1) {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "expected one document but retrieve multiple by condition", null, entities);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "expected one document but retrieve multiple by condition", null, entities);
         }
         else {
             return _.first(entities);

@@ -8,11 +8,11 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongodb = __importStar(require("mongodb"));
-var is;
-(function (is) {
-    is[is["yes"] = 1] = "yes";
-    is[is["no"] = 0] = "no";
-})(is = exports.is || (exports.is = {}));
+var Is;
+(function (Is) {
+    Is[Is["yes"] = 1] = "yes";
+    Is[Is["no"] = 0] = "no";
+})(Is = exports.Is || (exports.Is = {}));
 exports.EMPTY_OBJECT_ID_STR = `000000000000000000000000`;
 exports.EMPTY_OBJECT_ID = new mongodb.ObjectId(exports.EMPTY_OBJECT_ID_STR);
 exports.ME_UID = "00000000000000000000000000000000";

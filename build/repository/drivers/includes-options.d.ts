@@ -1,7 +1,7 @@
-import { is } from "../../constants";
+import { Is } from "../../constants";
 export interface IncludesOptions {
     includes?: {
-        deleted?: is;
-        archived?: is;
+        deleted?: Is;
+        archived?: Is;
     };
 }

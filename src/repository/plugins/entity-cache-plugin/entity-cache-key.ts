@@ -1,4 +1,4 @@
-import { WTError, code } from "../../../errors";
+import { WTError, WTCode } from "../../../errors";
 
 class EntityCacheKey {
 
@@ -59,7 +59,7 @@ class EntityCacheKey {
             );
         }
         else {
-            throw new WTError(code.invalidInput, "invalid format of cache key", "PREFIX|{TEAM_ID}COLLECTION_NAME:ID", value);
+            throw new WTError(WTCode.invalidInput, "invalid format of cache key", "PREFIX|{TEAM_ID}COLLECTION_NAME:ID", value);
         }
     }
 

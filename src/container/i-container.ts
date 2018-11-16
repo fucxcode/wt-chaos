@@ -1,6 +1,6 @@
 type Type = Function | Symbol;
 
-enum lifecycles {
+enum Lifecycles {
 
     singleton = 1,
 
@@ -56,7 +56,7 @@ interface IContainer {
 
     key: Symbol;
 
-    registerType(type: Type, ctor: Function, lifecycle?: lifecycles, paramTypes?: ParamType[], propTypes?: PropertyType[]): IContainer;
+    registerType(type: Type, ctor: Function, lifecycle?: Lifecycles, paramTypes?: ParamType[], propTypes?: PropertyType[]): IContainer;
 
     registerInstance(type: Symbol, instance: any): IContainer;
 
@@ -68,4 +68,4 @@ interface IContainer {
 
 }
 
-export { IContainer, lifecycles, Type, ParamType, PropertyType };
+export { IContainer, Lifecycles, Type, ParamType, PropertyType };

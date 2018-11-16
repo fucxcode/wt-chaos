@@ -196,7 +196,7 @@ function project(object, projection = [], defaultPicks = ["_id"]) {
         for (const key in projection) {
             const value = projection[key];
             if (!_.isEmpty(key)) {
-                if (value === constants_1.is.yes) {
+                if (value === constants_1.Is.yes) {
                     picks.push(key);
                 }
                 else {

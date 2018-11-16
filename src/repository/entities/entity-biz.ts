@@ -1,6 +1,6 @@
 import { Entity } from "./entity";
 import { Id } from "./id";
-import { Timestamp, UID, is } from "../../constants";
+import { Timestamp, UID, Is } from "../../constants";
 
 export interface BusinessEntity extends Entity {
 
@@ -14,7 +14,7 @@ export interface BusinessEntity extends Entity {
 
     updated_by?: UID;
 
-    is_deleted?: is;
+    is_deleted?: Is;
 
     deleted_at?: Timestamp;
 
@@ -22,7 +22,7 @@ export interface BusinessEntity extends Entity {
 
     deleted_op?: number;
 
-    is_archived?: is;
+    is_archived?: Is;
 
     archived_at?: Timestamp;
 

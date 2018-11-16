@@ -1,6 +1,6 @@
 /// <reference types="node" />
 /// <reference types="mocha" />
-import { is } from "../constants";
+import { Is } from "../constants";
 declare type ScanOptions = {
     match?: string;
     count?: number;
@@ -10,7 +10,7 @@ interface Cache {
     disconnect(): void;
     get(key: string): Promise<string | null | undefined>;
     getBuffer(key: string): Promise<Buffer>;
-    pexpire(key: string, milliseconds: number): Promise<is>;
+    pexpire(key: string, milliseconds: number): Promise<Is>;
     mgetBuffer(...keys: string[]): Promise<Buffer[]>;
     psetex(key: string, milliseconds: number, value: any): Promise<string>;
     set(key: string, value: any, ...args: any[]): Promise<string>;

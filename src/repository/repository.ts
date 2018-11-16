@@ -3,7 +3,7 @@ import { Driver, InsertOneOptions, InsertManyOptions, CountOptions, FindOneOptio
 import { OperationDescription } from "./operation-desc";
 import * as _ from "../utilities";
 import { DEFAULT_PAGE_SIZE, DEFAULT_PAGE_SIZE_LIMIT } from "../constants";
-import { WTError, code } from "../errors";
+import { WTError, WTCode } from "../errors";
 import { Plugin } from "./plugins/plugin";
 import { SavePluginContext } from "./plugins/contexts/plugin-context-save";
 import { PluginContext } from "./plugins/contexts/plugin-context";
@@ -106,7 +106,7 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
             limit: limit
         }));
         if (entities.length > 1) {
-            throw new WTError(code.invalidInput, "expected one document but retrieve multiple by condition", null, entities);
+            throw new WTError(WTCode.invalidInput, "expected one document but retrieve multiple by condition", null, entities);
         }
         else {
             return _.first(entities);

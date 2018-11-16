@@ -1,7 +1,7 @@
-import { IContainer, lifecycles, Type, ParamType } from "../i-container";
+import { IContainer, Lifecycles, Type, ParamType } from "../i-container";
 import { getDefaultContainer } from "../container";
 
-const injectable = function (container?: IContainer, lifecycle: lifecycles = lifecycles.singleton, type?: Type) {
+const injectable = function (container?: IContainer, lifecycle: Lifecycles = Lifecycles.singleton, type?: Type) {
     let realContainer: IContainer;
     if (container) {
         realContainer = container;

@@ -13,11 +13,11 @@ class Resolver {
     get lifecycle() {
         return this._lifecycle;
     }
-    constructor(container, ctor, paramTypes = [], propTypes = [], lifecycle = i_container_1.lifecycles.singleton, object) {
+    constructor(container, ctor, paramTypes = [], propTypes = [], lifecycle = i_container_1.Lifecycles.singleton, object) {
         this._container = container;
         if (object) {
             this._object = object;
-            this._lifecycle = i_container_1.lifecycles.singleton;
+            this._lifecycle = i_container_1.Lifecycles.singleton;
         }
         else {
             this._ctor = ctor;
@@ -49,7 +49,7 @@ class Resolver {
         }
     }
     resolve(params) {
-        if (this._lifecycle === i_container_1.lifecycles.instantiate) {
+        if (this._lifecycle === i_container_1.Lifecycles.instantiate) {
             const instance = this.instantiate(params);
             this.injectProperties(instance);
             return instance;
@@ -77,12 +77,12 @@ class Container {
         this._resolvers.set(type, item);
         return item;
     }
-    registerType(type, ctor, lifecycle = i_container_1.lifecycles.singleton, paramTypes, propTypes) {
+    registerType(type, ctor, lifecycle = i_container_1.Lifecycles.singleton, paramTypes, propTypes) {
         this.registerInternal(type, ctor, lifecycle, paramTypes, propTypes);
         return this;
     }
     registerInstance(type, instance) {
-        this.registerInternal(type, undefined, i_container_1.lifecycles.singleton, undefined, undefined, instance);
+        this.registerInternal(type, undefined, i_container_1.Lifecycles.singleton, undefined, undefined, instance);
         return this;
     }
     unregister(type) {

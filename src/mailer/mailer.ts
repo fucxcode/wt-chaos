@@ -2,7 +2,7 @@ import { spamList } from "./spam";
 import * as path from "path";
 import * as fs from "fs";
 import * as mustache from "mustache";
-import { _, WTError, code } from "../";
+import { _, WTError, WTCode } from "../";
 import * as util from "util";
 import { IMail } from "./adapter";
 import { MailConfig } from "./config";
@@ -38,7 +38,7 @@ export class Mailer {
         const templatePath = path.resolve(this.config.template,  templateSetting.templatePath);
 
         if (!this.checkRenderData(renderData)) {
-            throw new WTError(code.invalidInput, "spam data");
+            throw new WTError(WTCode.invalidInput, "spam data");
         }
         const template = fs.readFileSync(templatePath, "utf-8");
 

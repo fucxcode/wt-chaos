@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import * as _ from "../src/utilities";
 import * as mongodb from "mongodb";
-import { is } from "../src/constants";
+import { Is } from "../src/constants";
 import { $ } from "./$";
 
 describe("utilities", () => {
@@ -208,9 +208,9 @@ describe("utilities", () => {
             };
 
             const output = _.project(object, {
-                _id: is.yes,
-                number_prop: is.yes,
-                object_prop: is.yes
+                _id: Is.yes,
+                number_prop: Is.yes,
+                object_prop: Is.yes
             });
 
             assert.deepEqual(output, _.pick(object, ["_id", "number_prop", "object_prop"]));
@@ -233,9 +233,9 @@ describe("utilities", () => {
             };
 
             const output = _.project(object, {
-                _id: is.yes,
-                number_prop: is.no,
-                object_prop: is.yes
+                _id: Is.yes,
+                number_prop: Is.no,
+                object_prop: Is.yes
             });
 
             assert.deepEqual(output, _.pick(object, ["_id", "object_prop"]));
@@ -258,7 +258,7 @@ describe("utilities", () => {
             };
 
             const output = _.project(object, {
-                number_prop: is.no
+                number_prop: Is.no
             });
 
             assert.deepEqual(output, _.pick(object, ["_id", "string_prop", "object_prop", "array_prop"]));
@@ -281,11 +281,11 @@ describe("utilities", () => {
             };
 
             const output = _.project(object, {
-                _id: is.no,
-                string_prop: is.no,
-                number_prop: is.no,
-                object_prop: is.no,
-                array_prop: is.no
+                _id: Is.no,
+                string_prop: Is.no,
+                number_prop: Is.no,
+                object_prop: Is.no,
+                array_prop: Is.no
             });
 
             assert.deepEqual(output, {});
@@ -308,7 +308,7 @@ describe("utilities", () => {
             };
 
             const output = _.project(object, {
-                string_prop: is.yes
+                string_prop: Is.yes
             });
 
             assert.deepEqual(output, _.pick(object, ["_id", "string_prop"]));
@@ -331,7 +331,7 @@ describe("utilities", () => {
             };
 
             const output = _.project(object, {
-                string_prop: is.yes
+                string_prop: Is.yes
             }, ["_id", "number_prop"]);
 
             assert.deepEqual(output, _.pick(object, ["_id", "string_prop", "number_prop"]));
@@ -354,7 +354,7 @@ describe("utilities", () => {
             };
 
             const output = _.project(object, {
-                string_prop: is.yes
+                string_prop: Is.yes
             }, ["number_prop"]);
 
             assert.deepEqual(output, _.pick(object, ["string_prop", "number_prop"]));
@@ -377,8 +377,8 @@ describe("utilities", () => {
             };
 
             const output = _.project(object, {
-                string_prop: is.yes,
-                _id: is.no
+                string_prop: Is.yes,
+                _id: Is.no
             }, ["_id"]);
 
             assert.deepEqual(output, _.pick(object, ["string_prop"]));
@@ -402,7 +402,7 @@ describe("utilities", () => {
             };
 
             const output = _.project(object, {
-                "shaun.1.xu": is.yes
+                "shaun.1.xu": Is.yes
             });
 
             assert.deepEqual(output, _.pick(object, ["shaun.1.xu"]));
@@ -415,7 +415,7 @@ describe("utilities", () => {
             };
 
             const output = _.project(object, {
-                "shaun.1.xu": is.no
+                "shaun.1.xu": Is.no
             });
 
             assert.deepEqual(output, _.pick(object, ["prop.has.dot"]));
@@ -429,7 +429,7 @@ describe("utilities", () => {
             };
 
             const output = _.project(object, {
-                "prop.has.dot": is.yes
+                "prop.has.dot": Is.yes
             });
 
             assert.deepEqual(output, _.pick(object, ["prop.has.dot"]));
@@ -443,7 +443,7 @@ describe("utilities", () => {
             };
 
             const output = _.project(object, {
-                "prop.has": is.yes
+                "prop.has": Is.yes
             });
 
             assert.deepEqual(output, _.pick(object, ["prop.has"]));
@@ -457,7 +457,7 @@ describe("utilities", () => {
             };
 
             const output = _.project(object, {
-                "prop": is.yes
+                "prop": Is.yes
             });
 
             assert.deepEqual(output, _.pick(object, ["prop"]));

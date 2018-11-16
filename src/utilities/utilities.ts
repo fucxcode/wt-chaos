@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import * as _ from "./lodash-wrapper";
 import moment from "moment";
-import { ObjectID, is, Projection, ObjectOrId } from "../constants";
+import { ObjectID, Is, Projection, ObjectOrId } from "../constants";
 import * as mongodb from "mongodb";
 import { Id } from "../repository";
 import * as randomstring from "randomstring";
@@ -183,10 +183,10 @@ export function project<T extends object>(object: T, projection: Projection<T> =
         picks = _.filter(projection as (keyof T)[], x => !_.isEmpty(x));
     }
     else {
-        for (const key in projection as { [key in keyof T]: is; }) {
+        for (const key in projection as { [key in keyof T]: Is; }) {
             const value = projection[key];
             if (!_.isEmpty(key)) {
-                if (value === is.yes) {
+                if (value === Is.yes) {
                     picks.push(key);
                 }
                 else {

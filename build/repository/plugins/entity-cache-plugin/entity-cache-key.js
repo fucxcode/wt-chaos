@@ -43,7 +43,7 @@ class EntityCacheKey {
             return new EntityCacheKey(value.substring(posLeftBrace + 1, posRightBrace), value.substring(posRightBrace + 1, posColon), value.substring(posColon + 1));
         }
         else {
-            throw new errors_1.WTError(errors_1.code.invalidInput, "invalid format of cache key", "PREFIX|{TEAM_ID}COLLECTION_NAME:ID", value);
+            throw new errors_1.WTError(errors_1.WTCode.invalidInput, "invalid format of cache key", "PREFIX|{TEAM_ID}COLLECTION_NAME:ID", value);
         }
     }
     static tryParse(value) {

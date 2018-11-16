@@ -4,7 +4,7 @@ import { OperationDescription } from "../../operation-desc";
 import { Repository } from "../../repository";
 import { Id, Entity } from "../../entities";
 import { UpdateOptions } from "../../drivers/update-options";
-import { is } from "../../../constants";
+import { Is } from "../../../constants";
 import { Session } from "../../drivers";
 
 class UpdateByIdPluginContext<TSession extends Session> extends PluginContext<UpdateResult> {
@@ -16,7 +16,7 @@ class UpdateByIdPluginContext<TSession extends Session> extends PluginContext<Up
         public options?: UpdateOptions<TSession>
     ) {
         super(operationDescription, collectionName, driverName, "updateById", {
-            ok: is.yes,
+            ok: Is.yes,
             n: 0,
             nModified: 0
         });

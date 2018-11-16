@@ -2,7 +2,7 @@ import { assert } from "chai";
 import * as uuid from "node-uuid";
 import * as _ from "../src/utilities";
 
-import { IContainer, lifecycles } from "../src/container/i-container";
+import { IContainer, Lifecycles } from "../src/container/i-container";
 import { registerContainer, clearContainers, resolveContainer } from "../src/container/container";
 import { inject, injectable } from "../src/container/decorators";
 import { BypassActivationHandler } from "../src/container/activation-handlers/bypass-activation-handler";
@@ -56,7 +56,7 @@ describe(`container`, () => {
     }
 
     it(`register as singleton, should resolve the same instance`, () => {
-        container.registerType(TestClass, TestClass, lifecycles.singleton);
+        container.registerType(TestClass, TestClass, Lifecycles.singleton);
 
         const instances: TestClass[] = [];
         for (let i = 0; i < 10; i++) {
@@ -86,7 +86,7 @@ describe(`container`, () => {
     });
 
     it(`register as instantiate, should resolve different instance`, () => {
-        container.registerType(TestClass, TestClass, lifecycles.instantiate);
+        container.registerType(TestClass, TestClass, Lifecycles.instantiate);
 
         const instances: TestClass[] = [];
         for (let i = 0; i < 10; i++) {
@@ -150,7 +150,7 @@ describe(`container`, () => {
     });
 
     it(`resolve with params, instantiate, each instances uses its params to construct`, () => {
-        container.registerType(TestClass, TestClass, lifecycles.instantiate);
+        container.registerType(TestClass, TestClass, Lifecycles.instantiate);
 
         const ids: string[] = [];
         const names: string[] = [];
@@ -190,7 +190,7 @@ describe(`container`, () => {
 
     it(`@injectable(singleton) should register type in singleton`, () => {
 
-        @injectable(container, lifecycles.singleton)
+        @injectable(container, Lifecycles.singleton)
         // @ts-ignore
         class InjectableClass {
             private _id: string;
@@ -212,7 +212,7 @@ describe(`container`, () => {
 
     it(`@injectable(instantiate) should register type in instantiate`, () => {
 
-        @injectable(container, lifecycles.instantiate)
+        @injectable(container, Lifecycles.instantiate)
         // @ts-ignore
         class InjectableClass {
             private _id: string;

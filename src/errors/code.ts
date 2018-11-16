@@ -1,4 +1,4 @@
-enum code {
+enum WTCode {
     ok = 200,
     notFound = 400,
     invalidInput = 401,
@@ -6,4 +6,4 @@ enum code {
     internalError = 500
 }
 
-export { code };
+export { WTCode };

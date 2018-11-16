@@ -1,6 +1,6 @@
 import { Cache, Pipeline, ScanOptions } from "../cache";
 import IORedis from "ioredis";
-import { is } from "../../constants";
+import { Is } from "../../constants";
 import * as _ from "../../utilities";
 import { CacheHelper } from "../helper";
 import { Omit } from "lodash";
@@ -32,7 +32,7 @@ abstract class RedisBase implements Cache {
         return await this._redis.getBuffer(key);
     }
     
-    public async pexpire(key: string, milliseconds: number): Promise<is> {
+    public async pexpire(key: string, milliseconds: number): Promise<Is> {
         return await this._redis.pexpire(key, milliseconds);
     }
     public async mgetBuffer(...keys: string[]): Promise<Buffer[]> {

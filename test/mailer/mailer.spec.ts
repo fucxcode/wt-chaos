@@ -54,9 +54,11 @@ describe("#mailer", function () {
         layoutKey = $.randomString();
         const templateTail = `<div>${templateKey}<div>`;
         const layoutTail = `<div>${layoutKey}<div>`;
-        fs.unlinkSync(__dirname + "/template/template.html");
+        if (fs.existsSync(__dirname + "/template/template.html")) {
+            fs.unlinkSync(__dirname + "/template/template.html");
+            fs.unlinkSync(__dirname + "/layout/layout.html");
+        }
         fs.writeFileSync(__dirname + "/template/template.html", template + templateTail);
-        fs.unlinkSync(__dirname + "/layout/layout.html");
         fs.writeFileSync(__dirname + "/layout/layout.html", layout + layoutTail);
     });
 

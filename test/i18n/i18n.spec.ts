@@ -16,6 +16,7 @@ function _assertMissionFirstTask(
 
 describe("i18n", () => {
     let i18n: I18n;
+
     before(() => {
         i18n = new I18n(
             {
@@ -26,6 +27,7 @@ describe("i18n", () => {
             null
         );
     });
+
     it(`get zh-cn TITLE is 标题`, () => {
         const title = i18n.__("TITLE", "zh-cn");
         assert.equal(title, "标题");

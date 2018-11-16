@@ -97,7 +97,7 @@ describe("#mailer", function () {
         await mailer.send(setting, { templateData: exceptedRenderData }, $.randomString());
         const options = testMail.mailOptions;
 
-        assert.equal(_.isNil(options.html.match(templateKey)), false);
+        assert.equal(_.isNil(options.html.match(exceptedRenderData)), false);
     });
 
     after(() => {

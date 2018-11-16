@@ -64,6 +64,12 @@ class ExpressContext extends context_1.Context {
     set body(value) {
         this._res.send(value);
     }
+    get statusCode() {
+        return this._res.statusCode;
+    }
+    set statusCode(value) {
+        this._res.status(value);
+    }
     json(data) {
         this._res.json(data);
         return this;

@@ -16,6 +16,7 @@ declare class ExpressContext<T> extends Context<T> {
     readonly query: any;
     readonly params: any;
     body: any;
+    statusCode: number;
     json(data: any): ExpressContext<T>;
 }
 declare class ExpressRouter<T> extends Router<ExpressContext<T>, T> {

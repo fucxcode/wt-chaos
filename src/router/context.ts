@@ -50,6 +50,10 @@ abstract class Context<T> {
 
     public abstract set body(vale: any);
 
+    public abstract get statusCode(): number;
+
+    public abstract set statusCode(value: number);
+
     public abstract json(data: any): Context<T>;
 
 }

@@ -17,6 +17,7 @@ declare abstract class Context<T> {
     abstract readonly query: any;
     abstract readonly params: any;
     abstract body: any;
+    abstract statusCode: number;
     abstract json(data: any): Context<T>;
 }
 export { Context };

@@ -13,6 +13,7 @@ declare class KoaContext<T> extends Context<T> {
     readonly query: any;
     readonly params: any;
     body: any;
+    statusCode: number;
     json(data: any): KoaContext<T>;
 }
 declare class KoaRouter<T> extends Router<KoaContext<T>, T> {

@@ -37,6 +37,10 @@ class KoaContext<T> extends Context<T> {
     public get body(): any {
         return this._ctx.request.body;
     }
+
+    public set body(value: any) {
+        this._ctx.body = value;
+    }
     
     public json(data: any): KoaContext<T> {
         this._ctx.body = data;

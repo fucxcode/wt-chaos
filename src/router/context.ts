@@ -48,6 +48,8 @@ abstract class Context<T> {
 
     public abstract get body(): any;
 
+    public abstract set body(vale: any);
+
     public abstract json(data: any): Context<T>;
 
 }

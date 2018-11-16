@@ -70,6 +70,10 @@ class ExpressContext<T> extends Context<T> {
     public get body(): any {
         return this._req.body;
     }
+
+    public set body(value: any) {
+        this._res.send(value);
+    }
     
     public json(data: any): ExpressContext<T> {
         this._res.json(data);

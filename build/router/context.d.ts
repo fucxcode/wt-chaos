@@ -16,7 +16,7 @@ declare abstract class Context<T> {
     abstract readonly headers: IncomingHttpHeaders;
     abstract readonly query: any;
     abstract readonly params: any;
-    abstract readonly body: any;
+    abstract body: any;
     abstract json(data: any): Context<T>;
 }
 export { Context };

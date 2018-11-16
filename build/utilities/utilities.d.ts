@@ -37,4 +37,5 @@ export declare function tryParseObjectId(id?: ObjectID | null | undefined, creat
 export declare function parseObjectId(id?: ObjectID | null | undefined, createIfNil?: boolean, objectIdCreator?: (id?: string | number | mongodb.ObjectId) => mongodb.ObjectId): mongodb.ObjectId | null | undefined;
 export declare function asyncify(fn: (...args: any[]) => any): (...args: any[]) => Promise<any>;
 export declare function randomString(length?: number, charset?: "alphanumeric" | "alphabetic" | "numeric" | "hex"): string;
+export declare function md5(input: string): string;
 export * from "./lodash-wrapper";

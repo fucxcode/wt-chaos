@@ -19,6 +19,7 @@ const moment_1 = __importDefault(require("moment"));
 const constants_1 = require("../constants");
 const mongodb = __importStar(require("mongodb"));
 const randomstring = __importStar(require("randomstring"));
+const crypto_1 = __importDefault(require("crypto"));
 const REGEX_OBJECT_ID = new RegExp("^[0-9a-fA-F]{24}$");
 function wait(milliseconds) {
     return new Promise((resolve) => {
@@ -308,5 +309,12 @@ function randomString(length = 32, charset = "alphabetic") {
     });
 }
 exports.randomString = randomString;
+function md5(input) {
+    return crypto_1.default
+        .createHash("md5")
+        .update(input)
+        .digest("hex");
+}
+exports.md5 = md5;
 __export(require("./lodash-wrapper"));
 //# sourceMappingURL=utilities.js.map

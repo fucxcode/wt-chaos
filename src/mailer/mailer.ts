@@ -40,13 +40,12 @@ export class Mailer {
         if (!this.checkRenderData(renderData)) {
             throw new WTError(code.invalidInput, "spam data");
         }
-        const asyncReadFile = util.promisify(fs.readFile).bind(fs);
-        const template = await asyncReadFile(templatePath, "utf-8");
+        const template = fs.readFileSync(templatePath, "utf-8");
 
         let html;
         if (!_.isEmpty(templateSetting.layoutPath) && !_.isNil(this.config.layout)) {
             const layoutPath = path.resolve(<string>this.config.layout, <string>templateSetting.layoutPath);
-            const layout = await asyncReadFile(layoutPath, "utf-8");
+            const layout = fs.readFileSync(layoutPath, "utf-8");
             html = mustache.render(layout, renderData, { body: template });
         } else {
             html = mustache.render(template, renderData);

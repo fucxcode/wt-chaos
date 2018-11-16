@@ -23,7 +23,7 @@ class TestMail implements IMail {
 
 }
 
-describe.only("#mailer", function () {
+describe("#mailer", function () {
     let mailer: Mailer;
     let testMail: TestMail;
 
@@ -96,5 +96,10 @@ describe.only("#mailer", function () {
         const options = testMail.mailOptions;
 
         assert.equal(_.isNil(options.html.match(templateKey)), false);
+    });
+
+    after(() => {
+        fs.unlinkSync(__dirname + "/template/template.html");
+        fs.unlinkSync(__dirname + "/layout/layout.html");
     });
 }); 

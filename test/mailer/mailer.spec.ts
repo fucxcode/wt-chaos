@@ -1,105 +1,88 @@
-import { MailConfig, IMail, Mailer, TemplateSetting, IMailOptions } from "../../src/mailer";
+import {Mailer, ITransport, IOptionsResolver } from "../../src/mailer";
+import Mail = require("nodemailer/lib/mailer");
+import * as TypeMoq from "typemoq";
 import { $ } from "../$";
-import * as fs from "fs";
 import * as assert from "assert";
-import { _ } from "../../src";
+const EventEmitter = require('events');
 
-class TestMail implements IMail {
+class TestTransport extends EventEmitter implements ITransport {
+    private _name: string;
+    public get name(): string {
+        return this._name;
+    }
+
+    private _version: string;
+    public get version(): string {
+        return this._version;
+    }
+
+    private instance: any;
 
     private _invoked: boolean;
     public get invoked(): boolean {
         return this._invoked;
     }
 
-    private _mailOptions: IMailOptions;
+    private _mailOptions: any;
     public get mailOptions() {
         return this._mailOptions;
     }
 
-    public async sendMail(options: IMailOptions) {
-        this._invoked = true;
-        this._mailOptions = options;
+    constructor(){
+        super();
+        this._name = "test mailer";
+        this._version = "0.1";        
     }
 
+    public async send(options: any): Promise<any> {
+        console.log("invoked transport")
+        this._invoked = true;
+        this._mailOptions = options.data;
+        return;
+    }
 }
 
-describe("#mailer", function () {
-    let mailer: Mailer;
-    let testMail: TestMail;
+class TestOptionsResolver implements IOptionsResolver {
 
-    const noreply = $.randomString();
-    const service = $.randomString();
+    private _invoked: boolean;
+    public get invoked(): boolean {
+        return this._invoked;
+    }
 
-    const layout: string = "<div>\
-        {{> body }}\
-         </div>\n";
+    private _receivedOptions: any;
+    public get receivedOptions() {
+        return this._receivedOptions;
+    }
 
-    const template: string = "<div>\
-            {{ templateData}}\
-    </div>\n";
+    private _donateOptions: any;
+    public get donateOptions() {
+        return this._donateOptions;
+    }
 
-    let templateKey: string;
-    let layoutKey: string;
+    constructor(donateOptions: any){
+        this._donateOptions = donateOptions;
+        this._invoked = false;
+    }
 
-    beforeEach(() => {
-        testMail = new TestMail();
-        mailer = new Mailer(testMail,
-            {
-                template: __dirname + "/template",
-                layout: __dirname + "/layout",
-                sender: { noreply: noreply, service: service }
-            });
+    public async resolveOptions(options: any) {
+        this._receivedOptions = options;
+        return this._donateOptions as Mail.Options;
+    }
+}
 
-        templateKey = $.randomString();
-        layoutKey = $.randomString();
-        const templateTail = `<div>${templateKey}<div>`;
-        const layoutTail = `<div>${layoutKey}<div>`;
-        if (fs.existsSync(__dirname + "/template/template.html")) {
-            fs.unlinkSync(__dirname + "/template/template.html");
-            fs.unlinkSync(__dirname + "/layout/layout.html");
-        }
-        fs.writeFileSync(__dirname + "/template/template.html", template + templateTail);
-        fs.writeFileSync(__dirname + "/layout/layout.html", layout + layoutTail);
+describe.skip("#mailer", function () {
+    it("#send => optionsResolver invoked.", async () => {
+        const transport = new TestTransport();
+        const transportMock = TypeMoq.Mock.ofType(TestTransport);
+        const transitionOptions = {token: $.randomString()};
+        const resolver = new TestOptionsResolver(transitionOptions);
+        const mailer = new Mailer(transport, resolver);
+        const inputOptions = $.randomString();
+        console.log("11")
+        await mailer.send(inputOptions);
+        console.log("22")
+        assert.equal(resolver.receivedOptions, inputOptions);
+        assert.equal(transport.invoked, true);
+
     });
-
-    it("#instance invoked, subject, from, to", async () => {
-        const exceptedSubject = $.randomString();
-        const setting = new TemplateSetting(exceptedSubject, "template.html", "layout.html");
-        const exceptedTo = $.randomString();
-        await mailer.send(setting, { templateData: $.randomString() }, exceptedTo);
-
-        assert.equal(testMail.invoked, true);
-        assert.equal(testMail.mailOptions.subject, exceptedSubject);
-        assert.equal(testMail.mailOptions.from, noreply);
-        assert.equal(testMail.mailOptions.to, exceptedTo);
-    });
-
-    it("#read template", async () => {
-        const setting = new TemplateSetting($.randomString(), "template.html", "layout.html");
-        await mailer.send(setting, { templateData: $.randomString() }, $.randomString());
-        const options = testMail.mailOptions;
-        assert.equal(_.isNil(options.html.match(templateKey)), false);
-    });
-
-    it("#read layout", async () => {
-        const setting = new TemplateSetting($.randomString(), "template.html", "layout.html");
-        await mailer.send(setting, { templateData: $.randomString() }, $.randomString());
-        const options = testMail.mailOptions;
-
-        assert.equal(_.isNil(options.html.match(layoutKey)), false);
-    });
-
-    it("render data", async () => {
-        const exceptedRenderData = $.randomString();
-        const setting = new TemplateSetting($.randomString(), "template.html");
-        await mailer.send(setting, { templateData: exceptedRenderData }, $.randomString());
-        const options = testMail.mailOptions;
-
-        assert.equal(_.isNil(options.html.match(exceptedRenderData)), false);
-    });
-
-    after(() => {
-        fs.unlinkSync(__dirname + "/template/template.html");
-        fs.unlinkSync(__dirname + "/layout/layout.html");
-    });
-}); 
+})

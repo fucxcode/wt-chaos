@@ -74,8 +74,8 @@ describe("#tpl-resolver", function () {
         assert.equal(_.isNil((<string>mailOptions.html).match(exceptedRenderData)), false);
     });
 
-    // after(() => {
-    //     fs.unlinkSync(__dirname + "/template/template.html");
-    //     fs.unlinkSync(__dirname + "/layout/layout.html");
-    // });
+    after(() => {
+        fs.unlinkSync(__dirname + "/template/template.html");
+        fs.unlinkSync(__dirname + "/layout/layout.html");
+    });
 }); 

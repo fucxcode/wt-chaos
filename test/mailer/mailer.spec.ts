@@ -16,8 +16,6 @@ class TestTransport extends EventEmitter implements ITransport {
         return this._version;
     }
 
-    private instance: any;
-
     private _invoked: boolean;
     public get invoked(): boolean {
         return this._invoked;
@@ -34,11 +32,10 @@ class TestTransport extends EventEmitter implements ITransport {
         this._version = "0.1";        
     }
 
-    public async send(options: any): Promise<any> {
-        console.log("invoked transport")
+    public send(options: any, callback: Function) {
         this._invoked = true;
         this._mailOptions = options.data;
-        return;
+        callback(null, options);
     }
 }
 
@@ -65,24 +62,25 @@ class TestOptionsResolver implements IOptionsResolver {
     }
 
     public async resolveOptions(options: any) {
+        this._invoked = true;
         this._receivedOptions = options;
         return this._donateOptions as Mail.Options;
     }
 }
 
-describe.skip("#mailer", function () {
-    it("#send => optionsResolver invoked.", async () => {
+describe("#mailer", function () {
+    it("#send => optionsResolver invoked. transport invoked", async () => {
         const transport = new TestTransport();
-        const transportMock = TypeMoq.Mock.ofType(TestTransport);
         const transitionOptions = {token: $.randomString()};
         const resolver = new TestOptionsResolver(transitionOptions);
         const mailer = new Mailer(transport, resolver);
         const inputOptions = $.randomString();
-        console.log("11")
         await mailer.send(inputOptions);
-        console.log("22")
+
+        assert.equal(resolver.invoked, true);
         assert.equal(resolver.receivedOptions, inputOptions);
         assert.equal(transport.invoked, true);
+        assert.equal(transport.mailOptions.token, transitionOptions.token);
 
     });
 })

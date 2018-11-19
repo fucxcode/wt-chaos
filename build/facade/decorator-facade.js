@@ -7,10 +7,33 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const router_1 = require("../router");
 const decorator_middlewares_1 = require("./decorator-middlewares");
 const decorator_route_1 = require("./decorator-route");
 const $path = __importStar(require("path"));
-const facade = function (router) {
+const container_1 = require("../container");
+const facade = function (router, container) {
+    // try resolve router from container if not specified
+    let r;
+    if (router) {
+        r = router;
+    }
+    else {
+        const c = container || container_1.getDefaultContainer();
+        if (c) {
+            const ct = c;
+            const rt = ct.resolve(router_1.DEFAULT_ROUTER_KEY);
+            if (rt) {
+                r = rt;
+            }
+            else {
+                throw new Error("cannot find router from container when setting facade");
+            }
+        }
+        else {
+            throw new Error("cannot set facade without 'router' and default container");
+        }
+    }
     return function (target) {
         // save a reference to the original constructor
         const origin = target;
@@ -40,7 +63,7 @@ const facade = function (router) {
                     const path = $path.join(`/`, ...prefixes, options.path);
                     const middlewares = facadeMiddlewares.concat(methodMiddlewares.get(propertyKey) || []);
                     const handler = instance[propertyKey].bind(instance);
-                    router.route(method, path, ...middlewares.concat(handler));
+                    r.route(method, path, ...middlewares.concat(handler));
                 }
                 else {
                     throw new Error(`Cannot set route for ${instance.constructor.name}.${options.method} due to no method was specified.`);

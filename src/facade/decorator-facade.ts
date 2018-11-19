@@ -1,9 +1,32 @@
-import { Router, Context, RouterMiddleware } from "../router";
+import { Router, Context, RouterMiddleware, DEFAULT_ROUTER_KEY } from "../router";
 import { getFacadeMiddlewares, getMethodMiddlewares } from "./decorator-middlewares";
 import { getRoutePrefixes, getMethodRoutes } from "./decorator-route";
 import * as $path from "path";
+import { IContainer, getDefaultContainer } from "../container";
 
-const facade = function <TContext extends Context<TState>, TState>(router: Router<TContext, TState>) {
+const facade = function <TContext extends Context<TState>, TState>(router?: Router<TContext, TState>, container?: IContainer) {
+    // try resolve router from container if not specified
+    let r: Router<TContext, TState>;
+    if (router) {
+        r = router;
+    }
+    else {
+        const c = container || getDefaultContainer();
+        if (c) {
+            const ct = c;
+            const rt = ct.resolve<Router<TContext, TState>>(DEFAULT_ROUTER_KEY);
+            if (rt) {
+                r = rt;
+            }
+            else {
+                throw new Error("cannot find router from container when setting facade");
+            }
+        }
+        else {
+            throw new Error("cannot set facade without 'router' and default container");
+        }
+    }
+
     return function (target: any) {
         // save a reference to the original constructor
         const origin = target;
@@ -33,7 +56,7 @@ const facade = function <TContext extends Context<TState>, TState>(router: Route
                     const path = $path.join(`/`, ...prefixes, options.path);
                     const middlewares = facadeMiddlewares.concat(methodMiddlewares.get(propertyKey) || []);
                     const handler = (instance as any)[propertyKey].bind(instance) as RouterMiddleware<TContext, TState>;
-                    router.route(method, path, ...middlewares.concat(handler));
+                    r.route(method, path, ...middlewares.concat(handler));
                 }
                 else {
                     throw new Error(`Cannot set route for ${instance.constructor.name}.${options.method} due to no method was specified.`);

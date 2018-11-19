@@ -1,5 +1,6 @@
 import { Context } from "./context";
 import { HttpMethod } from "../constants";
+import { IContainer } from "../container";
 interface INextFunction {
     (error?: any): Promise<void>;
 }
@@ -9,6 +10,7 @@ interface RouterMiddleware<TContext extends Context<TState>, TState> {
 interface RouterHandler<TContext extends Context<TState>, TState> {
     (ctx: TContext): Promise<any>;
 }
+declare const DEFAULT_ROUTER_KEY: unique symbol;
 declare abstract class Router<TContext extends Context<TState>, TState> {
     private _prefix;
     readonly prefix: string;
@@ -18,5 +20,6 @@ declare abstract class Router<TContext extends Context<TState>, TState> {
     protected abstract onUse(handler: RouterMiddleware<TContext, TState>): void;
     route(method: HttpMethod, path: string, ...handlers: RouterHandler<TContext, TState>[]): void;
     protected abstract onRoute(method: HttpMethod, path: string, ...handlers: RouterHandler<TContext, TState>[]): void;
+    setDefault(container?: IContainer | undefined): void;
 }
-export { Router, INextFunction, RouterMiddleware, RouterHandler };
+export { Router, INextFunction, RouterMiddleware, RouterHandler, DEFAULT_ROUTER_KEY };

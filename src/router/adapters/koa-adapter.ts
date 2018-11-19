@@ -7,11 +7,12 @@ import * as uuid from "node-uuid";
 import { IncomingHttpHeaders } from "http";
 import bodyParser from "koa-bodyparser";
 import { HttpMethod } from "../../constants";
+import { WTCode } from "../../errors";
 
 class KoaContext<T> extends Context<T> {
 
     private _ctx: Koa.Context;
-    
+   
     constructor(ctx: Koa.Context, next?: INextFunction) {
         super(() => ctx.state, ctx.req, ctx.res, next, () => {
             if (!ctx.state.oid) {
@@ -95,7 +96,15 @@ class KoaRouter<T> extends Router<KoaContext<T>, T> {
         if (_.isFunction(fn)) {
             fn.call(this._router, path, ..._.map(handlers, handler => {
                 return async (ctx: Koa.Context, next: INextFunction) => {
-                    await handler(new KoaContext<T>(ctx, next));
+                    const context = new KoaContext<T>(ctx, next);
+                    const data = await handler(context);
+                    if (data) {
+                        ctx.body = {
+                            oid: context.oid,
+                            code: WTCode.ok,
+                            data: data
+                        };
+                    }
                     // in koa we MUST invoke `await next()` regardless if multiple handlers registered
                     await next();
                 };

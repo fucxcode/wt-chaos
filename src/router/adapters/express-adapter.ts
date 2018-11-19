@@ -6,6 +6,7 @@ import * as uuid from "node-uuid";
 import { IncomingHttpHeaders } from "http";
 import bodyParser from "body-parser";
 import { HttpMethod } from "../../constants";
+import { WTCode } from "../..";
 
 interface ExpressRequest extends express.Request {
 
@@ -132,7 +133,15 @@ class ExpressRouter<T> extends Router<ExpressContext<T>, T> {
         if (_.isFunction(fn)) {
             fn.call(this._app, path, ..._.map(handlers, handler => {
                 return (req: ExpressRequest, res: express.Response, next: express.NextFunction) => {
-                    Promise.resolve(handler(new ExpressContext<T>(req, res, next))).then(() => {
+                    const context = new ExpressContext<T>(req, res, next);
+                    Promise.resolve(handler(context)).then(data => {
+                        if (data && !res.finished) {
+                            res.json({
+                                oid: context.oid,
+                                code: WTCode.ok,
+                                data: data
+                            });
+                        }
                         next();
                     }).catch(error => {
                         next(error);

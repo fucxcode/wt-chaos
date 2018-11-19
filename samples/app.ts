@@ -77,10 +77,18 @@ router.proxy = true;
 @facade(router)
 @route("sys/internal")
 @middlewares(async (ctx: Context<State>) => {
+    console.log(1);
+    await _.wait(1000);
     ctx.state.uid = "123";
+    console.log(2);
+    await _.wait(1000);
 })
 @middlewares(async (ctx: Context<State>) => {
+    console.log(3);
+    await _.wait(1000);
     ctx.state.role = "NB";
+    console.log(4);
+    await _.wait(1000);
 })
 // @ts-ignore
 class MyFacade {
@@ -88,18 +96,23 @@ class MyFacade {
 
     @route("ping", HttpMethod.GET)
     // @ts-ignore
-    public async ping(ctx: Context<State>): Promise<void> {
-        await ctx.json("PONG!");
+    public async ping(ctx: Context<State>): Promise<string> {
+        console.log(5);
+        await _.wait(1000);
+        const result = "PONG!";
+        console.log(6);
+        await _.wait(1000);
+        return result;
     }
 
     @route("say", HttpMethod.POST)
     // @ts-ignore
-    public async say(ctx: Context<State>): Promise<void> {
-        await ctx.json({
+    public async say(ctx: Context<State>): Promise<any> {
+        return {
             oid: ctx.oid,
             state: ctx.state,
             incoming: ctx.body
-        });
+        };
     }
 
 }

@@ -16,6 +16,7 @@ const koa_router_1 = __importDefault(require("koa-router"));
 const _ = __importStar(require("../../utilities"));
 const uuid = __importStar(require("node-uuid"));
 const koa_bodyparser_1 = __importDefault(require("koa-bodyparser"));
+const errors_1 = require("../../errors");
 class KoaContext extends context_1.Context {
     constructor(ctx, next) {
         super(() => ctx.state, ctx.req, ctx.res, next, () => {
@@ -81,7 +82,15 @@ class KoaRouter extends router_1.Router {
         if (_.isFunction(fn)) {
             fn.call(this._router, path, ..._.map(handlers, handler => {
                 return async (ctx, next) => {
-                    await handler(new KoaContext(ctx, next));
+                    const context = new KoaContext(ctx, next);
+                    const data = await handler(context);
+                    if (data) {
+                        ctx.body = {
+                            oid: context.oid,
+                            code: errors_1.WTCode.ok,
+                            data: data
+                        };
+                    }
                     // in koa we MUST invoke `await next()` regardless if multiple handlers registered
                     await next();
                 };

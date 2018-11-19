@@ -10,13 +10,13 @@ interface INextFunction {
 
 interface RouterMiddleware<TContext extends Context<TState>, TState> {
 
-    (ctx: TContext): void;
+    (ctx: TContext): Promise<void>;
 
 }
 
 interface RouterHandler<TContext extends Context<TState>, TState> {
 
-    (ctx: TContext): void;
+    (ctx: TContext): Promise<any>;
 
 }
 

@@ -15,6 +15,7 @@ const router_1 = require("../router");
 const _ = __importStar(require("../../utilities"));
 const uuid = __importStar(require("node-uuid"));
 const body_parser_1 = __importDefault(require("body-parser"));
+const __1 = require("../..");
 class ExpressContext extends context_1.Context {
     constructor(request, response, next) {
         super(() => {
@@ -109,7 +110,15 @@ class ExpressRouter extends router_1.Router {
         if (_.isFunction(fn)) {
             fn.call(this._app, path, ..._.map(handlers, handler => {
                 return (req, res, next) => {
-                    Promise.resolve(handler(new ExpressContext(req, res, next))).then(() => {
+                    const context = new ExpressContext(req, res, next);
+                    Promise.resolve(handler(context)).then(data => {
+                        if (data && !res.finished) {
+                            res.json({
+                                oid: context.oid,
+                                code: __1.WTCode.ok,
+                                data: data
+                            });
+                        }
                         next();
                     }).catch(error => {
                         next(error);

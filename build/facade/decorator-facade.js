@@ -35,8 +35,6 @@ const resolveRouter = function (router, container) {
 };
 const facade = function (router, container) {
     return function (target) {
-        // try resolve router from container if not specified
-        const r = resolveRouter(router, container);
         // save a reference to the original constructor
         const origin = target;
         // a utility function to generate instances of a class
@@ -54,6 +52,8 @@ const facade = function (router, container) {
         // the new constructor behaviour
         const f = function (...args) {
             const instance = ctor(origin, args);
+            // try resolve router from container if not specified
+            const r = resolveRouter(router, container);
             // register routes for method decorated by "route" and "middleware" with incoming parameter "router"
             const prefixes = decorator_route_1.getRoutePrefixes(instance.constructor);
             const facadeMiddlewares = decorator_middlewares_1.getFacadeMiddlewares(instance.constructor);

@@ -28,8 +28,6 @@ const resolveRouter = function <TContext extends Context<TState>, TState>(router
 
 const facade = function <TContext extends Context<TState>, TState>(router?: Router<TContext, TState>, container?: IContainer) {
     return function (target: any) {
-        // try resolve router from container if not specified
-        const r = resolveRouter(router, container);
         // save a reference to the original constructor
         const origin = target;
         // a utility function to generate instances of a class
@@ -47,6 +45,8 @@ const facade = function <TContext extends Context<TState>, TState>(router?: Rout
         // the new constructor behaviour
         const f: any = function (...args: any[]) {
             const instance = ctor(origin, args);
+            // try resolve router from container if not specified
+            const r = resolveRouter(router, container);
             // register routes for method decorated by "route" and "middleware" with incoming parameter "router"
             const prefixes = getRoutePrefixes(instance.constructor);
             const facadeMiddlewares = getFacadeMiddlewares<TContext, TState>(instance.constructor);

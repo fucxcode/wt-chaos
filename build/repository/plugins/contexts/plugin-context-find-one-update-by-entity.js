@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const plugin_context_1 = require("./plugin-context");
 class FindOneAndUpdateByEntityPluginContext extends plugin_context_1.PluginContext {
-    constructor(operationDescription, collectionName, driverName, entity, condition, options) {
-        super(operationDescription, collectionName, driverName, "findOneAndUpdateByEntity", undefined);
+    constructor(operationDescription, driverName, collectionName, entity, condition, options) {
+        super(operationDescription, driverName, collectionName, "findOneAndUpdateByEntity", undefined);
         this.entity = entity;
         this.condition = condition;
         this.options = options;

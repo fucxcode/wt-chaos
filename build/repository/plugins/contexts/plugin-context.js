@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class PluginContext {
-    constructor(operationDescription, collectionName, driverName, name, defaultResult) {
+    constructor(operationDescription, driverName, collectionName, name, defaultResult) {
         this._operationDescription = operationDescription;
         this._collectionName = collectionName;
         this._driverName = driverName;

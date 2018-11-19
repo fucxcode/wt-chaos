@@ -6,6 +6,6 @@ import { Session } from "../../drivers/session";
 declare class ErasePluginContext<TSession extends Session> extends PluginContext<DeleteResult> {
     condition?: any;
     options?: DeleteOptions<TSession> | undefined;
-    constructor(operationDescription: OperationDescription, collectionName: string, driverName: string, condition?: any, options?: DeleteOptions<TSession> | undefined);
+    constructor(operationDescription: OperationDescription, driverName: string, collectionName: string, condition?: any, options?: DeleteOptions<TSession> | undefined);
 }
 export { ErasePluginContext };

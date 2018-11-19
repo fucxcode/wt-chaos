@@ -8,6 +8,6 @@ declare class UpdateByEntityPluginContext<T extends Entity, TSession extends Ses
     entity: T;
     condition?: any;
     options?: UpdateOptions<TSession> | undefined;
-    constructor(operationDescription: OperationDescription, collectionName: string, driverName: string, entity: T, condition?: any, options?: UpdateOptions<TSession> | undefined);
+    constructor(operationDescription: OperationDescription, driverName: string, collectionName: string, entity: T, condition?: any, options?: UpdateOptions<TSession> | undefined);
 }
 export { UpdateByEntityPluginContext };

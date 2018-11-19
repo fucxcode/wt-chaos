@@ -7,6 +7,6 @@ declare class UpdatePluginContext<TSession extends Session> extends PluginContex
     condition?: any;
     update?: any;
     options?: UpdateOptions<TSession> | undefined;
-    constructor(operationDescription: OperationDescription, collectionName: string, driverName: string, condition?: any, update?: any, options?: UpdateOptions<TSession> | undefined);
+    constructor(operationDescription: OperationDescription, driverName: string, collectionName: string, condition?: any, update?: any, options?: UpdateOptions<TSession> | undefined);
 }
 export { UpdatePluginContext };

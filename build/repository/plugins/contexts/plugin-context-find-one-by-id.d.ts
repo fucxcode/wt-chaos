@@ -7,6 +7,6 @@ declare class FindOneByIdPluginContext<T extends Entity, TSession extends Sessio
     id: Id;
     condition?: any;
     options?: FindOptions<T, TSession> | undefined;
-    constructor(operationDescription: OperationDescription, collectionName: string, driverName: string, id: Id, condition?: any, options?: FindOptions<T, TSession> | undefined);
+    constructor(operationDescription: OperationDescription, driverName: string, collectionName: string, id: Id, condition?: any, options?: FindOptions<T, TSession> | undefined);
 }
 export { FindOneByIdPluginContext };

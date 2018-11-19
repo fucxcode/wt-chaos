@@ -13,7 +13,7 @@ declare class PluginContext<TResult> {
     private _result;
     result: TResult;
     private _properties;
-    constructor(operationDescription: OperationDescription, collectionName: string, driverName: string, name: string, defaultResult: TResult);
+    constructor(operationDescription: OperationDescription, driverName: string, collectionName: string, name: string, defaultResult: TResult);
     setProperty<T>(key: string, value: T): void;
     getProperty<T>(key: string): T;
 }

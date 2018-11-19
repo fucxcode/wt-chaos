@@ -6,6 +6,6 @@ declare class MapReducePluginContext<TResult, TSession extends Session> extends 
     map: Function | string;
     reduce: Function | string;
     options?: MapReduceOptions<TSession> | undefined;
-    constructor(operationDescription: OperationDescription, collectionName: string, driverName: string, map: Function | string, reduce: Function | string, options?: MapReduceOptions<TSession> | undefined);
+    constructor(operationDescription: OperationDescription, driverName: string, collectionName: string, map: Function | string, reduce: Function | string, options?: MapReduceOptions<TSession> | undefined);
 }
 export { MapReducePluginContext };

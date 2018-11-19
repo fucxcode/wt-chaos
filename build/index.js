@@ -30,4 +30,6 @@ const sms = __importStar(require("./sms"));
 exports.sms = sms;
 const i18n = __importStar(require("./i18n"));
 exports.i18n = i18n;
+const mailer = __importStar(require("./mailer"));
+exports.mailer = mailer;
 //# sourceMappingURL=index.js.map

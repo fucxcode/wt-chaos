@@ -9,4 +9,5 @@ import * as repository from "./repository";
 import * as facade from "./facade";
 import * as sms from "./sms";
 import * as i18n from "./i18n";
-export { _, constants, WTError, WTErrorResponse, WTCode, container, cache, serializer, router, repository, facade, sms, i18n };
+import * as mailer from "./mailer";
+export { _, constants, WTError, WTErrorResponse, WTCode, container, cache, serializer, router, repository, facade, sms, i18n, mailer };

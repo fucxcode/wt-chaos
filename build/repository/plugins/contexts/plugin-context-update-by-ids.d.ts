@@ -9,6 +9,6 @@ declare class UpdateByIdsPluginContext<TSession extends Session> extends PluginC
     condition?: any;
     update?: any;
     options?: UpdateOptions<TSession> | undefined;
-    constructor(operationDescription: OperationDescription, collectionName: string, driverName: string, ids: Id[], condition?: any, update?: any, options?: UpdateOptions<TSession> | undefined);
+    constructor(operationDescription: OperationDescription, driverName: string, collectionName: string, ids: Id[], condition?: any, update?: any, options?: UpdateOptions<TSession> | undefined);
 }
 export { UpdateByIdsPluginContext };

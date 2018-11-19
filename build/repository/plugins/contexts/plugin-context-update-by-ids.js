@@ -3,8 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const plugin_context_1 = require("./plugin-context");
 const constants_1 = require("../../../constants");
 class UpdateByIdsPluginContext extends plugin_context_1.PluginContext {
-    constructor(operationDescription, collectionName, driverName, ids, condition, update, options) {
-        super(operationDescription, collectionName, driverName, "updateByIds", {
+    constructor(operationDescription, driverName, collectionName, ids, condition, update, options) {
+        super(operationDescription, driverName, collectionName, "updateByIds", {
             ok: constants_1.Is.yes,
             n: 0,
             nModified: 0

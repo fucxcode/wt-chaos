@@ -1,5 +1,5 @@
-import { IMail } from "./adapter";
-import { MailConfig } from "./config";
+import { TransportOptions, Transport } from "nodemailer";
+import { IOptionsResolver } from "./resolvers";
 export declare class TemplateSetting {
     subject: string;
     templatePath: string;
@@ -8,10 +8,7 @@ export declare class TemplateSetting {
 }
 export declare class Mailer {
     private instance;
-    private config;
-    constructor(instance: IMail, config: MailConfig);
-    private checkRenderData;
-    private sendInternal;
-    send(templateSetting: TemplateSetting, renderData: Object, to: string): Promise<any>;
-    serviceSend(templateSetting: TemplateSetting, renderData: Object, to: string): Promise<any>;
+    private optionsResolver;
+    constructor(transport: Transport | TransportOptions, resolver: IOptionsResolver);
+    send(options: any): Promise<any>;
 }

@@ -9,6 +9,6 @@ declare class FindByPageNextPluginContext<T extends Entity, TSession extends Ses
     pageIndex: number;
     pageSize: number;
     options: FindOptions<T, TSession>;
-    constructor(operationDescription: OperationDescription, collectionName: string, driverName: string, condition: any, pageIndex: number, pageSize: number, options: FindOptions<T, TSession>);
+    constructor(operationDescription: OperationDescription, driverName: string, collectionName: string, condition: any, pageIndex: number, pageSize: number, options: FindOptions<T, TSession>);
 }
 export { FindByPageNextPluginContext };

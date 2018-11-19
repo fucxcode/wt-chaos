@@ -7,6 +7,6 @@ declare class FindOneAndUpdateByEntityPluginContext<T extends Entity, TSession e
     entity: T;
     condition?: any;
     options?: FindOneAndUpdateOptions<T, TSession> | undefined;
-    constructor(operationDescription: OperationDescription, collectionName: string, driverName: string, entity: T, condition?: any, options?: FindOneAndUpdateOptions<T, TSession> | undefined);
+    constructor(operationDescription: OperationDescription, driverName: string, collectionName: string, entity: T, condition?: any, options?: FindOneAndUpdateOptions<T, TSession> | undefined);
 }
 export { FindOneAndUpdateByEntityPluginContext };

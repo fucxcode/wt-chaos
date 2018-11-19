@@ -7,6 +7,6 @@ declare class FindByIdsPluginContext<T extends Entity, TSession extends Session>
     ids: Id[];
     condition?: any;
     options?: FindOptions<T, TSession> | undefined;
-    constructor(operationDescription: OperationDescription, collectionName: string, driverName: string, ids: Id[], condition?: any, options?: FindOptions<T, TSession> | undefined);
+    constructor(operationDescription: OperationDescription, driverName: string, collectionName: string, ids: Id[], condition?: any, options?: FindOptions<T, TSession> | undefined);
 }
 export { FindByIdsPluginContext };

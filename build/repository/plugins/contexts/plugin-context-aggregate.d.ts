@@ -5,6 +5,6 @@ import { Session } from "../../drivers";
 declare class AggregatePluginContext<TResult, TSession extends Session> extends PluginContext<Partial<TResult>[]> {
     pipeline: any[];
     options?: AggregateOptions<TSession> | undefined;
-    constructor(operationDescription: OperationDescription, collectionName: string, driverName: string, pipeline: any[], options?: AggregateOptions<TSession> | undefined);
+    constructor(operationDescription: OperationDescription, driverName: string, collectionName: string, pipeline: any[], options?: AggregateOptions<TSession> | undefined);
 }
 export { AggregatePluginContext };

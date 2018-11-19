@@ -54,6 +54,8 @@ abstract class Context<T> {
 
     public abstract set statusCode(value: number);
 
+    public abstract cookie(name: string): string | undefined;
+
     public abstract json(data: any): Context<T>;
 
 }

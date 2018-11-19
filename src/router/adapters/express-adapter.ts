@@ -83,6 +83,9 @@ class ExpressContext<T> extends Context<T> {
         this._res.status(value);
     }
 
+    public cookie(name: string): string {
+        return this._req.cookies[name];
+    }
     
     public json(data: any): ExpressContext<T> {
         this._res.json(data);

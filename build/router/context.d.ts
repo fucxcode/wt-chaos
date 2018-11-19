@@ -18,6 +18,7 @@ declare abstract class Context<T> {
     abstract readonly params: any;
     abstract body: any;
     abstract statusCode: number;
+    abstract cookie(name: string): string | undefined;
     abstract json(data: any): Context<T>;
 }
 export { Context };

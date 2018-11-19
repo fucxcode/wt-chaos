@@ -49,6 +49,10 @@ class KoaContext<T> extends Context<T> {
     public set statusCode(value: number) {
         this._ctx.status = value;
     }
+
+    public cookie(name: string): string {
+        return this._ctx.cookies.get(name);
+    }
     
     public json(data: any): KoaContext<T> {
         this._ctx.body = data;

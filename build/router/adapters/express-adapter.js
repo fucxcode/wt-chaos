@@ -70,6 +70,9 @@ class ExpressContext extends context_1.Context {
     set statusCode(value) {
         this._res.status(value);
     }
+    cookie(name) {
+        return this._req.cookies[name];
+    }
     json(data) {
         this._res.json(data);
         return this;

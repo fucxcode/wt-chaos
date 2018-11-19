@@ -33,8 +33,11 @@ abstract class Router<TContext extends Context<TState>, TState> {
     public abstract get proxy(): boolean;
     public abstract set proxy(value: boolean);
 
-    constructor(prefix: string = "") {
+    constructor(prefix: string = "", isDefault: boolean = true, container?: IContainer) {
         this._prefix = prefix;
+        if (isDefault) {
+            this.setDefault(container);
+        }
     }
 
     public use(handler: RouterMiddleware<TContext, TState>): void {

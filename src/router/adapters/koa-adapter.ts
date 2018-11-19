@@ -8,6 +8,7 @@ import { IncomingHttpHeaders } from "http";
 import bodyParser from "koa-bodyparser";
 import { HttpMethod } from "../../constants";
 import { WTCode } from "../../errors";
+import { IContainer } from "../../container";
 
 class KoaContext<T> extends Context<T> {
 
@@ -75,8 +76,8 @@ class KoaRouter<T> extends Router<KoaContext<T>, T> {
         this._app.proxy = value;
     }
 
-    constructor(app: Koa, prefix?: string) {
-        super(prefix);
+    constructor(app: Koa, prefix?: string, isDefault: boolean = true, container?: IContainer) {
+        super(prefix, isDefault, container);
         this._app = app;
         this._app.use(bodyParser());
 

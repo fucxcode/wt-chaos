@@ -4,6 +4,7 @@ import { Router, RouterMiddleware, RouterHandler } from "../router";
 import * as express from "express";
 import { IncomingHttpHeaders } from "http";
 import { HttpMethod } from "../../constants";
+import { IContainer } from "../../container";
 interface ExpressRequest extends express.Request {
     oid?: string;
     state?: any;
@@ -23,7 +24,7 @@ declare class ExpressContext<T> extends Context<T> {
 declare class ExpressRouter<T> extends Router<ExpressContext<T>, T> {
     private _app;
     proxy: boolean;
-    constructor(app: express.Express, prefix?: string);
+    constructor(app: express.Express, prefix?: string, isDefault?: boolean, container?: IContainer);
     onUse(handler: RouterMiddleware<ExpressContext<T>, T>): void;
     onRoute(method: HttpMethod, path: string | RegExp, ...handlers: RouterHandler<ExpressContext<T>, T>[]): void;
 }

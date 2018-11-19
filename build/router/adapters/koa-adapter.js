@@ -58,8 +58,8 @@ class KoaContext extends context_1.Context {
 }
 exports.KoaContext = KoaContext;
 class KoaRouter extends router_1.Router {
-    constructor(app, prefix) {
-        super(prefix);
+    constructor(app, prefix, isDefault = true, container) {
+        super(prefix, isDefault, container);
         this._app = app;
         this._app.use(koa_bodyparser_1.default());
         this._router = new koa_router_1.default();

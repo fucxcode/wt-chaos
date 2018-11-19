@@ -81,8 +81,8 @@ class ExpressContext extends context_1.Context {
 }
 exports.ExpressContext = ExpressContext;
 class ExpressRouter extends router_1.Router {
-    constructor(app, prefix) {
-        super(prefix);
+    constructor(app, prefix, isDefault = true, container) {
+        super(prefix, isDefault, container);
         this._app = app;
         this._app.use(body_parser_1.default.urlencoded({
             extended: false

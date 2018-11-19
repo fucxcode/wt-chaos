@@ -7,6 +7,7 @@ import { IncomingHttpHeaders } from "http";
 import bodyParser from "body-parser";
 import { HttpMethod } from "../../constants";
 import { WTCode } from "../..";
+import { IContainer } from "../../container";
 
 interface ExpressRequest extends express.Request {
 
@@ -112,9 +113,8 @@ class ExpressRouter<T> extends Router<ExpressContext<T>, T> {
         }
     }
 
-
-    constructor(app: express.Express, prefix?: string) {
-        super(prefix);
+    constructor(app: express.Express, prefix?: string, isDefault: boolean = true, container?: IContainer) {
+        super(prefix, isDefault, container);
         this._app = app;
         this._app.use(bodyParser.urlencoded({
             extended: false

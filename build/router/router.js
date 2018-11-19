@@ -12,8 +12,11 @@ const container_1 = require("../container");
 const DEFAULT_ROUTER_KEY = Symbol.for("default_router");
 exports.DEFAULT_ROUTER_KEY = DEFAULT_ROUTER_KEY;
 class Router {
-    constructor(prefix = "") {
+    constructor(prefix = "", isDefault = true, container) {
         this._prefix = prefix;
+        if (isDefault) {
+            this.setDefault(container);
+        }
     }
     get prefix() {
         return this._prefix;

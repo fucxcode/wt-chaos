@@ -12,11 +12,9 @@ const decorator_middlewares_1 = require("./decorator-middlewares");
 const decorator_route_1 = require("./decorator-route");
 const $path = __importStar(require("path"));
 const container_1 = require("../container");
-const facade = function (router, container) {
-    // try resolve router from container if not specified
-    let r;
+const resolveRouter = function (router, container) {
     if (router) {
-        r = router;
+        return router;
     }
     else {
         const c = container || container_1.getDefaultContainer();
@@ -24,7 +22,7 @@ const facade = function (router, container) {
             const ct = c;
             const rt = ct.resolve(router_1.DEFAULT_ROUTER_KEY);
             if (rt) {
-                r = rt;
+                return rt;
             }
             else {
                 throw new Error("cannot find router from container when setting facade");
@@ -34,7 +32,11 @@ const facade = function (router, container) {
             throw new Error("cannot set facade without 'router' and default container");
         }
     }
+};
+const facade = function (router, container) {
     return function (target) {
+        // try resolve router from container if not specified
+        const r = resolveRouter(router, container);
         // save a reference to the original constructor
         const origin = target;
         // a utility function to generate instances of a class

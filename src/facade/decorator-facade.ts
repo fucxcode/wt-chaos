@@ -4,11 +4,9 @@ import { getRoutePrefixes, getMethodRoutes } from "./decorator-route";
 import * as $path from "path";
 import { IContainer, getDefaultContainer } from "../container";
 
-const facade = function <TContext extends Context<TState>, TState>(router?: Router<TContext, TState>, container?: IContainer) {
-    // try resolve router from container if not specified
-    let r: Router<TContext, TState>;
+const resolveRouter = function <TContext extends Context<TState>, TState>(router?: Router<TContext, TState>, container?: IContainer): Router<TContext, TState> {
     if (router) {
-        r = router;
+        return router;
     }
     else {
         const c = container || getDefaultContainer();
@@ -16,7 +14,7 @@ const facade = function <TContext extends Context<TState>, TState>(router?: Rout
             const ct = c;
             const rt = ct.resolve<Router<TContext, TState>>(DEFAULT_ROUTER_KEY);
             if (rt) {
-                r = rt;
+                return rt;
             }
             else {
                 throw new Error("cannot find router from container when setting facade");
@@ -26,8 +24,12 @@ const facade = function <TContext extends Context<TState>, TState>(router?: Rout
             throw new Error("cannot set facade without 'router' and default container");
         }
     }
+};
 
+const facade = function <TContext extends Context<TState>, TState>(router?: Router<TContext, TState>, container?: IContainer) {
     return function (target: any) {
+        // try resolve router from container if not specified
+        const r = resolveRouter(router, container);
         // save a reference to the original constructor
         const origin = target;
         // a utility function to generate instances of a class

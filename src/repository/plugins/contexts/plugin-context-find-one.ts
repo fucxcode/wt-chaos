@@ -7,11 +7,11 @@ import { Session } from "../../drivers";
 
 class FindOnePluginContext<T extends Entity, TSession extends Session> extends PluginContext<Partial<T> | undefined> {
 
-    constructor(operationDescription: OperationDescription, collectionName: string, driverName: string,
+    constructor(operationDescription: OperationDescription, driverName: string, collectionName: string,
         public condition?: any,
         public options?: FindOptions<T, TSession>
     ) {
-        super(operationDescription, collectionName, driverName, "findOne", undefined);
+        super(operationDescription, driverName, collectionName, "findOne", undefined);
     }
 
 }

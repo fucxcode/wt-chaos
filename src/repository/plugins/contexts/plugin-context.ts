@@ -43,7 +43,7 @@ class PluginContext<TResult> {
 
     private _properties: Map<string, any>;
 
-    constructor(operationDescription: OperationDescription, collectionName: string, driverName: string, name: string, defaultResult: TResult) {
+    constructor(operationDescription: OperationDescription, driverName: string, collectionName: string, name: string, defaultResult: TResult) {
         this._operationDescription = operationDescription;
         this._collectionName = collectionName;
         this._driverName = driverName;

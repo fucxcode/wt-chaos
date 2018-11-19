@@ -5,11 +5,11 @@ import { Session } from "../../drivers";
 
 class AggregatePluginContext<TResult, TSession extends Session> extends PluginContext<Partial<TResult>[]> {
 
-    constructor(operationDescription: OperationDescription, collectionName: string, driverName: string,
+    constructor(operationDescription: OperationDescription, driverName: string, collectionName: string,
         public pipeline: any[], 
         public options?: AggregateOptions<TSession>
     ) {
-        super(operationDescription, collectionName, driverName, "aggregate", []);
+        super(operationDescription, driverName, collectionName, "aggregate", []);
     }
 
 }

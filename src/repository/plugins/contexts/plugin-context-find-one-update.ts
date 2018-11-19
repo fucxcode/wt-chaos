@@ -6,12 +6,12 @@ import { Session } from "../../drivers";
 
 class FindOneAndUpdatePluginContext<T extends Entity, TSession extends Session> extends PluginContext<Partial<T> | undefined> {
 
-    constructor(operationDescription: OperationDescription, collectionName: string, driverName: string,
+    constructor(operationDescription: OperationDescription, driverName: string, collectionName: string,
         public condition?: any, 
         public update?: any, 
         public options?: FindOneAndUpdateOptions<T, TSession>
     ) {
-        super(operationDescription, collectionName, driverName, "findOneAndUpdate", undefined);
+        super(operationDescription, driverName, collectionName, "findOneAndUpdate", undefined);
     }
 
 }

@@ -7,12 +7,12 @@ import { Session } from "../../drivers";
 
 class MapReducePluginContext<TResult, TSession extends Session> extends PluginContext<Partial<TResult>[]> {
 
-    constructor(operationDescription: OperationDescription, collectionName: string, driverName: string,
+    constructor(operationDescription: OperationDescription, driverName: string, collectionName: string,
         public map: Function | string, 
         public reduce: Function | string, 
         public options?: MapReduceOptions<TSession>
     ) {
-        super(operationDescription, collectionName, driverName, "mapReduce", []);
+        super(operationDescription, driverName, collectionName, "mapReduce", []);
     }
 
 }

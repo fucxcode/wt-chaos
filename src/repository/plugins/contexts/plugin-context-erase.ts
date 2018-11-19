@@ -9,11 +9,11 @@ import { Session } from "../../drivers/session";
 
 class ErasePluginContext<TSession extends Session> extends PluginContext<DeleteResult> {
 
-    constructor(operationDescription: OperationDescription, collectionName: string, driverName: string,
+    constructor(operationDescription: OperationDescription, driverName: string, collectionName: string,
         public condition?: any,
         public options?: DeleteOptions<TSession>
     ) {
-        super(operationDescription, collectionName, driverName, "erase", {
+        super(operationDescription, driverName, collectionName, "erase", {
             ok: Is.yes,
             n: 0
         });

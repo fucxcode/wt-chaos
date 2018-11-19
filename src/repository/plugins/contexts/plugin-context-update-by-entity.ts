@@ -9,12 +9,12 @@ import { Session } from "../../drivers";
 
 class UpdateByEntityPluginContext<T extends Entity, TSession extends Session> extends PluginContext<UpdateResult> {
 
-    constructor(operationDescription: OperationDescription, collectionName: string, driverName: string,
+    constructor(operationDescription: OperationDescription, driverName: string, collectionName: string,
         public entity: T,
         public condition?: any,
         public options?: UpdateOptions<TSession>
     ) {
-        super(operationDescription, collectionName, driverName, "updateByEntity", {
+        super(operationDescription, driverName, collectionName, "updateByEntity", {
             ok: Is.yes,
             n: 0,
             nModified: 0

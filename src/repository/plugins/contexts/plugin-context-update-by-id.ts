@@ -9,13 +9,13 @@ import { Session } from "../../drivers";
 
 class UpdateByIdPluginContext<TSession extends Session> extends PluginContext<UpdateResult> {
 
-    constructor(operationDescription: OperationDescription, collectionName: string, driverName: string,
+    constructor(operationDescription: OperationDescription, driverName: string, collectionName: string,
         public id: Id, 
         public condition?: any, 
         public update?: any, 
         public options?: UpdateOptions<TSession>
     ) {
-        super(operationDescription, collectionName, driverName, "updateById", {
+        super(operationDescription, driverName, collectionName, "updateById", {
             ok: Is.yes,
             n: 0,
             nModified: 0

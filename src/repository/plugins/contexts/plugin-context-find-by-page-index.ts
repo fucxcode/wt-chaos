@@ -8,13 +8,13 @@ import { Session } from "../../drivers";
 
 class FindByPageIndexPluginContext<T extends Entity, TSession extends Session> extends PluginContext<FindByPageIndexResult<T>> {
 
-    constructor(operationDescription: OperationDescription, collectionName: string, driverName: string,
+    constructor(operationDescription: OperationDescription, driverName: string, collectionName: string,
         public condition: any, 
         public pageIndex: number, 
         public pageSize: number, 
         public options: FindOptions<T, TSession>
     ) {
-        super(operationDescription, collectionName, driverName, "findByPageIndex", new FindByPageIndexResult<T>([], pageIndex, pageSize, 0));
+        super(operationDescription, driverName, collectionName, "findByPageIndex", new FindByPageIndexResult<T>([], pageIndex, pageSize, 0));
     }
 
 }

@@ -6,11 +6,11 @@ import { InsertManyOptions, InsertOneOptions, Session } from "../../drivers";
 
 class SavePluginContext<T extends Entity, TSession extends Session> extends PluginContext<Partial<T> | Partial<T>[] | undefined> {
 
-    constructor(operationDescription: OperationDescription, collectionName: string, driverName: string,
+    constructor(operationDescription: OperationDescription, driverName: string, collectionName: string,
         public entityOrArray: T | T[],
         public options?: InsertOneOptions<TSession> | InsertManyOptions<TSession>
     ) {
-        super(operationDescription, collectionName, driverName, "save", undefined);
+        super(operationDescription, driverName, collectionName, "save", undefined);
     }
 
 }

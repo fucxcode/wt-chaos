@@ -3,6 +3,7 @@ import * as uuid from "node-uuid";
 import { INextFunction } from "./router";
 import * as _ from "../utilities";
 import { ISomeObject } from "../constants";
+import { Cookies } from "./cookies";
 
 abstract class Context<T> {
 
@@ -55,6 +56,8 @@ abstract class Context<T> {
     public abstract set statusCode(value: number);
 
     public abstract cookie(name: string): string | undefined;
+
+    // public abstract get cookies(): Cookies;
 
     public abstract json(data: any): Context<T>;
 

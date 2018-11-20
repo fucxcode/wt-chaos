@@ -74,6 +74,10 @@ const facade = function (router, container) {
             return instance;
         };
         f.prototype = origin.prototype;
+        // copy reflect metadata items to the new constructor
+        for (const key of Reflect.getMetadataKeys(origin)) {
+            Reflect.defineMetadata(key, Reflect.getMetadata(key, origin), f);
+        }
         return f;
     };
 };

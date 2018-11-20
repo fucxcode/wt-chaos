@@ -4,6 +4,11 @@ import { Router, ExpressRouter, ExpressContext, KoaContext, KoaRouter, Context }
 import * as _ from "../src/utilities";
 import { route, facade, middlewares } from "../src/facade";
 import { HttpMethod } from "../src/constants";
+import { registerContainer, BypassActivationHandler, setDefaultContainer, injectable, inject } from "../src/container";
+
+const k = Symbol.for("default");
+const container = registerContainer(k, new BypassActivationHandler());
+setDefaultContainer(k);
 
 class State {
 
@@ -74,34 +79,43 @@ router.proxy = true;
 //     console.log(`${Date.now()} out handler`);
 // });
 
+@injectable()
+// @ts-ignore
+class Service {
+
+    public lower(name: string): string {
+        return name.toLowerCase();
+    }
+
+}
+
+@injectable()
 @facade(router)
 @route("sys/internal")
 @middlewares(async (ctx: Context<State>) => {
-    console.log(1);
-    await _.wait(1000);
     ctx.state.uid = "123";
-    console.log(2);
-    await _.wait(1000);
 })
 @middlewares(async (ctx: Context<State>) => {
-    console.log(3);
-    await _.wait(1000);
     ctx.state.role = "NB";
-    console.log(4);
-    await _.wait(1000);
 })
 // @ts-ignore
 class MyFacade {
 
+    @inject()
+    // @ts-ignore
+    private _service: Service;
+
+    private _pong = "PONG!";
+
+    private _data = {
+        name: "Shaun Xu",
+        dep: "wt-fp"
+    };
 
     @route("ping", HttpMethod.GET)
     // @ts-ignore
     public async ping(ctx: Context<State>): Promise<string> {
-        console.log(5);
-        await _.wait(1000);
-        const result = "PONG!";
-        console.log(6);
-        await _.wait(1000);
+        const result = this._service.lower(this._pong);
         return result;
     }
 
@@ -111,13 +125,14 @@ class MyFacade {
         return {
             oid: ctx.oid,
             state: ctx.state,
-            incoming: ctx.body
+            incoming: ctx.body,
+            data: this._data
         };
     }
 
 }
 
-const myFacade = new MyFacade();
+const myFacade = container.resolve<MyFacade>(MyFacade);
 
 app.listen(22222, () => {
     console.log(`ready`);

@@ -17,7 +17,7 @@ export interface TPLConfig {
         service: string;
     };
 }
-export declare class TplResolver implements IOptionsResolver {
+export declare class TPLResolver implements IOptionsResolver {
     private config;
     constructor(config: TPLConfig);
     private checkRenderData;

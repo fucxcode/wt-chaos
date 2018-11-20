@@ -6,5 +6,5 @@ export declare class SendCloud implements ITransport {
     readonly version: string;
     private instance;
     constructor(options: any);
-    send(mail: any): Promise<void>;
+    send(mail: any, callback: (err: Error | null, info: any) => void): void;
 }

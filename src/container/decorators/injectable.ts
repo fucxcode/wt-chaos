@@ -1,13 +1,13 @@
-import { IContainer, Lifecycles, Type, ParamType } from "../i-container";
-import { getDefaultContainer } from "../container";
+import { Container, Lifecycles, Type, ParamType } from "../container";
+import { ContainerPool } from "../container-pool";
 
-const injectable = function (container?: IContainer, lifecycle: Lifecycles = Lifecycles.singleton, type?: Type) {
-    let realContainer: IContainer;
+const injectable = function (container?: Container, lifecycle: Lifecycles = Lifecycles.singleton, type?: Type) {
+    let realContainer: Container;
     if (container) {
         realContainer = container;
     }
     else {
-        const defaultContainer = getDefaultContainer();
+        const defaultContainer = ContainerPool.getDefaultContainer();
         if (defaultContainer) {
             realContainer = defaultContainer;
         }
@@ -20,7 +20,7 @@ const injectable = function (container?: IContainer, lifecycle: Lifecycles = Lif
         const designParamTypes: any[] = Reflect.getMetadata(`design:paramtypes`, target);
         const injectedParamIndexes: {
             index: number,
-            container: IContainer,
+            container: Container,
             type?: Type
         }[] = Reflect.getMetadata(`wt:injected-params-indexes`, target) || [];
         for (const injectedParamIndex of injectedParamIndexes) {

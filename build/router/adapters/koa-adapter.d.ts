@@ -6,7 +6,7 @@ import { Router, RouterMiddleware, RouterHandler, INextFunction } from "../route
 import Koa from "koa";
 import { IncomingHttpHeaders } from "http";
 import { HttpMethod } from "../../constants";
-import { IContainer } from "../../container";
+import { Container } from "../../container";
 import { Cookies } from "../cookies";
 declare class KoaContext<T> extends Context<T> {
     private _ctx;
@@ -26,7 +26,7 @@ declare class KoaRouter<T> extends Router<KoaContext<T>, T> {
     private _app;
     private _router;
     proxy: boolean;
-    constructor(app: Koa, prefix?: string, isDefault?: boolean, container?: IContainer);
+    constructor(app: Koa, prefix?: string, isDefault?: boolean, container?: Container);
     onUse(handler: RouterMiddleware<KoaContext<T>, T>): void;
     onRoute(method: HttpMethod, path: string | RegExp, ...handlers: RouterHandler<KoaContext<T>, T>[]): void;
 }

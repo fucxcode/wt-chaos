@@ -17,7 +17,7 @@ const resolveRouter = function (router, container) {
         return router;
     }
     else {
-        const c = container || container_1.getDefaultContainer();
+        const c = container || container_1.ContainerPool.getDefaultContainer();
         if (c) {
             const ct = c;
             const rt = ct.resolve(router_1.DEFAULT_ROUTER_KEY);

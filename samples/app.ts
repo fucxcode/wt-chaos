@@ -4,11 +4,9 @@ import { Router, ExpressRouter, ExpressContext, KoaContext, KoaRouter, Context }
 import * as _ from "../src/utilities";
 import { route, facade, middlewares } from "../src/facade";
 import { HttpMethod } from "../src/constants";
-import { registerContainer, BypassActivationHandler, setDefaultContainer, injectable, inject } from "../src/container";
+import { ContainerPool, injectable, inject } from "../src/container";
 
-const k = Symbol.for("default");
-const container = registerContainer(k, new BypassActivationHandler());
-setDefaultContainer(k);
+const container = ContainerPool.registerContainer();
 
 class State {
 
@@ -23,7 +21,7 @@ class State {
 // const router: Router<ExpressContext<State>, State> = new ExpressRouter(app, "/api");
 
 const app = new Koa();
-const router: Router<KoaContext<State>, State> = new KoaRouter(app, "/api");
+const router: Router<KoaContext<State>, State> = new KoaRouter(app, "/api", true);
 
 router.proxy = true;
 
@@ -90,7 +88,7 @@ class Service {
 }
 
 @injectable()
-@facade(router)
+@facade()
 @route("sys/internal")
 @middlewares(async (ctx: Context<State>) => {
     ctx.state.uid = "123";

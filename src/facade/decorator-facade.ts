@@ -2,14 +2,14 @@ import { Router, Context, RouterMiddleware, DEFAULT_ROUTER_KEY } from "../router
 import { getFacadeMiddlewares, getMethodMiddlewares } from "./decorator-middlewares";
 import { getRoutePrefixes, getMethodRoutes } from "./decorator-route";
 import * as $path from "path";
-import { IContainer, getDefaultContainer } from "../container";
+import { Container, ContainerPool } from "../container";
 
-const resolveRouter = function <TContext extends Context<TState>, TState>(router?: Router<TContext, TState>, container?: IContainer): Router<TContext, TState> {
+const resolveRouter = function <TContext extends Context<TState>, TState>(router?: Router<TContext, TState>, container?: Container): Router<TContext, TState> {
     if (router) {
         return router;
     }
     else {
-        const c = container || getDefaultContainer();
+        const c = container || ContainerPool.getDefaultContainer();
         if (c) {
             const ct = c;
             const rt = ct.resolve<Router<TContext, TState>>(DEFAULT_ROUTER_KEY);
@@ -26,7 +26,7 @@ const resolveRouter = function <TContext extends Context<TState>, TState>(router
     }
 };
 
-const facade = function <TContext extends Context<TState>, TState>(router?: Router<TContext, TState>, container?: IContainer) {
+const facade = function <TContext extends Context<TState>, TState>(router?: Router<TContext, TState>, container?: Container) {
     return function (target: any) {
         // save a reference to the original constructor
         const origin = target;

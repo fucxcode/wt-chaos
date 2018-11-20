@@ -2,18 +2,17 @@ import { assert } from "chai";
 import * as uuid from "node-uuid";
 import * as _ from "../src/utilities";
 
-import { IContainer, Lifecycles } from "../src/container/i-container";
-import { registerContainer, clearContainers, resolveContainer } from "../src/container/container";
+import { Container, Lifecycles, ContainerPool } from "../src/container";
 import { inject, injectable } from "../src/container/decorators";
 import { BypassActivationHandler } from "../src/container/activation-handlers/bypass-activation-handler";
 
 describe(`container`, () => {
 
-    let container: IContainer;
+    let container: Container;
 
     beforeEach(() => {
-        clearContainers();
-        container = registerContainer(Symbol(), new BypassActivationHandler());
+        ContainerPool.clearContainers();
+        container = ContainerPool.registerContainer(Symbol(), new BypassActivationHandler());
     });
 
     it(`register a container and resolve`, () => {
@@ -22,14 +21,14 @@ describe(`container`, () => {
             keys.push(Symbol.for(uuid.v4()));
         }
 
-        const containers: IContainer[] = [];
+        const containers: Container[] = [];
         for (const key of keys) {
-            containers.push(registerContainer(key, new BypassActivationHandler()));
+            containers.push(ContainerPool.registerContainer(key, new BypassActivationHandler()));
         }
 
         assert.equal(containers.length, keys.length);
         for (const key of keys) {
-            const container = resolveContainer(key);
+            const container = ContainerPool.resolveContainer(key);
             assert.ok(container);
             assert.equal(container.key, key);
         }

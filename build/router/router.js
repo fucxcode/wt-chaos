@@ -27,7 +27,7 @@ class Router {
     route(method, path, ...handlers) {
         this.onRoute(method, $path.join(this._prefix, path), ...handlers);
     }
-    setDefault(container = container_1.getDefaultContainer()) {
+    setDefault(container = container_1.ContainerPool.getDefaultContainer()) {
         if (container) {
             const c = container;
             c.registerInstance(DEFAULT_ROUTER_KEY, this);

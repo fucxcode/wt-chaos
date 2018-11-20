@@ -1,7 +1,7 @@
 import { Context } from "./context";
 import * as $path from "path";
 import { HttpMethod } from "../constants";
-import { IContainer, getDefaultContainer } from "../container";
+import { Container, ContainerPool } from "../container";
 
 interface INextFunction {
 
@@ -33,7 +33,7 @@ abstract class Router<TContext extends Context<TState>, TState> {
     public abstract get proxy(): boolean;
     public abstract set proxy(value: boolean);
 
-    constructor(prefix: string = "", isDefault: boolean = true, container?: IContainer) {
+    constructor(prefix: string = "", isDefault: boolean = true, container?: Container) {
         this._prefix = prefix;
         if (isDefault) {
             this.setDefault(container);
@@ -52,7 +52,7 @@ abstract class Router<TContext extends Context<TState>, TState> {
 
     protected abstract onRoute(method: HttpMethod, path: string, ...handlers: RouterHandler<TContext, TState>[]): void;
 
-    public setDefault(container: IContainer | undefined = getDefaultContainer()): void {
+    public setDefault(container: Container | undefined = ContainerPool.getDefaultContainer()): void {
         if (container) {
             const c = container;
             c.registerInstance(DEFAULT_ROUTER_KEY, this);

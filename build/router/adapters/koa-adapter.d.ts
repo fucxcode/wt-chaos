@@ -31,6 +31,6 @@ declare class KoaRouter<T> extends Router<KoaContext<T>, T> {
     proxy: boolean;
     constructor(app: Koa, prefix?: string, isDefault?: boolean, container?: Container);
     onUse(handler: RouterMiddleware<KoaContext<T>, T>): void;
-    onRoute(method: HttpMethod, path: string | RegExp, ...handlers: RouterHandler<KoaContext<T>, T>[]): void;
+    onRoute(method: HttpMethod, path: string | RegExp, middlewares: RouterMiddleware<KoaContext<T>, T>[], handler: RouterHandler<KoaContext<T>, T>): void;
 }
 export { KoaRouter, KoaContext };

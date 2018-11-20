@@ -15,7 +15,6 @@ const router_1 = require("../router");
 const _ = __importStar(require("../../utilities"));
 const uuid = __importStar(require("node-uuid"));
 const body_parser_1 = __importDefault(require("body-parser"));
-const __1 = require("../..");
 class ExpressCookies {
     constructor(req, res) {
         this._req = req;
@@ -33,31 +32,13 @@ class ExpressCookies {
     }
 }
 class ExpressContext extends context_1.Context {
-    constructor(request, response, next) {
+    constructor(request, response) {
         super(() => {
             if (!request.state) {
                 request.state = {};
             }
             return request.state;
-        }, request, response, (error) => {
-            if (next) {
-                return new Promise((resolve, reject) => {
-                    if (error) {
-                        return reject(error);
-                    }
-                    else {
-                        response.on("finish", () => {
-                            return resolve();
-                        });
-                        return next();
-                    }
-                });
-            }
-            else {
-                return Promise.resolve();
-            }
-            // return Promise.resolve(next && next(error));
-        }, () => {
+        }, request, response, () => {
             if (!request.oid) {
                 request.oid = uuid.v4();
             }
@@ -133,29 +114,66 @@ class ExpressRouter extends router_1.Router {
     }
     onUse(handler) {
         this._app.use(_.asyncify((req, res, next) => {
-            handler(new ExpressContext(req, res, next));
+            handler(new ExpressContext(req, res), next);
         }));
     }
-    onRoute(method, path, ...handlers) {
+    onRoute(method, path, middlewares, handler) {
         const fn = this._app[method.toLowerCase()];
         if (_.isFunction(fn)) {
-            fn.call(this._app, path, ..._.map(handlers, handler => {
-                return (req, res, next) => {
-                    const context = new ExpressContext(req, res, next);
-                    Promise.resolve(handler(context)).then(data => {
-                        if (data && !res.finished) {
-                            res.json({
-                                oid: context.oid,
-                                code: __1.WTCode.ok,
-                                data: data
+            const handlers = [];
+            for (const middleware of middlewares) {
+                handlers.push((req, res, next) => {
+                    const c = new ExpressContext(req, res);
+                    const n = (error) => {
+                        if (next) {
+                            return new Promise((resolve, reject) => {
+                                if (error) {
+                                    return reject(error);
+                                }
+                                else {
+                                    res.on("finish", () => {
+                                        return resolve();
+                                    });
+                                    return next();
+                                }
                             });
                         }
+                        else {
+                            return Promise.resolve();
+                        }
+                    };
+                    Promise.resolve(middleware(c, n)).then(() => {
                         next();
                     }).catch(error => {
                         next(error);
                     });
-                };
-            }));
+                });
+                handlers.push((req, res, next) => {
+                    Promise.resolve(handler(new ExpressContext(req, res))).then(() => {
+                        next();
+                    }).catch(error => {
+                        next(error);
+                    });
+                });
+            }
+            fn.call(this._app, path, ...handlers);
+            // fn.call(this._app, path, ..._.map(handlers, handler => {
+            //     return (req: ExpressRequest, res: express.Response, next: express.NextFunction) => {
+            //         const context = new ExpressContext<T>(req, res, next);
+            //         Promise.resolve(handler(context)).then(data => {
+            //             if (data && !res.finished) {
+            //                 res.json({
+            //                     oid: context.oid,
+            //                     code: WTCode.ok,
+            //                     data: data
+            //                 });
+            //             }
+            //             next();
+            //         }).catch(error => {
+            //             next(error);
+            //         });
+            //     };
+            // }));
         }
         else {
             throw new Error(`Express does not support method "${method}"`);

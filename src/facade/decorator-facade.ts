@@ -1,4 +1,4 @@
-import { Router, Context, RouterMiddleware, DEFAULT_ROUTER_KEY } from "../router";
+import { Router, Context, RouterMiddleware, DEFAULT_ROUTER_KEY, RouterHandler } from "../router";
 import { getFacadeMiddlewares, getMethodMiddlewares } from "./decorator-middlewares";
 import { getRoutePrefixes, getMethodRoutes } from "./decorator-route";
 import * as $path from "path";
@@ -57,8 +57,8 @@ const facade = function <TContext extends Context<TState>, TState>(router?: Rout
                     const method = options.method;
                     const path = $path.join(`/`, ...prefixes, options.path);
                     const middlewares = facadeMiddlewares.concat(methodMiddlewares.get(propertyKey) || []);
-                    const handler = (instance as any)[propertyKey].bind(instance) as RouterMiddleware<TContext, TState>;
-                    r.route(method, path, ...middlewares.concat(handler));
+                    const handler = (instance as any)[propertyKey].bind(instance) as RouterHandler<TContext, TState>;
+                    r.route(method, path, middlewares, handler);
                 }
                 else {
                     throw new Error(`Cannot set route for ${instance.constructor.name}.${options.method} due to no method was specified.`);

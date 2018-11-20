@@ -9,12 +9,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const uuid = __importStar(require("node-uuid"));
 class Context {
-    constructor(stateResolver, request, response, next, oidResolver = uuid.v4) {
+    // private _next?: INextFunction;
+    // public get next(): INextFunction {
+    //     return this._next || Promise.resolve;
+    // }
+    constructor(stateResolver, request, response, oidResolver = uuid.v4) {
         this._oid = oidResolver();
         this._state = stateResolver();
         this._request = request;
         this._response = response;
-        this._next = next;
+        // this._next = next;
     }
     get oid() {
         return this._oid;
@@ -27,9 +31,6 @@ class Context {
     }
     get response() {
         return this._response;
-    }
-    get next() {
-        return this._next || Promise.resolve;
     }
 }
 exports.Context = Context;

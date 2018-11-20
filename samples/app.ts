@@ -1,6 +1,6 @@
 import express from "express";
 import Koa from "koa";
-import { Router, ExpressRouter, ExpressContext, KoaContext, KoaRouter, Context } from "../src/router";
+import { Router, ExpressRouter, ExpressContext, KoaContext, KoaRouter, Context, INextFunction } from "../src/router";
 import * as _ from "../src/utilities";
 import { route, facade, middlewares } from "../src/facade";
 import { HttpMethod } from "../src/constants";
@@ -90,11 +90,13 @@ class Service {
 @injectable()
 @facade()
 @route("sys/internal")
-@middlewares(async (ctx: Context<State>) => {
+@middlewares(async (ctx: Context<State>, next: INextFunction) => {
     ctx.state.uid = "123";
+    await next();
 })
-@middlewares(async (ctx: Context<State>) => {
+@middlewares(async (ctx: Context<State>, next: INextFunction) => {
     ctx.state.role = "NB";
+    await next();
 })
 // @ts-ignore
 class MyFacade {

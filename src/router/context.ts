@@ -28,17 +28,17 @@ abstract class Context<T> {
         return this._response;
     }
 
-    private _next?: INextFunction;
-    public get next(): INextFunction {
-        return this._next || Promise.resolve;
-    }
+    // private _next?: INextFunction;
+    // public get next(): INextFunction {
+    //     return this._next || Promise.resolve;
+    // }
 
-    constructor(stateResolver: () => T, request?: http.IncomingMessage, response?: http.ServerResponse, next?: INextFunction, oidResolver: () => string = uuid.v4) {
+    constructor(stateResolver: () => T, request?: http.IncomingMessage, response?: http.ServerResponse, oidResolver: () => string = uuid.v4) {
         this._oid = oidResolver();
         this._state = stateResolver();
         this._request = request;
         this._response = response;
-        this._next = next;
+        // this._next = next;
     }
 
     public abstract get headers(): IncomingHttpHeaders;

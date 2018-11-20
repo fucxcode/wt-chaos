@@ -65,7 +65,7 @@ const facade = function (router, container) {
                     const path = $path.join(`/`, ...prefixes, options.path);
                     const middlewares = facadeMiddlewares.concat(methodMiddlewares.get(propertyKey) || []);
                     const handler = instance[propertyKey].bind(instance);
-                    r.route(method, path, ...middlewares.concat(handler));
+                    r.route(method, path, middlewares, handler);
                 }
                 else {
                     throw new Error(`Cannot set route for ${instance.constructor.name}.${options.method} due to no method was specified.`);

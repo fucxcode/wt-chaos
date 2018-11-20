@@ -1,6 +1,5 @@
 /// <reference types="node" />
 import http, { IncomingHttpHeaders } from "http";
-import { INextFunction } from "./router";
 import { Cookies } from "./cookies";
 declare abstract class Context<T> {
     private _oid;
@@ -11,9 +10,7 @@ declare abstract class Context<T> {
     readonly request: http.IncomingMessage | undefined;
     private _response?;
     readonly response: http.ServerResponse | undefined;
-    private _next?;
-    readonly next: INextFunction;
-    constructor(stateResolver: () => T, request?: http.IncomingMessage, response?: http.ServerResponse, next?: INextFunction, oidResolver?: () => string);
+    constructor(stateResolver: () => T, request?: http.IncomingMessage, response?: http.ServerResponse, oidResolver?: () => string);
     abstract readonly headers: IncomingHttpHeaders;
     abstract readonly query: any;
     abstract readonly params: any;

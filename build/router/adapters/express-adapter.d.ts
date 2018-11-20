@@ -13,7 +13,7 @@ interface ExpressRequest extends express.Request {
 declare class ExpressContext<T> extends Context<T> {
     private _req;
     private _res;
-    constructor(request: ExpressRequest, response: express.Response, next?: express.NextFunction);
+    constructor(request: ExpressRequest, response: express.Response);
     readonly headers: IncomingHttpHeaders;
     readonly query: any;
     readonly params: any;
@@ -32,6 +32,6 @@ declare class ExpressRouter<T> extends Router<ExpressContext<T>, T> {
     proxy: boolean;
     constructor(app: express.Express, prefix?: string, isDefault?: boolean, container?: Container);
     onUse(handler: RouterMiddleware<ExpressContext<T>, T>): void;
-    onRoute(method: HttpMethod, path: string | RegExp, ...handlers: RouterHandler<ExpressContext<T>, T>[]): void;
+    onRoute(method: HttpMethod, path: string | RegExp, middlewares: RouterMiddleware<ExpressContext<T>, T>[], handler: RouterHandler<ExpressContext<T>, T>): void;
 }
 export { ExpressContext, ExpressRouter };

@@ -11,7 +11,7 @@ interface INextFunction {
 
 interface RouterMiddleware<TContext extends Context<TState>, TState> {
 
-    (ctx: TContext): Promise<void>;
+    (ctx: TContext, next: INextFunction): Promise<void>;
 
 }
 
@@ -46,11 +46,11 @@ abstract class Router<TContext extends Context<TState>, TState> {
 
     protected abstract onUse(handler: RouterMiddleware<TContext, TState>): void;
 
-    public route(method: HttpMethod, path: string, ...handlers: RouterHandler<TContext, TState>[]): void {
-        this.onRoute(method, $path.join(this._prefix, path), ...handlers);
+    public route(method: HttpMethod, path: string, middlewares: RouterMiddleware<TContext, TState>[], handler: RouterHandler<TContext, TState>): void {
+        this.onRoute(method, $path.join(this._prefix, path), middlewares, handler);
     }
 
-    protected abstract onRoute(method: HttpMethod, path: string, ...handlers: RouterHandler<TContext, TState>[]): void;
+    protected abstract onRoute(method: HttpMethod, path: string, middlewares: RouterMiddleware<TContext, TState>[], handler: RouterHandler<TContext, TState>): void;
 
     public setDefault(container: Container | undefined = ContainerPool.getDefaultContainer()): void {
         if (container) {

@@ -24,8 +24,8 @@ class Router {
     use(handler) {
         this.onUse(handler);
     }
-    route(method, path, ...handlers) {
-        this.onRoute(method, $path.join(this._prefix, path), ...handlers);
+    route(method, path, middlewares, handler) {
+        this.onRoute(method, $path.join(this._prefix, path), middlewares, handler);
     }
     setDefault(container = container_1.ContainerPool.getDefaultContainer()) {
         if (container) {

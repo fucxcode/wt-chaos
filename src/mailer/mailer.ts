@@ -3,15 +3,6 @@ import { createTransport, TransportOptions, Transport } from "nodemailer";
 import Mail = require("nodemailer/lib/mailer");
 import { IOptionsResolver } from "./resolvers";
 
-export class TemplateSetting {
-
-    constructor(
-        public subject: string,
-        public templatePath: string,
-        public layoutPath?: string
-    ) { }
-}
-
 export class Mailer {
 
     private instance: Mail;

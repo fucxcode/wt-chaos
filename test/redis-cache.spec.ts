@@ -1,6 +1,5 @@
 import { assert } from "chai";
 import * as _ from "../src/utilities";
-import { is } from "../src/constants";
 import { $ } from "./$";
 import * as TypeMoq from "typemoq";
 import { Cache } from "../src/cache";

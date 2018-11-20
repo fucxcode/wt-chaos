@@ -1,12 +1,11 @@
-
 import { $ } from "../$";
 import * as fs from "fs";
 import * as assert from "assert";
 import { _ } from "../../src";
-import {TplResolver, TPLConfig, TPLOptions} from "../../src/mailer";
+import { TPLResolver, TPLConfig, TPLOptions } from "../../src/mailer";
 
-describe("#tpl-resolver", function () {
-    let tpl: TplResolver;
+describe("#tpl-resolver", function() {
+    let tpl: TPLResolver;
 
     const noreply = $.randomString();
     const service = $.randomString();
@@ -23,7 +22,7 @@ describe("#tpl-resolver", function () {
     let layoutKey: string;
 
     beforeEach(() => {
-        tpl = new TplResolver({
+        tpl = new TPLResolver({
             layout: __dirname + "/layout",
             template: __dirname + "/template",
             sender: {
@@ -40,14 +39,26 @@ describe("#tpl-resolver", function () {
             fs.unlinkSync(__dirname + "/template/template.html");
             fs.unlinkSync(__dirname + "/layout/layout.html");
         }
-        fs.writeFileSync(__dirname + "/template/template.html", template + templateTail);
-        fs.writeFileSync(__dirname + "/layout/layout.html", layout + layoutTail);
+        fs.writeFileSync(
+            __dirname + "/template/template.html",
+            template + templateTail
+        );
+        fs.writeFileSync(
+            __dirname + "/layout/layout.html",
+            layout + layoutTail
+        );
     });
 
     it("#subject, from, to", async () => {
         const exceptedSubject = $.randomString();
         const exceptedTo = $.randomString();
-        const options = new TPLOptions(exceptedSubject, exceptedTo, {}, "template.html", "layout.html");
+        const options = new TPLOptions(
+            exceptedSubject,
+            exceptedTo,
+            {},
+            "template.html",
+            "layout.html"
+        );
         const mailOptions = await tpl.resolveOptions(options);
 
         assert.equal(mailOptions.subject, exceptedSubject);
@@ -56,26 +67,53 @@ describe("#tpl-resolver", function () {
     });
 
     it("#read template", async () => {
-        const options = new TPLOptions($.randomString(), $.randomString(), {}, "template.html", "layout.html");
+        const options = new TPLOptions(
+            $.randomString(),
+            $.randomString(),
+            {},
+            "template.html",
+            "layout.html"
+        );
         const mailOptions = await tpl.resolveOptions(options);
-        assert.equal(_.isNil((<string>mailOptions.html).match(templateKey)), false);
+        assert.equal(
+            _.isNil((<string>mailOptions.html).match(templateKey)),
+            false
+        );
     });
 
     it("#read layout", async () => {
-        const options = new TPLOptions($.randomString(), $.randomString(), {}, "template.html", "layout.html");
+        const options = new TPLOptions(
+            $.randomString(),
+            $.randomString(),
+            {},
+            "template.html",
+            "layout.html"
+        );
         const mailOptions = await tpl.resolveOptions(options);
-        assert.equal(_.isNil((<string>mailOptions.html).match(layoutKey)), false);
+        assert.equal(
+            _.isNil((<string>mailOptions.html).match(layoutKey)),
+            false
+        );
     });
 
     it("render data", async () => {
         const exceptedRenderData = $.randomString();
-        const options = new TPLOptions($.randomString(),$.randomString(), { templateData: exceptedRenderData }, "template.html", "layout.html");
+        const options = new TPLOptions(
+            $.randomString(),
+            $.randomString(),
+            { templateData: exceptedRenderData },
+            "template.html",
+            "layout.html"
+        );
         const mailOptions = await tpl.resolveOptions(options);
-        assert.equal(_.isNil((<string>mailOptions.html).match(exceptedRenderData)), false);
+        assert.equal(
+            _.isNil((<string>mailOptions.html).match(exceptedRenderData)),
+            false
+        );
     });
 
     after(() => {
         fs.unlinkSync(__dirname + "/template/template.html");
         fs.unlinkSync(__dirname + "/layout/layout.html");
     });
-}); 
+});

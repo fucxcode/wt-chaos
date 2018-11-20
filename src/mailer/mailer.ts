@@ -3,7 +3,7 @@ import { createTransport, TransportOptions, Transport } from "nodemailer";
 import Mail = require("nodemailer/lib/mailer");
 import { IOptionsResolver } from "./resolvers";
 
-export class Mailer {
+export class Mailer<TOptions> {
 
     private instance: Mail;
 
@@ -14,7 +14,7 @@ export class Mailer {
         this.optionsResolver = resolver;
     }
 
-    public async send(options: any): Promise<any> {
+    public async send(options: TOptions): Promise<any> {
         const eMailOptions = await this.optionsResolver.resolveOptions(options);
         return await this.instance.sendMail(eMailOptions);
     }

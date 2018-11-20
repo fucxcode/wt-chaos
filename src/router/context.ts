@@ -61,7 +61,13 @@ abstract class Context<T> {
 
     public abstract get ips(): string[];
 
+    public abstract get host(): string;
+
+    public abstract get protocol(): string;
+
     public abstract json(data: any): Context<T>;
+
+    public abstract redirect(url: string, alt?: string): void;
 
 }
 

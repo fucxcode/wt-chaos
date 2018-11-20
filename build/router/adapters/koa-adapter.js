@@ -60,9 +60,18 @@ class KoaContext extends context_1.Context {
     get ips() {
         return this._ctx.ips;
     }
+    get host() {
+        return this._ctx.host;
+    }
+    get protocol() {
+        return this._ctx.protocol;
+    }
     json(data) {
         this._ctx.body = data;
         return this;
+    }
+    redirect(url, alt) {
+        this._ctx.redirect(url, alt);
     }
 }
 exports.KoaContext = KoaContext;

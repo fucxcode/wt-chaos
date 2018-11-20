@@ -22,6 +22,9 @@ declare abstract class Context<T> {
     abstract readonly cookies: Cookies;
     abstract readonly ip: string;
     abstract readonly ips: string[];
+    abstract readonly host: string;
+    abstract readonly protocol: string;
     abstract json(data: any): Context<T>;
+    abstract redirect(url: string, alt?: string): void;
 }
 export { Context };

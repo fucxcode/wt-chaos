@@ -96,9 +96,18 @@ class ExpressContext extends context_1.Context {
     get ips() {
         return this._req.ips;
     }
+    get host() {
+        return this._req.host;
+    }
+    get protocol() {
+        return this._req.protocol;
+    }
     json(data) {
         this._res.json(data);
         return this;
+    }
+    redirect(url, alt) {
+        this._res.redirect(url);
     }
 }
 exports.ExpressContext = ExpressContext;

@@ -124,11 +124,22 @@ class ExpressContext<T> extends Context<T> {
         return this._req.ips;
     }
 
+    public get host(): string {
+        return this._req.host;
+    }
+
+    public get protocol(): string {
+        return this._req.protocol;
+    }
+
     public json(data: any): ExpressContext<T> {
         this._res.json(data);
         return this;
     }
 
+    public redirect(url: string, alt?: string): void {
+        this._res.redirect(url);
+    }
 }
 
 class ExpressRouter<T> extends Router<ExpressContext<T>, T> {

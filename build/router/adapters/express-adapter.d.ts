@@ -22,7 +22,10 @@ declare class ExpressContext<T> extends Context<T> {
     readonly cookies: Cookies;
     readonly ip: string;
     readonly ips: string[];
+    readonly host: string;
+    readonly protocol: string;
     json(data: any): ExpressContext<T>;
+    redirect(url: string, alt?: string): void;
 }
 declare class ExpressRouter<T> extends Router<ExpressContext<T>, T> {
     private _app;

@@ -20,7 +20,10 @@ declare class KoaContext<T> extends Context<T> {
     readonly cookies: Cookies;
     readonly ip: string;
     readonly ips: string[];
+    readonly host: string;
+    readonly protocol: string;
     json(data: any): KoaContext<T>;
+    redirect(url: string, alt?: string): void;
 }
 declare class KoaRouter<T> extends Router<KoaContext<T>, T> {
     private _app;

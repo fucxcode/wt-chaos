@@ -1,9 +1,9 @@
-import {Mailer, ITransport, IOptionsResolver } from "../../src/mailer";
+import { Mailer, ITransport, IOptionsResolver } from "../../src/mailer";
 import Mail = require("nodemailer/lib/mailer");
 import * as TypeMoq from "typemoq";
 import { $ } from "../$";
 import * as assert from "assert";
-const EventEmitter = require('events');
+const EventEmitter = require("event");
 
 class TestTransport extends EventEmitter implements ITransport {
     private _name: string;
@@ -26,10 +26,10 @@ class TestTransport extends EventEmitter implements ITransport {
         return this._mailOptions;
     }
 
-    constructor(){
+    constructor() {
         super();
         this._name = "test mailer";
-        this._version = "0.1";        
+        this._version = "0.1";
     }
 
     public send(options: any, callback: Function) {
@@ -40,7 +40,6 @@ class TestTransport extends EventEmitter implements ITransport {
 }
 
 class TestOptionsResolver implements IOptionsResolver {
-
     private _invoked: boolean;
     public get invoked(): boolean {
         return this._invoked;
@@ -56,7 +55,7 @@ class TestOptionsResolver implements IOptionsResolver {
         return this._donateOptions;
     }
 
-    constructor(donateOptions: any){
+    constructor(donateOptions: any) {
         this._donateOptions = donateOptions;
         this._invoked = false;
     }
@@ -68,10 +67,10 @@ class TestOptionsResolver implements IOptionsResolver {
     }
 }
 
-describe("#mailer", function () {
+describe("#mailer", function() {
     it("#send => optionsResolver invoked. transport invoked", async () => {
         const transport = new TestTransport();
-        const transitionOptions = {token: $.randomString()};
+        const transitionOptions = { token: $.randomString() };
         const resolver = new TestOptionsResolver(transitionOptions);
         const mailer = new Mailer(transport, resolver);
         const inputOptions = $.randomString();
@@ -81,6 +80,5 @@ describe("#mailer", function () {
         assert.equal(resolver.receivedOptions, inputOptions);
         assert.equal(transport.invoked, true);
         assert.equal(transport.mailOptions.token, transitionOptions.token);
-
     });
-})
+});

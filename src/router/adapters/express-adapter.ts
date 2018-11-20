@@ -8,12 +8,39 @@ import bodyParser from "body-parser";
 import { HttpMethod } from "../../constants";
 import { WTCode } from "../..";
 import { IContainer } from "../../container";
+import { Cookies, GetOption, SetOption } from "../cookies";
 
 interface ExpressRequest extends express.Request {
 
     oid?: string;
 
     state?: any;
+
+}
+
+class ExpressCookies implements Cookies {
+
+    private _req: ExpressRequest;
+
+    private _res: express.Response;
+
+    constructor(req: ExpressRequest, res: express.Response) {
+        this._req = req;
+        this._res = res;
+    }
+
+    public get secure(): boolean {
+        throw new Error("not implements");
+    }
+
+    public get(name: string, opts?: GetOption): string {
+        return this._req.cookies[name];
+    }
+
+    public set(name: string, value?: string, opts?: SetOption): Cookies {
+        this._res.cookie(name, value, opts || {});
+        return this;
+    }
 
 }
 
@@ -84,11 +111,19 @@ class ExpressContext<T> extends Context<T> {
     public set statusCode(value: number) {
         this._res.status(value);
     }
-
-    public cookie(name: string): string {
-        return this._req.cookies[name];
+  
+    public get cookies(): Cookies {
+        return new ExpressCookies(this._req, this._res);
     }
-    
+
+    public get ip(): string {
+        return this._req.ip;
+    }
+
+    public get ips(): string[] {
+        return this._req.ips;
+    }
+
     public json(data: any): ExpressContext<T> {
         this._res.json(data);
         return this;

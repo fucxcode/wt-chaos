@@ -16,6 +16,22 @@ const _ = __importStar(require("../../utilities"));
 const uuid = __importStar(require("node-uuid"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const __1 = require("../..");
+class ExpressCookies {
+    constructor(req, res) {
+        this._req = req;
+        this._res = res;
+    }
+    get secure() {
+        throw new Error("not implements");
+    }
+    get(name, opts) {
+        return this._req.cookies[name];
+    }
+    set(name, value, opts) {
+        this._res.cookie(name, value, opts || {});
+        return this;
+    }
+}
 class ExpressContext extends context_1.Context {
     constructor(request, response, next) {
         super(() => {
@@ -71,8 +87,14 @@ class ExpressContext extends context_1.Context {
     set statusCode(value) {
         this._res.status(value);
     }
-    cookie(name) {
-        return this._req.cookies[name];
+    get cookies() {
+        return new ExpressCookies(this._req, this._res);
+    }
+    get ip() {
+        return this._req.ip;
+    }
+    get ips() {
+        return this._req.ips;
     }
     json(data) {
         this._res.json(data);

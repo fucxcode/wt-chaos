@@ -5,6 +5,7 @@ import * as express from "express";
 import { IncomingHttpHeaders } from "http";
 import { HttpMethod } from "../../constants";
 import { IContainer } from "../../container";
+import { Cookies } from "../cookies";
 interface ExpressRequest extends express.Request {
     oid?: string;
     state?: any;
@@ -18,7 +19,9 @@ declare class ExpressContext<T> extends Context<T> {
     readonly params: any;
     body: any;
     statusCode: number;
-    cookie(name: string): string;
+    readonly cookies: Cookies;
+    readonly ip: string;
+    readonly ips: string[];
     json(data: any): ExpressContext<T>;
 }
 declare class ExpressRouter<T> extends Router<ExpressContext<T>, T> {

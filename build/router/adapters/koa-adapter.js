@@ -51,8 +51,14 @@ class KoaContext extends context_1.Context {
     set statusCode(value) {
         this._ctx.status = value;
     }
-    cookie(name) {
-        return this._ctx.cookies.get(name);
+    get cookies() {
+        return this._ctx.cookies;
+    }
+    get ip() {
+        return this._ctx.ip;
+    }
+    get ips() {
+        return this._ctx.ips;
     }
     json(data) {
         this._ctx.body = data;

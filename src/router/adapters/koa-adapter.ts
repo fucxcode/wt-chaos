@@ -9,6 +9,7 @@ import bodyParser from "koa-bodyparser";
 import { HttpMethod } from "../../constants";
 import { WTCode } from "../../errors";
 import { IContainer } from "../../container";
+import { Cookies } from "../cookies";
 
 class KoaContext<T> extends Context<T> {
 
@@ -55,10 +56,18 @@ class KoaContext<T> extends Context<T> {
         this._ctx.status = value;
     }
 
-    public cookie(name: string): string {
-        return this._ctx.cookies.get(name);
+    public get cookies(): Cookies {
+        return this._ctx.cookies;
     }
-    
+
+    public get ip(): string {
+        return this._ctx.ip;
+    }
+
+    public get ips(): string[] {
+        return this._ctx.ips;
+    }
+
     public json(data: any): KoaContext<T> {
         this._ctx.body = data;
         return this;

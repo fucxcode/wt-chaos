@@ -1,6 +1,7 @@
 /// <reference types="node" />
 import http, { IncomingHttpHeaders } from "http";
 import { INextFunction } from "./router";
+import { Cookies } from "./cookies";
 declare abstract class Context<T> {
     private _oid;
     readonly oid: string;
@@ -18,7 +19,9 @@ declare abstract class Context<T> {
     abstract readonly params: any;
     abstract body: any;
     abstract statusCode: number;
-    abstract cookie(name: string): string | undefined;
+    abstract readonly cookies: Cookies;
+    abstract readonly ip: string;
+    abstract readonly ips: string[];
     abstract json(data: any): Context<T>;
 }
 export { Context };

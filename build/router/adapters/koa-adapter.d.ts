@@ -7,6 +7,7 @@ import Koa from "koa";
 import { IncomingHttpHeaders } from "http";
 import { HttpMethod } from "../../constants";
 import { IContainer } from "../../container";
+import { Cookies } from "../cookies";
 declare class KoaContext<T> extends Context<T> {
     private _ctx;
     readonly innerContext: Koa.Context;
@@ -16,7 +17,9 @@ declare class KoaContext<T> extends Context<T> {
     readonly params: any;
     body: any;
     statusCode: number;
-    cookie(name: string): string;
+    readonly cookies: Cookies;
+    readonly ip: string;
+    readonly ips: string[];
     json(data: any): KoaContext<T>;
 }
 declare class KoaRouter<T> extends Router<KoaContext<T>, T> {

@@ -1,11 +1,10 @@
 import { Mailer, ITransport, IOptionsResolver } from "../../src/mailer";
 import Mail = require("nodemailer/lib/mailer");
-import * as TypeMoq from "typemoq";
 import { $ } from "../$";
 import * as assert from "assert";
-const EventEmitter = require("event");
+import { EventEmitter } from "events";
 
-class TestTransport extends EventEmitter implements ITransport {
+class TestTransport extends EventEmitter  implements ITransport {
     private _name: string;
     public get name(): string {
         return this._name;

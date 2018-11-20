@@ -225,8 +225,8 @@ class ProductRepository extends Repository<InMemoryDbSession, InMemoryDbId, InMe
         return this.driver.collections.get(this.collectionName);
     }
 
-    constructor(driver: InMemoryDbDriver) {
-        super("products", driver);
+    constructor(driverProvider: () => InMemoryDbDriver) {
+        super("products", driverProvider);
     }
 
 }
@@ -240,7 +240,7 @@ describe("repository: in-mem-db", () => {
 
     before(() => {
         driver = new InMemoryDbDriver();
-        repository = new ProductRepository(driver);
+        repository = new ProductRepository(() => driver);
         team = driver.parseId();
         uid = uuid.v4();
     });

@@ -16,8 +16,8 @@ const errors_1 = require("../errors");
 const moment_1 = __importDefault(require("moment"));
 const constants_1 = require("../constants");
 class BusinessRepository extends repository_1.Repository {
-    constructor(collectionName, driver, plugins = []) {
-        super(collectionName, driver, plugins);
+    constructor(collectionName, driverProvider, plugins) {
+        super(collectionName, driverProvider, plugins);
     }
     async onSave(context) {
         if (!context.operationDescription.team) {

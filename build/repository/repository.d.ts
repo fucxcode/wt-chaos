@@ -8,13 +8,13 @@ import { ErasePluginContext } from "./plugins/contexts/plugin-context-erase";
 import { FindByPageIndexResult } from "./find-by-page-index-result";
 import { FindByPageNextResult } from "./find-by-page-next-result";
 declare abstract class Repository<TSession extends Session, TID extends Id, TDriver extends Driver<TSession, TID>, TEntity extends Entity> {
-    private _driver;
+    private _driverProvider;
     readonly driver: TDriver;
     private _plugins;
     readonly plugins: Plugin[];
     private _collectionName;
     readonly collectionName: string;
-    constructor(collectionName: string, driver: TDriver, plugins?: Plugin[]);
+    constructor(collectionName: string, driverProvider?: () => TDriver, plugins?: Plugin[]);
     private processPluginBeforeActions;
     private processPluginAfterActions;
     protected onSave(context: SavePluginContext<TEntity, TSession>): Promise<void>;

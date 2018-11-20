@@ -4,7 +4,7 @@ import { BusinessEntity, Id } from "./entities";
 import { Plugin, SavePluginContext, CountPluginContext, ErasePluginContext } from "./plugins";
 import { OperationDescription } from "./operation-desc";
 declare abstract class BusinessRepository<TSession extends Session, TID extends Id, TDriver extends Driver<TSession, TID>, TEntity extends BusinessEntity> extends Repository<TSession, TID, TDriver, TEntity> {
-    constructor(collectionName: string, driver: TDriver, plugins?: Plugin[]);
+    constructor(collectionName: string, driverProvider?: () => TDriver, plugins?: Plugin[]);
     protected onSave(context: SavePluginContext<TEntity, TSession>): Promise<void>;
     private combineCondition;
     protected onCount(context: CountPluginContext<TSession>): Promise<void>;

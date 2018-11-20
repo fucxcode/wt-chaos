@@ -13,6 +13,9 @@ import { IContainer } from "../../container";
 class KoaContext<T> extends Context<T> {
 
     private _ctx: Koa.Context;
+    public get innerContext(): Koa.Context {
+        return this._ctx;
+    }
    
     constructor(ctx: Koa.Context, next?: INextFunction) {
         super(() => ctx.state, ctx.req, ctx.res, next, () => {

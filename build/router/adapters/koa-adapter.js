@@ -27,6 +27,9 @@ class KoaContext extends context_1.Context {
         });
         this._ctx = ctx;
     }
+    get innerContext() {
+        return this._ctx;
+    }
     get headers() {
         return this._ctx.headers;
     }

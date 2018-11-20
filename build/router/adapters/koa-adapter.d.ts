@@ -9,6 +9,7 @@ import { HttpMethod } from "../../constants";
 import { IContainer } from "../../container";
 declare class KoaContext<T> extends Context<T> {
     private _ctx;
+    readonly innerContext: Koa.Context;
     constructor(ctx: Koa.Context, next?: INextFunction);
     readonly headers: IncomingHttpHeaders;
     readonly query: any;

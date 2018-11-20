@@ -41,7 +41,7 @@ const SPAM_LIST = [
 export class TPLOptions {
     constructor(
         public subject: string,
-        public to: string,
+        public to: string | string[],
         public renderData: Object,
         public templatePath: string,
         public layoutPath?: string,

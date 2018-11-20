@@ -2,12 +2,12 @@ import { IOptionsResolver } from "./i-resolver";
 import Mail = require("nodemailer/lib/mailer");
 export declare class TPLOptions {
     subject: string;
-    to: string;
+    to: string | string[];
     renderData: Object;
     templatePath: string;
     layoutPath?: string | undefined;
     from?: string | undefined;
-    constructor(subject: string, to: string, renderData: Object, templatePath: string, layoutPath?: string | undefined, from?: string | undefined);
+    constructor(subject: string, to: string | string[], renderData: Object, templatePath: string, layoutPath?: string | undefined, from?: string | undefined);
 }
 export interface TPLConfig {
     template?: string;

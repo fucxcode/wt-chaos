@@ -26,7 +26,7 @@ export class YunPian implements SmsInterface {
         return await this.yunPianSdk.sendVoiceCode(mobile, code);
     }
 
-    public async sendMessage(templateId: string, mobile: string, params: object) {
+    public async sendMessage(templateId: string, mobile: string, params?: object) {
         return await this.yunPianSdk.sendTemplateSMS(templateId, mobile, params);
     }
 

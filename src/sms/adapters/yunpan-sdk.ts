@@ -31,15 +31,15 @@ export class YunPianSdk {
         });
     }
 
-    private _getSMSTemplateValue(values: any): any {
+    private getSMSTemplateValue(values: any): any {
         return _.reduce(values, (result: any, value, key) => {
             result[`#${key}#`] = value;
             return result;
         }, {});
     }
 
-    public async sendTemplateSMS(templateId: string, mobile: string, params: object) {
-        const values = this._getSMSTemplateValue(params);
+    public async sendTemplateSMS(templateId: string, mobile: string, params?: object) {
+        const values = this.getSMSTemplateValue(params || {});
         const textResponse = await this._post(`/tpl/get.json`, { tpl_id: templateId });
         const body = JSON.parse(textResponse);
         let text = body.tpl_content;

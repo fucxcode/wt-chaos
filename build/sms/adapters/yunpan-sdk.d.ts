@@ -4,7 +4,7 @@ export declare class YunPianSdk {
     constructor(appKey: string);
     static getInstance(appKey: string): YunPianSdk;
     private _post;
-    private _getSMSTemplateValue;
-    sendTemplateSMS(templateId: string, mobile: string, params: object): Promise<any>;
+    private getSMSTemplateValue;
+    sendTemplateSMS(templateId: string, mobile: string, params?: object): Promise<any>;
     sendVoiceCode(mobile: string, code: string): Promise<any>;
 }

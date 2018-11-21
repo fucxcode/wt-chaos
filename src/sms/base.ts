@@ -4,6 +4,6 @@ export interface SmsInterface {
 
     sendVoiceCode(mobile: string, code: string): Promise<any>;
 
-    sendMessage(templateId: string, mobile: string, params: object): Promise<any>;
+    sendMessage(templateId: string, mobile: string, params?: object): Promise<any>;
 
 }

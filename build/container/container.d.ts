@@ -1,9 +1,30 @@
-import { IContainer } from "./i-container";
-import { IActivationHandler } from "./activation-handlers/i-activation-handler";
-declare const registerContainer: (key: Symbol, activationHandler: IActivationHandler) => IContainer;
-declare const unregisterContainer: (key: Symbol, newDefaultContainerKey?: Symbol | undefined) => boolean;
-declare const clearContainers: () => void;
-declare const resolveContainer: (key: Symbol) => IContainer | undefined;
-declare const getDefaultContainer: () => IContainer | undefined;
-declare const setDefaultContainer: (key: Symbol) => void;
-export { registerContainer, unregisterContainer, clearContainers, resolveContainer, getDefaultContainer, setDefaultContainer };
+declare type Type = Function | Symbol;
+declare enum Lifecycles {
+    singleton = 1,
+    instantiate = 2
+}
+declare class ParamType {
+    private _type;
+    readonly type: any;
+    private _container;
+    readonly container: Container;
+    constructor(type: any, container: Container);
+}
+declare class PropertyType {
+    private _key;
+    readonly key: string;
+    private _type;
+    readonly type: any;
+    private _container;
+    readonly container: Container;
+    constructor(key: string, type: any, container: Container);
+}
+interface Container {
+    key: Symbol;
+    registerType(type: Type, ctor: Function, lifecycle?: Lifecycles, paramTypes?: ParamType[], propTypes?: PropertyType[]): Container;
+    registerInstance(type: Symbol, instance: any): Container;
+    unregister(type: Type): boolean;
+    clear(): void;
+    resolve<T extends object>(type: Type, throwErrorUnregister?: boolean, ...params: any[]): T | undefined;
+}
+export { Container, Lifecycles, Type, ParamType, PropertyType };

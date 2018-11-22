@@ -1,14 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const i_container_1 = require("../i-container");
 const container_1 = require("../container");
+const container_pool_1 = require("../container-pool");
 const inject = function (container, throwErrorUnregister = true, type, lazy = false) {
     let realContainer;
     if (container) {
         realContainer = container;
     }
     else {
-        const defaultContainer = container_1.getDefaultContainer();
+        const defaultContainer = container_pool_1.ContainerPool.getDefaultContainer();
         if (defaultContainer) {
             realContainer = defaultContainer;
         }
@@ -43,7 +43,7 @@ const inject = function (container, throwErrorUnregister = true, type, lazy = fa
                 // since this metadata will be retrieved in class decorator @injectable and it can only contact the `target.constructor`
                 // so in this case we should save metadata in `target.constructor` rather than `target`
                 const injectedProperties = Reflect.getMetadata(`wt-injected-props`, target.constructor) || [];
-                injectedProperties.push(new i_container_1.PropertyType(key, propertyType, realContainer));
+                injectedProperties.push(new container_1.PropertyType(key, propertyType, realContainer));
                 Reflect.defineMetadata(`wt-injected-props`, injectedProperties, target.constructor);
             }
         }

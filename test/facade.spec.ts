@@ -5,6 +5,7 @@ import * as _ from "../src/utilities";
 import { facade, route, middlewares } from "../src/facade";
 import * as uuid from "node-uuid";
 import { assert } from "chai";
+import { Cookies } from "../src/router/cookies";
 
 describe("facade", () => {
 
@@ -22,6 +23,34 @@ describe("facade", () => {
     }
 
     class TestContext extends Context<TestState> {
+
+        public get statusCode(): number {
+            throw new Error("not implemented");
+        }
+
+        public get cookies(): Cookies {
+            throw new Error("not implemented");
+        }
+
+        public get ip(): string {
+            throw new Error("not implemented");
+        }
+
+        public get ips(): string[] {
+            throw new Error("not implemented");
+        }
+
+        public get host(): string {
+            throw new Error("not implemented");
+        }
+
+        public get protocol(): string {
+            throw new Error("not implemented");
+        }
+
+        public redirect(url: string, alt?: string): void {
+            throw new Error("not implemented.");
+        }
 
         constructor(state: TestState) {
             super(() => state);
@@ -54,7 +83,8 @@ describe("facade", () => {
         constructor(
             public method: HttpMethod,
             public path: string,
-            public handlers: RouterHandler<TestContext, TestState>[]
+            public middlewares: RouterMiddleware<TestContext, TestState>[],
+            public handler: RouterHandler<TestContext, TestState>
         ) { }
 
     }
@@ -83,8 +113,8 @@ describe("facade", () => {
             throw new Error("not implemented");
         }
 
-        protected onRoute(method: HttpMethod, path: string, ...handlers: RouterHandler<TestContext, TestState>[]): void {
-            this._routes.push(new RouteEntry(method, path, handlers));
+        protected onRoute(method: HttpMethod, path: string, middlewares: RouterMiddleware<TestContext, TestState>[], handler: RouterHandler<TestContext, TestState>): void {
+            this._routes.push(new RouteEntry(method, path, middlewares, handler));
         }
 
         public clear(): void {
@@ -95,9 +125,10 @@ describe("facade", () => {
             const context = new TestContext(state);
             const entry = _.find(this._routes, r => r.method === method && r.path === path);
             if (entry) {
-                for (const handler of entry.handlers) {
-                    await handler(context);
+                for (const middleware of entry.middlewares) {
+                    await middleware(context, () => Promise.resolve());
                 }
+                await entry.handler(context);
             }
             else {
                 throw new Error((404).toString());

@@ -30,14 +30,14 @@ class YunPianSdk {
             })
         });
     }
-    _getSMSTemplateValue(values) {
+    getSMSTemplateValue(values) {
         return _.reduce(values, (result, value, key) => {
             result[`#${key}#`] = value;
             return result;
         }, {});
     }
     async sendTemplateSMS(templateId, mobile, params) {
-        const values = this._getSMSTemplateValue(params);
+        const values = this.getSMSTemplateValue(params || {});
         const textResponse = await this._post(`/tpl/get.json`, { tpl_id: templateId });
         const body = JSON.parse(textResponse);
         let text = body.tpl_content;

@@ -24,12 +24,13 @@ import { AggregatePluginContext } from "./plugins/contexts/plugin-context-aggreg
 import { MapReducePluginContext } from "./plugins/contexts/plugin-context-map-reduce";
 import { FindByPageIndexResult } from "./find-by-page-index-result";
 import { FindByPageNextResult } from "./find-by-page-next-result";
+import { DriverExtensions } from "./drivers/driver-extensions";
 
 abstract class Repository<TSession extends Session, TID extends Id, TDriver extends Driver<TSession, TID>, TEntity extends Entity> {
 
-    private _driver: TDriver;
+    private _driverProvider: () => TDriver;
     public get driver(): TDriver {
-        return this._driver;
+        return this._driverProvider();
     }
 
     private _plugins: Plugin[];
@@ -42,9 +43,9 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
         return this._collectionName;
     }
 
-    constructor(collectionName: string, driver: TDriver, plugins: Plugin[] = []) {
+    constructor(collectionName: string, driverProvider: () => TDriver = DriverExtensions.getDefault, plugins: Plugin[] = []) {
         this._collectionName = collectionName;
-        this._driver = driver;
+        this._driverProvider = driverProvider;
         this._plugins = plugins;
     }
 
@@ -64,12 +65,12 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
 
     protected async onSave(context: SavePluginContext<TEntity, TSession>): Promise<void> {
         context.result = _.isArray(context.entityOrArray) ?
-            await this._driver.insertMany(this._collectionName, context.entityOrArray, context.options) :
-            await this._driver.insertOne(this._collectionName, context.entityOrArray, context.options);
+            await this.driver.insertMany(this._collectionName, context.entityOrArray, context.options) :
+            await this.driver.insertOne(this._collectionName, context.entityOrArray, context.options);
     }
 
     public async save(operationDescription: OperationDescription, entityOrArray: TEntity | TEntity[], options?: InsertOneOptions<TSession> | InsertManyOptions<TSession>): Promise<Partial<TEntity> | Partial<TEntity>[] | undefined> {
-        const context = new SavePluginContext<TEntity, TSession>(operationDescription, this._driver.name, this._collectionName, entityOrArray, options);
+        const context = new SavePluginContext<TEntity, TSession>(operationDescription, this._driverProvider.name, this._collectionName, entityOrArray, options);
         await this.processPluginBeforeActions<Partial<TEntity> | Partial<TEntity>[] | undefined, SavePluginContext<TEntity, TSession>>(context, (p, c) => p.beforeSave(c));
 
         if (!context.cancel) {
@@ -81,11 +82,11 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
     }
 
     protected async onCount(context: CountPluginContext<TSession>): Promise<void> {
-        context.result = await this._driver.count(this._collectionName, context.condition, context.options);
+        context.result = await this.driver.count(this._collectionName, context.condition, context.options);
     }
 
     public async count(operationDescription: OperationDescription, condition?: any, options?: CountOptions<TSession>): Promise<number> {
-        const context = new CountPluginContext<TSession>(operationDescription, this._driver.name, this._collectionName, condition, options);
+        const context = new CountPluginContext<TSession>(operationDescription, this._driverProvider.name, this._collectionName, condition, options);
         await this.processPluginBeforeActions<number, CountPluginContext<TSession>>(context, (p, c) => p.beforeCount(c));
 
         if (!context.cancel) {
@@ -97,7 +98,7 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
     }
 
     protected async onFind(operationDescription: OperationDescription, condition?: any, options?: FindOptions<TEntity, TSession>): Promise<Partial<TEntity>[]> {
-        return await this._driver.find<TEntity>(this._collectionName, condition, options);
+        return await this.driver.find<TEntity>(this._collectionName, condition, options);
     }
 
     private async findOneInternal(operationDescription: OperationDescription, condition?: any, throwErrorWhenMultipleDocuments: boolean = false, options?: FindOptions<TEntity, TSession>): Promise<Partial<TEntity> | undefined> {
@@ -114,7 +115,7 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
     }
 
     public async findOne(operationDescription: OperationDescription, condition?: any, throwErrorWhenMultipleDocuments: boolean = false, options?: FindOptions<TEntity, TSession>): Promise<Partial<TEntity> | undefined> {
-        const context = new FindOnePluginContext<TEntity, TSession>(operationDescription, this._driver.name, this._collectionName, condition, options);
+        const context = new FindOnePluginContext<TEntity, TSession>(operationDescription, this._driverProvider.name, this._collectionName, condition, options);
         await this.processPluginBeforeActions<Partial<TEntity> | undefined, FindOnePluginContext<TEntity, TSession>>(context, (p, c) => p.beforeFindOne(c));
 
         if (!context.cancel) {
@@ -126,7 +127,7 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
     }
 
     public async findOneById(operationDescription: OperationDescription, id: Id, condition?: any, options?: FindOneOptions<TEntity, TSession>): Promise<Partial<TEntity> | undefined> {
-        const context = new FindOneByIdPluginContext<TEntity, TSession>(operationDescription, this._driver.name, this._collectionName, id, condition, options);
+        const context = new FindOneByIdPluginContext<TEntity, TSession>(operationDescription, this._driverProvider.name, this._collectionName, id, condition, options);
         await this.processPluginBeforeActions<Partial<TEntity> | undefined, FindOneByIdPluginContext<TEntity, TSession>>(context, (p, c) => p.beforeFindOneById(c));
 
         if (!context.cancel) {
@@ -140,7 +141,7 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
     }
 
     public async findByIds(operationDescription: OperationDescription, ids: Id[], condition?: any, options?: FindOptions<TEntity, TSession>): Promise<Partial<TEntity>[]> {
-        const context = new FindByIdsPluginContext<TEntity, TSession>(operationDescription, this._driver.name, this._collectionName, ids, condition, options);
+        const context = new FindByIdsPluginContext<TEntity, TSession>(operationDescription, this._driverProvider.name, this._collectionName, ids, condition, options);
         await this.processPluginBeforeActions<Partial<TEntity>[], FindByIdsPluginContext<TEntity, TSession>>(context, (p, c) => p.beforeFindByIds(c));
 
         if (!context.cancel) {
@@ -158,7 +159,7 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
     }
 
     public async findByPageIndex(operationDescription: OperationDescription, condition?: any, pageIndex: number = 0, pageSize: number = DEFAULT_PAGE_SIZE, options: FindOptions<TEntity, TSession> = {}): Promise<FindByPageIndexResult<TEntity>> {
-        const context = new FindByPageIndexPluginContext<TEntity, TSession>(operationDescription, this._driver.name, this._collectionName, condition, pageIndex, pageSize, options);
+        const context = new FindByPageIndexPluginContext<TEntity, TSession>(operationDescription, this._driverProvider.name, this._collectionName, condition, pageIndex, pageSize, options);
         await this.processPluginBeforeActions<FindByPageIndexResult<TEntity>, FindByPageIndexPluginContext<TEntity, TSession>>(context, (p, c) => p.beforeFindByPageIndex(c));
 
         if (!context.cancel) {
@@ -199,7 +200,7 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
     }
 
     public async findByPageNext(operationDescription: OperationDescription, condition?: any, pageIndex: number = 0, pageSize: number = DEFAULT_PAGE_SIZE, options: FindOptions<TEntity, TSession> = {}): Promise<FindByPageNextResult<TEntity>> {
-        const context = new FindByPageNextPluginContext<TEntity, TSession>(operationDescription, this._driver.name, this._collectionName, condition, pageIndex, pageSize, options);
+        const context = new FindByPageNextPluginContext<TEntity, TSession>(operationDescription, this._driverProvider.name, this._collectionName, condition, pageIndex, pageSize, options);
         await this.processPluginBeforeActions<FindByPageNextResult<TEntity>, FindByPageNextPluginContext<TEntity, TSession>>(context, (p, c) => p.beforeFindByPageNext(c));
 
         if (!context.cancel) {
@@ -273,12 +274,12 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
     protected async onUpdate(operationDescription: OperationDescription, condition?: any, update?: any, multi: boolean = false, options?: UpdateOptions<TSession>): Promise<UpdateResult> {
         update = this.parseUpdate(update);
         return multi ?
-            await this._driver.updateMany(this._collectionName, condition, update, options) :
-            await this._driver.updateOne(this._collectionName, condition, update, options);
+            await this.driver.updateMany(this._collectionName, condition, update, options) :
+            await this.driver.updateOne(this._collectionName, condition, update, options);
     }
 
     public async update(operationDescription: OperationDescription, condition?: any, update?: any, multi: boolean = false, options?: UpdateOptions<TSession>): Promise<UpdateResult> {
-        const context = new UpdatePluginContext<TSession>(operationDescription, this._driver.name, this._collectionName, condition, update, options);
+        const context = new UpdatePluginContext<TSession>(operationDescription, this._driverProvider.name, this._collectionName, condition, update, options);
         await this.processPluginBeforeActions<UpdateResult, UpdatePluginContext<TSession>>(context, (p, c) => p.beforeUpdate(c));
 
         if (!context.cancel) {
@@ -290,7 +291,7 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
     }
 
     public async updateById(operationDescription: OperationDescription, id: Id, condition?: any, update?: any, options?: UpdateOptions<TSession>): Promise<UpdateResult> {
-        const context = new UpdateByIdPluginContext<TSession>(operationDescription, this._driver.name, this._collectionName, id, condition, update, options);
+        const context = new UpdateByIdPluginContext<TSession>(operationDescription, this._driverProvider.name, this._collectionName, id, condition, update, options);
         await this.processPluginBeforeActions<UpdateResult, UpdateByIdPluginContext<TSession>>(context, (p, c) => p.beforeUpdateById(c));
 
         if (!context.cancel) {
@@ -304,7 +305,7 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
     }
 
     public async updateByIds(operationDescription: OperationDescription, ids: Id[], condition?: any, update?: any, options?: UpdateOptions<TSession>): Promise<UpdateResult> {
-        const context = new UpdateByIdsPluginContext<TSession>(operationDescription, this._driver.name, this._collectionName, ids, condition, update, options);
+        const context = new UpdateByIdsPluginContext<TSession>(operationDescription, this._driverProvider.name, this._collectionName, ids, condition, update, options);
         await this.processPluginBeforeActions<UpdateResult, UpdateByIdsPluginContext<TSession>>(context, (p, c) => p.beforeUpdateByIds(c));
 
         if (!context.cancel) {
@@ -320,7 +321,7 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
     }
 
     public async updateByEntity(operationDescription: OperationDescription, entity: TEntity, condition?: any, options?: UpdateOptions<TSession>): Promise<UpdateResult> {
-        const context = new UpdateByEntityPluginContext<TEntity, TSession>(operationDescription, this._driver.name, this._collectionName, entity, condition, options);
+        const context = new UpdateByEntityPluginContext<TEntity, TSession>(operationDescription, this._driverProvider.name, this._collectionName, entity, condition, options);
         await this.processPluginBeforeActions<UpdateResult, UpdateByEntityPluginContext<TEntity, TSession>>(context, (p, c) => p.beforeUpdateByEntity(c));
 
         if (!context.cancel) {
@@ -335,12 +336,12 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
 
     protected async onErase(context: ErasePluginContext<TSession>, multi: boolean): Promise<void> {
         context.result = multi ?
-            await this._driver.deleteMany(this._collectionName, context.condition, context.options) :
-            await this._driver.deleteOne(this._collectionName, context.condition, context.options);
+            await this.driver.deleteMany(this._collectionName, context.condition, context.options) :
+            await this.driver.deleteOne(this._collectionName, context.condition, context.options);
     }
 
     protected async erase(operationDescription: OperationDescription, condition?: any, multi: boolean = false, options?: DeleteOptions<TSession>): Promise<DeleteResult> {
-        const context = new ErasePluginContext<TSession>(operationDescription, this._driver.name, this._collectionName, condition, options);
+        const context = new ErasePluginContext<TSession>(operationDescription, this._driverProvider.name, this._collectionName, condition, options);
         await this.processPluginBeforeActions<DeleteResult, ErasePluginContext<TSession>>(context, (p, c) => p.beforeErase(c));
 
         if (!context.cancel) {
@@ -352,11 +353,11 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
     }
 
     protected async onFindOneAndUpdate(operationDescription: OperationDescription, condition?: any, update?: any, options?: FindOneAndUpdateOptions<TEntity, TSession>): Promise<Partial<TEntity> | undefined> {
-        return await this._driver.findOneAndUpdate<TEntity>(this._collectionName, condition, this.parseUpdate(update), options);
+        return await this.driver.findOneAndUpdate<TEntity>(this._collectionName, condition, this.parseUpdate(update), options);
     }
 
     public async findOneAndUpdate(operationDescription: OperationDescription, condition?: any, update?: any, options?: FindOneAndUpdateOptions<TEntity, TSession>): Promise<Partial<TEntity> | undefined> {
-        const context = new FindOneAndUpdatePluginContext<TEntity, TSession>(operationDescription, this._driver.name, this._collectionName, condition, update, options);
+        const context = new FindOneAndUpdatePluginContext<TEntity, TSession>(operationDescription, this._driverProvider.name, this._collectionName, condition, update, options);
         await this.processPluginBeforeActions<Partial<TEntity> | undefined, FindOneAndUpdatePluginContext<TEntity, TSession>>(context, (p, c) => p.beforeFindOneAndUpdate(c));
 
         if (!context.cancel) {
@@ -368,7 +369,7 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
     }
 
     public async findOneAndUpdateByEntity(operationDescription: OperationDescription, entity: TEntity, condition?: any, options?: FindOneAndUpdateOptions<TEntity, TSession>): Promise<Partial<TEntity> | undefined> {
-        const context = new FindOneAndUpdateByEntityPluginContext<TEntity, TSession>(operationDescription, this._driver.name, this._collectionName, entity, condition, options);
+        const context = new FindOneAndUpdateByEntityPluginContext<TEntity, TSession>(operationDescription, this._driverProvider.name, this._collectionName, entity, condition, options);
         await this.processPluginBeforeActions<Partial<TEntity> | undefined, FindOneAndUpdateByEntityPluginContext<TEntity, TSession>>(context, (p, c) => p.beforeFindOneAndUpdateByEntity(c));
 
         if (!context.cancel) {
@@ -382,15 +383,15 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
     }
 
     public initializeBulkOp(operationDescription: OperationDescription, ordered: boolean = false): BulkOperation {
-        return this._driver.initializeBulkOp(this._collectionName, ordered);
+        return this.driver.initializeBulkOp(this._collectionName, ordered);
     }
 
     public async aggregate<TResult>(operationDescription: OperationDescription, pipeline: any[], options?: AggregateOptions<TSession>): Promise<Partial<TResult>[]> {
-        const context = new AggregatePluginContext<TResult, TSession>(operationDescription, this._driver.name, this._collectionName, pipeline, options);
+        const context = new AggregatePluginContext<TResult, TSession>(operationDescription, this._driverProvider.name, this._collectionName, pipeline, options);
         await this.processPluginBeforeActions<Partial<TResult>[], AggregatePluginContext<TResult, TSession>>(context, (p, c) => p.beforeAggregate(c));
 
         if (!context.cancel) {
-            context.result = await this._driver.aggregate<TResult>(this._collectionName, context.pipeline, context.options);
+            context.result = await this.driver.aggregate<TResult>(this._collectionName, context.pipeline, context.options);
         }
 
         await this.processPluginAfterActions<Partial<TResult>[], AggregatePluginContext<TResult, TSession>>(context, (p, c) => p.afterAggregate(c));
@@ -398,11 +399,11 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
     }
 
     public async mapReduce<TResult>(operationDescription: OperationDescription, map: Function | string, reduce: Function | string, options?: MapReduceOptions<TSession>): Promise<Partial<TResult>[]> {
-        const context = new MapReducePluginContext<TResult, TSession>(operationDescription, this._driver.name, this._collectionName, map, reduce, options);
+        const context = new MapReducePluginContext<TResult, TSession>(operationDescription, this._driverProvider.name, this._collectionName, map, reduce, options);
         await this.processPluginBeforeActions<Partial<TResult>[], MapReducePluginContext<TResult, TSession>>(context, (p, c) => p.beforeMapReduce(c));
 
         if (!context.cancel) {
-            context.result = await this._driver.mapReduce<TResult>(this._collectionName, context.map, context.reduce, context.options);
+            context.result = await this.driver.mapReduce<TResult>(this._collectionName, context.map, context.reduce, context.options);
         }
 
         await this.processPluginAfterActions<Partial<TResult>[], MapReducePluginContext<TResult, TSession>>(context, (p, c) => p.afterMapReduce(c));

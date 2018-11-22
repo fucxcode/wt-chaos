@@ -5,6 +5,6 @@ function __export(m) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./activation-handlers"));
 __export(require("./decorators"));
+__export(require("./container-pool"));
 __export(require("./container"));
-__export(require("./i-container"));
 //# sourceMappingURL=index.js.map

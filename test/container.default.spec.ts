@@ -2,21 +2,20 @@ import { assert } from "chai";
 import * as uuid from "node-uuid";
 import * as _ from "../src/utilities";
 
-import { IContainer, lifecycles } from "../src/container/i-container";
-import { registerContainer, clearContainers, resolveContainer, setDefaultContainer } from "../src/container/container";
+import { ContainerPool } from "../src/container";
 import { inject, injectable } from "../src/container/decorators";
 import { BypassActivationHandler } from "../src/container/activation-handlers/bypass-activation-handler";
 
 describe(`default container`, () => {
 
     beforeEach(() => {
-        clearContainers();
+        ContainerPool.clearContainers();
     });
 
     it(`register 1st container, set default. inject and injectable should use default container`, () => {
         const key = Symbol("default");
-        const container = registerContainer(key, new BypassActivationHandler());
-        setDefaultContainer(key);
+        const container = ContainerPool.registerContainer(key, new BypassActivationHandler());
+        ContainerPool.setDefaultContainer(key);
 
         @injectable()
         // @ts-ignore
@@ -50,7 +49,7 @@ describe(`default container`, () => {
 
     it(`register 1st container, no default. inject and injectable should use this container as default`, () => {
         const key = Symbol("default");
-        const container = registerContainer(key, new BypassActivationHandler());
+        const container = ContainerPool.registerContainer(key, new BypassActivationHandler());
 
         @injectable()
         // @ts-ignore

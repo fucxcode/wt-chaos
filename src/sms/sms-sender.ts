@@ -49,7 +49,7 @@ export class SmsSender {
         return await this.service.sendVoiceCode(mobile, code);
     }
 
-    public async sendMessage(templateId: string, mobile: string, params: object) {
+    public async sendMessage(templateId: string, mobile: string, params?: object) {
         return await this.service.sendMessage(templateId, mobile, params);
     }
 }

@@ -1,13 +1,13 @@
-import { IContainer, Type, PropertyType } from "../i-container";
-import { getDefaultContainer } from "../container";
+import { Container, Type, PropertyType } from "../container";
+import { ContainerPool } from "../container-pool";
 
-const inject = function (container?: IContainer, throwErrorUnregister: boolean = true, type?: Type, lazy: boolean = false): (...args: any[]) => any {
-    let realContainer: IContainer;
+const inject = function (container?: Container, throwErrorUnregister: boolean = true, type?: Type, lazy: boolean = false): (...args: any[]) => any {
+    let realContainer: Container;
     if (container) {
         realContainer = container;
     }
     else {
-        const defaultContainer = getDefaultContainer();
+        const defaultContainer = ContainerPool.getDefaultContainer();
         if (defaultContainer) {
             realContainer = defaultContainer;
         }
@@ -54,7 +54,7 @@ const inject = function (container?: IContainer, throwErrorUnregister: boolean =
             if (!methodName) {
                 const injectedParamIndexes: {
                     index: number,
-                    container: IContainer,
+                    container: Container,
                     type?: Type
                 }[] = Reflect.getMetadata(`wt:injected-params-indexes`, target) || [];
                 injectedParamIndexes.push({

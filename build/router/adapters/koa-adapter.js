@@ -19,13 +19,16 @@ const koa_bodyparser_1 = __importDefault(require("koa-bodyparser"));
 const errors_1 = require("../../errors");
 class KoaContext extends context_1.Context {
     constructor(ctx, next) {
-        super(() => ctx.state, ctx.req, ctx.res, next, () => {
+        super(() => ctx.state, ctx.req, ctx.res, () => {
             if (!ctx.state.oid) {
                 ctx.state.oid = uuid.v4();
             }
             return ctx.state.oid;
         });
         this._ctx = ctx;
+    }
+    get innerContext() {
+        return this._ctx;
     }
     get headers() {
         return this._ctx.headers;
@@ -48,12 +51,27 @@ class KoaContext extends context_1.Context {
     set statusCode(value) {
         this._ctx.status = value;
     }
-    cookie(name) {
-        return this._ctx.cookies.get(name);
+    get cookies() {
+        return this._ctx.cookies;
+    }
+    get ip() {
+        return this._ctx.ip;
+    }
+    get ips() {
+        return this._ctx.ips;
+    }
+    get host() {
+        return this._ctx.host;
+    }
+    get protocol() {
+        return this._ctx.protocol;
     }
     json(data) {
         this._ctx.body = data;
         return this;
+    }
+    redirect(url, alt) {
+        this._ctx.redirect(url, alt);
     }
 }
 exports.KoaContext = KoaContext;
@@ -74,27 +92,47 @@ class KoaRouter extends router_1.Router {
     }
     onUse(handler) {
         this._router.use(async (ctx, next) => {
-            await handler(new KoaContext(ctx, next));
+            await handler(new KoaContext(ctx), next);
         });
     }
-    onRoute(method, path, ...handlers) {
+    onRoute(method, path, middlewares, handler) {
         const fn = this._router[method.toLowerCase()];
         if (_.isFunction(fn)) {
-            fn.call(this._router, path, ..._.map(handlers, handler => {
-                return async (ctx, next) => {
-                    const context = new KoaContext(ctx, next);
-                    const data = await handler(context);
-                    if (data) {
-                        ctx.body = {
-                            oid: context.oid,
-                            code: errors_1.WTCode.ok,
-                            data: data
-                        };
-                    }
-                    // in koa we MUST invoke `await next()` regardless if multiple handlers registered
-                    await next();
-                };
-            }));
+            const handlers = [];
+            for (const middleware of middlewares) {
+                handlers.push(async (ctx, next) => {
+                    await middleware(new KoaContext(ctx, next), next);
+                });
+            }
+            handlers.push(async (ctx, next) => {
+                const context = new KoaContext(ctx, next);
+                const data = await handler(context);
+                if (data) {
+                    ctx.body = {
+                        oid: context.oid,
+                        code: errors_1.WTCode.ok,
+                        data: data
+                    };
+                }
+                // in koa we MUST invoke `await next()` regardless if multiple handlers registered
+                await next();
+            });
+            fn.call(this._router, path, ...handlers);
+            // fn.call(this._router, path, ..._.map(handlers, handler => {
+            //     return async (ctx: Koa.Context, next: INextFunction) => {
+            //         const context = new KoaContext<T>(ctx, next);
+            //         const data = await handler(context);
+            //         if (data) {
+            //             ctx.body = {
+            //                 oid: context.oid,
+            //                 code: WTCode.ok,
+            //                 data: data
+            //             };
+            //         }
+            //         // in koa we MUST invoke `await next()` regardless if multiple handlers registered
+            //         await next();
+            //     };
+            // }));
         }
         else {
             throw new Error(`Koa does not support method "${method}"`);

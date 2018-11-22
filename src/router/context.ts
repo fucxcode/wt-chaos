@@ -3,6 +3,7 @@ import * as uuid from "node-uuid";
 import { INextFunction } from "./router";
 import * as _ from "../utilities";
 import { ISomeObject } from "../constants";
+import { Cookies } from "./cookies";
 
 abstract class Context<T> {
 
@@ -27,17 +28,17 @@ abstract class Context<T> {
         return this._response;
     }
 
-    private _next?: INextFunction;
-    public get next(): INextFunction {
-        return this._next || Promise.resolve;
-    }
+    // private _next?: INextFunction;
+    // public get next(): INextFunction {
+    //     return this._next || Promise.resolve;
+    // }
 
-    constructor(stateResolver: () => T, request?: http.IncomingMessage, response?: http.ServerResponse, next?: INextFunction, oidResolver: () => string = uuid.v4) {
+    constructor(stateResolver: () => T, request?: http.IncomingMessage, response?: http.ServerResponse, oidResolver: () => string = uuid.v4) {
         this._oid = oidResolver();
         this._state = stateResolver();
         this._request = request;
         this._response = response;
-        this._next = next;
+        // this._next = next;
     }
 
     public abstract get headers(): IncomingHttpHeaders;
@@ -54,9 +55,19 @@ abstract class Context<T> {
 
     public abstract set statusCode(value: number);
 
-    public abstract cookie(name: string): string | undefined;
+    public abstract get cookies(): Cookies;
+
+    public abstract get ip(): string;
+
+    public abstract get ips(): string[];
+
+    public abstract get host(): string;
+
+    public abstract get protocol(): string;
 
     public abstract json(data: any): Context<T>;
+
+    public abstract redirect(url: string, alt?: string): void;
 
 }
 

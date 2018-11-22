@@ -11,7 +11,7 @@ const path = __importStar(require("path"));
 const fs = __importStar(require("fs"));
 const mustache = __importStar(require("mustache"));
 const errors_1 = require("../../errors");
-const spamList = [
+const SPAM_LIST = [
     "奔跑吧",
     "粉丝回馈活动",
     "84978888",
@@ -54,13 +54,13 @@ class TPLOptions {
     }
 }
 exports.TPLOptions = TPLOptions;
-class TplResolver {
+class TPLResolver {
     constructor(config) {
         this.config = config;
     }
     checkRenderData(renderData) {
         for (const data in renderData) {
-            if (spamList.includes(data)) {
+            if (SPAM_LIST.includes(data)) {
                 return false;
             }
         }
@@ -97,5 +97,5 @@ class TplResolver {
         return emailOptions;
     }
 }
-exports.TplResolver = TplResolver;
+exports.TPLResolver = TPLResolver;
 //# sourceMappingURL=tpl-resolver.js.map

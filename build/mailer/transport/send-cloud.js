@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const scTransport = require('nodemailer-sendcloud-transport');
+const scTransport = require("nodemailer-sendcloud-transport");
 class SendCloud {
     get name() {
         return this._name;
@@ -13,8 +13,8 @@ class SendCloud {
         this.instance = scTransport(options);
         this._version = this.instance.version;
     }
-    async send(mail) {
-        return await this.instance.send(mail);
+    send(mail, callback) {
+        return this.instance.send(mail, callback);
     }
 }
 exports.SendCloud = SendCloud;

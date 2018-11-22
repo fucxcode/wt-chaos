@@ -129,3 +129,37 @@
 //         console.log("fail");
 //         console.log(error);
 //     });
+
+import { ContainerPool } from "../src/container";
+import { Repository, MongoDBSession, MongoDBId, MongoDBDriver, Entity, OperationDescription } from "../src/repository";
+import { MongoClient } from "mongodb";
+import { DriverExtensions } from "../src/repository/drivers/driver-extensions";
+
+const container = ContainerPool.registerContainer();
+
+interface AEntity extends Entity {
+    name?: string;
+}
+
+class ARepo extends Repository<MongoDBSession, MongoDBId, MongoDBDriver, AEntity> {
+
+    constructor() {
+        super("a_entities");
+    }
+
+}
+
+let driver: MongoDBDriver;
+
+async function connect() {
+    const client = await MongoClient.connect("mongodb://localhost:27017", { useNewUrlParser: true });
+    driver = new MongoDBDriver(client, "test");
+    DriverExtensions.setDefault(driver);
+}
+
+connect().then(() => {
+    const repo = new ARepo();
+    return repo.findByPageIndex(new OperationDescription());
+}).then(result => {
+    console.log(result.count);
+});

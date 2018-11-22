@@ -14,8 +14,8 @@ describe("read write strategy", () => {
 
     class TestRepository extends Repository<MongoDBSession, MongoDBId, MongoDBDriver, TestEntity> {
 
-        constructor(driver: MongoDBDriver, plugins: Plugin[] = []) {
-            super("__test_collection__", driver, plugins);
+        constructor(driverProvider: () => MongoDBDriver, plugins: Plugin[] = []) {
+            super("__test_collection__", driverProvider, plugins);
         }
 
     }
@@ -35,7 +35,7 @@ describe("read write strategy", () => {
         db.setup(x => x.collection(TypeMoq.It.isAny())).returns(() => collection.object).verifiable();
 
         const driver = new MongoDBDriver(client.object, "__test_db__", undefined, undefined, strategy);
-        const repository = new TestRepository(driver, plugins);
+        const repository = new TestRepository(() => driver, plugins);
         return {
             clientMock: client,
             dbMock: db,

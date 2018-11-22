@@ -8,14 +8,18 @@ import { IncomingHttpHeaders } from "http";
 import bodyParser from "koa-bodyparser";
 import { HttpMethod } from "../../constants";
 import { WTCode } from "../../errors";
-import { IContainer } from "../../container";
+import { Container } from "../../container";
+import { Cookies } from "../cookies";
 
 class KoaContext<T> extends Context<T> {
 
     private _ctx: Koa.Context;
+    public get innerContext(): Koa.Context {
+        return this._ctx;
+    }
    
     constructor(ctx: Koa.Context, next?: INextFunction) {
-        super(() => ctx.state, ctx.req, ctx.res, next, () => {
+        super(() => ctx.state, ctx.req, ctx.res, () => {
             if (!ctx.state.oid) {
                 ctx.state.oid = uuid.v4();
             }
@@ -52,13 +56,33 @@ class KoaContext<T> extends Context<T> {
         this._ctx.status = value;
     }
 
-    public cookie(name: string): string {
-        return this._ctx.cookies.get(name);
+    public get cookies(): Cookies {
+        return this._ctx.cookies;
     }
-    
+
+    public get ip(): string {
+        return this._ctx.ip;
+    }
+
+    public get ips(): string[] {
+        return this._ctx.ips;
+    }
+
+    public get host(): string {
+        return this._ctx.host;
+    }
+
+    public get protocol(): string {
+        return this._ctx.protocol;
+    }
+
     public json(data: any): KoaContext<T> {
         this._ctx.body = data;
         return this;
+    }
+
+    public redirect(url: string, alt?: string): void {
+        this._ctx.redirect(url, alt);
     }
 }
 
@@ -76,7 +100,7 @@ class KoaRouter<T> extends Router<KoaContext<T>, T> {
         this._app.proxy = value;
     }
 
-    constructor(app: Koa, prefix?: string, isDefault: boolean = true, container?: IContainer) {
+    constructor(app: Koa, prefix?: string, isDefault: boolean = true, container?: Container) {
         super(prefix, isDefault, container);
         this._app = app;
         this._app.use(bodyParser());
@@ -88,28 +112,49 @@ class KoaRouter<T> extends Router<KoaContext<T>, T> {
 
     public onUse(handler: RouterMiddleware<KoaContext<T>, T>): void {
         this._router.use(async (ctx, next) => {
-            await handler(new KoaContext<T>(ctx, next));
+            await handler(new KoaContext<T>(ctx), next);
         });
     }
 
-    public onRoute(method: HttpMethod, path: string | RegExp, ...handlers: RouterHandler<KoaContext<T>, T>[]): void {
+    public onRoute(method: HttpMethod, path: string | RegExp, middlewares: RouterMiddleware<KoaContext<T>, T>[], handler: RouterHandler<KoaContext<T>, T>): void {
         const fn = (this._router as any)[method.toLowerCase()] as Function;
         if (_.isFunction(fn)) {
-            fn.call(this._router, path, ..._.map(handlers, handler => {
-                return async (ctx: Koa.Context, next: INextFunction) => {
-                    const context = new KoaContext<T>(ctx, next);
-                    const data = await handler(context);
-                    if (data) {
-                        ctx.body = {
-                            oid: context.oid,
-                            code: WTCode.ok,
-                            data: data
-                        };
-                    }
-                    // in koa we MUST invoke `await next()` regardless if multiple handlers registered
-                    await next();
-                };
-            }));
+            const handlers: ((ctx: Koa.Context, next: INextFunction) => Promise<any>)[] = [];
+            for (const middleware of middlewares) {
+                handlers.push(async (ctx: Koa.Context, next: INextFunction) => {
+                    await middleware(new KoaContext<T>(ctx, next), next);
+                });
+            }
+            handlers.push(async (ctx: Koa.Context, next: INextFunction) => {
+                const context = new KoaContext<T>(ctx, next);
+                const data = await handler(context);
+                if (data) {
+                    ctx.body = {
+                        oid: context.oid,
+                        code: WTCode.ok,
+                        data: data
+                    };
+                }
+                // in koa we MUST invoke `await next()` regardless if multiple handlers registered
+                await next();
+            });
+            fn.call(this._router, path, ...handlers);
+
+            // fn.call(this._router, path, ..._.map(handlers, handler => {
+            //     return async (ctx: Koa.Context, next: INextFunction) => {
+            //         const context = new KoaContext<T>(ctx, next);
+            //         const data = await handler(context);
+            //         if (data) {
+            //             ctx.body = {
+            //                 oid: context.oid,
+            //                 code: WTCode.ok,
+            //                 data: data
+            //             };
+            //         }
+            //         // in koa we MUST invoke `await next()` regardless if multiple handlers registered
+            //         await next();
+            //     };
+            // }));
         }
         else {
             throw new Error(`Koa does not support method "${method}"`);

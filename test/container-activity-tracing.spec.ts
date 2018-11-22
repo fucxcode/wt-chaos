@@ -1,5 +1,4 @@
-import { IContainer } from "../src/container/i-container";
-import { clearContainers, registerContainer, ActivityTracingActivationHandler } from "../src/container";
+import { Container, ContainerPool } from "../src/container";
 
 // describe(`container`, () => {
 

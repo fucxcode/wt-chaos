@@ -5,7 +5,7 @@ import * as mustache from "mustache";
 import { WTInvalidInputError } from "../../errors";
 import Mail = require("nodemailer/lib/mailer");
 
-const spamList = [
+const SPAM_LIST = [
     "奔跑吧",
     "粉丝回馈活动",
     "84978888",
@@ -41,7 +41,7 @@ const spamList = [
 export class TPLOptions {
     constructor(
         public subject: string,
-        public to: string,
+        public to: string | string[],
         public renderData: Object,
         public templatePath: string,
         public layoutPath?: string,
@@ -58,7 +58,7 @@ export interface TPLConfig {
     };
 }
 
-export class TplResolver implements IOptionsResolver {
+export class TPLResolver implements IOptionsResolver {
 
     private config: TPLConfig;
 
@@ -68,7 +68,7 @@ export class TplResolver implements IOptionsResolver {
 
     private checkRenderData(renderData: Object): boolean {
         for (const data in renderData) {
-            if (spamList.includes(data)) {
+            if (SPAM_LIST.includes(data)) {
                 return false;
             }
         }

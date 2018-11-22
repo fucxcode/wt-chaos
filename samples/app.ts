@@ -1,9 +1,12 @@
 import express from "express";
 import Koa from "koa";
-import { Router, ExpressRouter, ExpressContext, KoaContext, KoaRouter, Context } from "../src/router";
+import { Router, ExpressRouter, ExpressContext, KoaContext, KoaRouter, Context, INextFunction } from "../src/router";
 import * as _ from "../src/utilities";
 import { route, facade, middlewares } from "../src/facade";
 import { HttpMethod } from "../src/constants";
+import { ContainerPool, injectable, inject } from "../src/container";
+
+const container = ContainerPool.registerContainer();
 
 class State {
 
@@ -18,7 +21,7 @@ class State {
 // const router: Router<ExpressContext<State>, State> = new ExpressRouter(app, "/api");
 
 const app = new Koa();
-const router: Router<KoaContext<State>, State> = new KoaRouter(app, "/api");
+const router: Router<KoaContext<State>, State> = new KoaRouter(app, "/api", true);
 
 router.proxy = true;
 
@@ -74,34 +77,45 @@ router.proxy = true;
 //     console.log(`${Date.now()} out handler`);
 // });
 
-@facade(router)
+@injectable()
+// @ts-ignore
+class Service {
+
+    public lower(name: string): string {
+        return name.toLowerCase();
+    }
+
+}
+
+@injectable()
+@facade()
 @route("sys/internal")
-@middlewares(async (ctx: Context<State>) => {
-    console.log(1);
-    await _.wait(1000);
+@middlewares(async (ctx: Context<State>, next: INextFunction) => {
     ctx.state.uid = "123";
-    console.log(2);
-    await _.wait(1000);
+    await next();
 })
-@middlewares(async (ctx: Context<State>) => {
-    console.log(3);
-    await _.wait(1000);
+@middlewares(async (ctx: Context<State>, next: INextFunction) => {
     ctx.state.role = "NB";
-    console.log(4);
-    await _.wait(1000);
+    await next();
 })
 // @ts-ignore
 class MyFacade {
 
+    @inject()
+    // @ts-ignore
+    private _service: Service;
+
+    private _pong = "PONG!";
+
+    private _data = {
+        name: "Shaun Xu",
+        dep: "wt-fp"
+    };
 
     @route("ping", HttpMethod.GET)
     // @ts-ignore
     public async ping(ctx: Context<State>): Promise<string> {
-        console.log(5);
-        await _.wait(1000);
-        const result = "PONG!";
-        console.log(6);
-        await _.wait(1000);
+        const result = this._service.lower(this._pong);
         return result;
     }
 
@@ -111,13 +125,14 @@ class MyFacade {
         return {
             oid: ctx.oid,
             state: ctx.state,
-            incoming: ctx.body
+            incoming: ctx.body,
+            data: this._data
         };
     }
 
 }
 
-const myFacade = new MyFacade();
+const myFacade = container.resolve<MyFacade>(MyFacade);
 
 app.listen(22222, () => {
     console.log(`ready`);

@@ -4,6 +4,7 @@ export * from "./bulk-write-result";
 export * from "./count-options";
 export * from "./delete-options";
 export * from "./delete-result";
+export * from "./driver-extensions";
 export * from "./driver";
 export * from "./find-one-options";
 export * from "./find-one-update-options";

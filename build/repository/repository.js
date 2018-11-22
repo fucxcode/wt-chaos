@@ -30,14 +30,15 @@ const find_by_page_index_result_1 = require("./find-by-page-index-result");
 exports.FindByPageIndexResult = find_by_page_index_result_1.FindByPageIndexResult;
 const find_by_page_next_result_1 = require("./find-by-page-next-result");
 exports.FindByPageNextResult = find_by_page_next_result_1.FindByPageNextResult;
+const driver_extensions_1 = require("./drivers/driver-extensions");
 class Repository {
-    constructor(collectionName, driver, plugins = []) {
+    constructor(collectionName, driverProvider = driver_extensions_1.DriverExtensions.getDefault, plugins = []) {
         this._collectionName = collectionName;
-        this._driver = driver;
+        this._driverProvider = driverProvider;
         this._plugins = plugins;
     }
     get driver() {
-        return this._driver;
+        return this._driverProvider();
     }
     get plugins() {
         return this._plugins;
@@ -59,11 +60,11 @@ class Repository {
     }
     async onSave(context) {
         context.result = _.isArray(context.entityOrArray) ?
-            await this._driver.insertMany(this._collectionName, context.entityOrArray, context.options) :
-            await this._driver.insertOne(this._collectionName, context.entityOrArray, context.options);
+            await this.driver.insertMany(this._collectionName, context.entityOrArray, context.options) :
+            await this.driver.insertOne(this._collectionName, context.entityOrArray, context.options);
     }
     async save(operationDescription, entityOrArray, options) {
-        const context = new plugin_context_save_1.SavePluginContext(operationDescription, this._driver.name, this._collectionName, entityOrArray, options);
+        const context = new plugin_context_save_1.SavePluginContext(operationDescription, this._driverProvider.name, this._collectionName, entityOrArray, options);
         await this.processPluginBeforeActions(context, (p, c) => p.beforeSave(c));
         if (!context.cancel) {
             await this.onSave(context);
@@ -72,10 +73,10 @@ class Repository {
         return context.result;
     }
     async onCount(context) {
-        context.result = await this._driver.count(this._collectionName, context.condition, context.options);
+        context.result = await this.driver.count(this._collectionName, context.condition, context.options);
     }
     async count(operationDescription, condition, options) {
-        const context = new plugin_context_count_1.CountPluginContext(operationDescription, this._driver.name, this._collectionName, condition, options);
+        const context = new plugin_context_count_1.CountPluginContext(operationDescription, this._driverProvider.name, this._collectionName, condition, options);
         await this.processPluginBeforeActions(context, (p, c) => p.beforeCount(c));
         if (!context.cancel) {
             await this.onCount(context);
@@ -84,7 +85,7 @@ class Repository {
         return context.result;
     }
     async onFind(operationDescription, condition, options) {
-        return await this._driver.find(this._collectionName, condition, options);
+        return await this.driver.find(this._collectionName, condition, options);
     }
     async findOneInternal(operationDescription, condition, throwErrorWhenMultipleDocuments = false, options) {
         const limit = throwErrorWhenMultipleDocuments ? 2 : 1;
@@ -99,7 +100,7 @@ class Repository {
         }
     }
     async findOne(operationDescription, condition, throwErrorWhenMultipleDocuments = false, options) {
-        const context = new plugin_context_find_one_1.FindOnePluginContext(operationDescription, this._driver.name, this._collectionName, condition, options);
+        const context = new plugin_context_find_one_1.FindOnePluginContext(operationDescription, this._driverProvider.name, this._collectionName, condition, options);
         await this.processPluginBeforeActions(context, (p, c) => p.beforeFindOne(c));
         if (!context.cancel) {
             context.result = await this.findOneInternal(operationDescription, context.condition, throwErrorWhenMultipleDocuments, context.options);
@@ -108,7 +109,7 @@ class Repository {
         return context.result;
     }
     async findOneById(operationDescription, id, condition, options) {
-        const context = new plugin_context_find_one_by_id_1.FindOneByIdPluginContext(operationDescription, this._driver.name, this._collectionName, id, condition, options);
+        const context = new plugin_context_find_one_by_id_1.FindOneByIdPluginContext(operationDescription, this._driverProvider.name, this._collectionName, id, condition, options);
         await this.processPluginBeforeActions(context, (p, c) => p.beforeFindOneById(c));
         if (!context.cancel) {
             context.result = await this.findOneInternal(operationDescription, _.assign({}, context.condition, {
@@ -119,7 +120,7 @@ class Repository {
         return context.result;
     }
     async findByIds(operationDescription, ids, condition, options) {
-        const context = new plugin_context_find_by_ids_1.FindByIdsPluginContext(operationDescription, this._driver.name, this._collectionName, ids, condition, options);
+        const context = new plugin_context_find_by_ids_1.FindByIdsPluginContext(operationDescription, this._driverProvider.name, this._collectionName, ids, condition, options);
         await this.processPluginBeforeActions(context, (p, c) => p.beforeFindByIds(c));
         if (!context.cancel) {
             context.result = await this.onFind(operationDescription, _.assign({}, context.condition, {
@@ -132,7 +133,7 @@ class Repository {
         return context.result;
     }
     async findByPageIndex(operationDescription, condition, pageIndex = 0, pageSize = constants_1.DEFAULT_PAGE_SIZE, options = {}) {
-        const context = new plugin_context_find_by_page_index_1.FindByPageIndexPluginContext(operationDescription, this._driver.name, this._collectionName, condition, pageIndex, pageSize, options);
+        const context = new plugin_context_find_by_page_index_1.FindByPageIndexPluginContext(operationDescription, this._driverProvider.name, this._collectionName, condition, pageIndex, pageSize, options);
         await this.processPluginBeforeActions(context, (p, c) => p.beforeFindByPageIndex(c));
         if (!context.cancel) {
             // ensure `pageIndex`, `pageSize` are numbers
@@ -169,7 +170,7 @@ class Repository {
         return context.result;
     }
     async findByPageNext(operationDescription, condition, pageIndex = 0, pageSize = constants_1.DEFAULT_PAGE_SIZE, options = {}) {
-        const context = new plugin_context_find_by_page_next_1.FindByPageNextPluginContext(operationDescription, this._driver.name, this._collectionName, condition, pageIndex, pageSize, options);
+        const context = new plugin_context_find_by_page_next_1.FindByPageNextPluginContext(operationDescription, this._driverProvider.name, this._collectionName, condition, pageIndex, pageSize, options);
         await this.processPluginBeforeActions(context, (p, c) => p.beforeFindByPageNext(c));
         if (!context.cancel) {
             // ensure `pageIndex`, `pageSize` are numbers
@@ -237,11 +238,11 @@ class Repository {
     async onUpdate(operationDescription, condition, update, multi = false, options) {
         update = this.parseUpdate(update);
         return multi ?
-            await this._driver.updateMany(this._collectionName, condition, update, options) :
-            await this._driver.updateOne(this._collectionName, condition, update, options);
+            await this.driver.updateMany(this._collectionName, condition, update, options) :
+            await this.driver.updateOne(this._collectionName, condition, update, options);
     }
     async update(operationDescription, condition, update, multi = false, options) {
-        const context = new plugin_context_update_1.UpdatePluginContext(operationDescription, this._driver.name, this._collectionName, condition, update, options);
+        const context = new plugin_context_update_1.UpdatePluginContext(operationDescription, this._driverProvider.name, this._collectionName, condition, update, options);
         await this.processPluginBeforeActions(context, (p, c) => p.beforeUpdate(c));
         if (!context.cancel) {
             context.result = await this.onUpdate(operationDescription, context.condition, context.update, multi, context.options);
@@ -250,7 +251,7 @@ class Repository {
         return context.result;
     }
     async updateById(operationDescription, id, condition, update, options) {
-        const context = new plugin_context_update_by_id_1.UpdateByIdPluginContext(operationDescription, this._driver.name, this._collectionName, id, condition, update, options);
+        const context = new plugin_context_update_by_id_1.UpdateByIdPluginContext(operationDescription, this._driverProvider.name, this._collectionName, id, condition, update, options);
         await this.processPluginBeforeActions(context, (p, c) => p.beforeUpdateById(c));
         if (!context.cancel) {
             context.result = await this.onUpdate(operationDescription, _.assign({}, context.condition, {
@@ -261,7 +262,7 @@ class Repository {
         return context.result;
     }
     async updateByIds(operationDescription, ids, condition, update, options) {
-        const context = new plugin_context_update_by_ids_1.UpdateByIdsPluginContext(operationDescription, this._driver.name, this._collectionName, ids, condition, update, options);
+        const context = new plugin_context_update_by_ids_1.UpdateByIdsPluginContext(operationDescription, this._driverProvider.name, this._collectionName, ids, condition, update, options);
         await this.processPluginBeforeActions(context, (p, c) => p.beforeUpdateByIds(c));
         if (!context.cancel) {
             context.result = await this.onUpdate(operationDescription, _.assign({}, context.condition, {
@@ -274,7 +275,7 @@ class Repository {
         return context.result;
     }
     async updateByEntity(operationDescription, entity, condition, options) {
-        const context = new plugin_context_update_by_entity_1.UpdateByEntityPluginContext(operationDescription, this._driver.name, this._collectionName, entity, condition, options);
+        const context = new plugin_context_update_by_entity_1.UpdateByEntityPluginContext(operationDescription, this._driverProvider.name, this._collectionName, entity, condition, options);
         await this.processPluginBeforeActions(context, (p, c) => p.beforeUpdateByEntity(c));
         if (!context.cancel) {
             context.result = await this.onUpdate(operationDescription, _.assign(context.condition, {
@@ -286,11 +287,11 @@ class Repository {
     }
     async onErase(context, multi) {
         context.result = multi ?
-            await this._driver.deleteMany(this._collectionName, context.condition, context.options) :
-            await this._driver.deleteOne(this._collectionName, context.condition, context.options);
+            await this.driver.deleteMany(this._collectionName, context.condition, context.options) :
+            await this.driver.deleteOne(this._collectionName, context.condition, context.options);
     }
     async erase(operationDescription, condition, multi = false, options) {
-        const context = new plugin_context_erase_1.ErasePluginContext(operationDescription, this._driver.name, this._collectionName, condition, options);
+        const context = new plugin_context_erase_1.ErasePluginContext(operationDescription, this._driverProvider.name, this._collectionName, condition, options);
         await this.processPluginBeforeActions(context, (p, c) => p.beforeErase(c));
         if (!context.cancel) {
             await this.onErase(context, multi);
@@ -299,10 +300,10 @@ class Repository {
         return context.result;
     }
     async onFindOneAndUpdate(operationDescription, condition, update, options) {
-        return await this._driver.findOneAndUpdate(this._collectionName, condition, this.parseUpdate(update), options);
+        return await this.driver.findOneAndUpdate(this._collectionName, condition, this.parseUpdate(update), options);
     }
     async findOneAndUpdate(operationDescription, condition, update, options) {
-        const context = new plugin_context_find_one_update_1.FindOneAndUpdatePluginContext(operationDescription, this._driver.name, this._collectionName, condition, update, options);
+        const context = new plugin_context_find_one_update_1.FindOneAndUpdatePluginContext(operationDescription, this._driverProvider.name, this._collectionName, condition, update, options);
         await this.processPluginBeforeActions(context, (p, c) => p.beforeFindOneAndUpdate(c));
         if (!context.cancel) {
             context.result = await this.onFindOneAndUpdate(operationDescription, context.condition, this.parseUpdate(context.update), context.options);
@@ -311,7 +312,7 @@ class Repository {
         return context.result;
     }
     async findOneAndUpdateByEntity(operationDescription, entity, condition, options) {
-        const context = new plugin_context_find_one_update_by_entity_1.FindOneAndUpdateByEntityPluginContext(operationDescription, this._driver.name, this._collectionName, entity, condition, options);
+        const context = new plugin_context_find_one_update_by_entity_1.FindOneAndUpdateByEntityPluginContext(operationDescription, this._driverProvider.name, this._collectionName, entity, condition, options);
         await this.processPluginBeforeActions(context, (p, c) => p.beforeFindOneAndUpdateByEntity(c));
         if (!context.cancel) {
             context.result = await this.onFindOneAndUpdate(operationDescription, _.assign({}, context.condition, {
@@ -322,22 +323,22 @@ class Repository {
         return context.result;
     }
     initializeBulkOp(operationDescription, ordered = false) {
-        return this._driver.initializeBulkOp(this._collectionName, ordered);
+        return this.driver.initializeBulkOp(this._collectionName, ordered);
     }
     async aggregate(operationDescription, pipeline, options) {
-        const context = new plugin_context_aggregate_1.AggregatePluginContext(operationDescription, this._driver.name, this._collectionName, pipeline, options);
+        const context = new plugin_context_aggregate_1.AggregatePluginContext(operationDescription, this._driverProvider.name, this._collectionName, pipeline, options);
         await this.processPluginBeforeActions(context, (p, c) => p.beforeAggregate(c));
         if (!context.cancel) {
-            context.result = await this._driver.aggregate(this._collectionName, context.pipeline, context.options);
+            context.result = await this.driver.aggregate(this._collectionName, context.pipeline, context.options);
         }
         await this.processPluginAfterActions(context, (p, c) => p.afterAggregate(c));
         return context.result;
     }
     async mapReduce(operationDescription, map, reduce, options) {
-        const context = new plugin_context_map_reduce_1.MapReducePluginContext(operationDescription, this._driver.name, this._collectionName, map, reduce, options);
+        const context = new plugin_context_map_reduce_1.MapReducePluginContext(operationDescription, this._driverProvider.name, this._collectionName, map, reduce, options);
         await this.processPluginBeforeActions(context, (p, c) => p.beforeMapReduce(c));
         if (!context.cancel) {
-            context.result = await this._driver.mapReduce(this._collectionName, context.map, context.reduce, context.options);
+            context.result = await this.driver.mapReduce(this._collectionName, context.map, context.reduce, context.options);
         }
         await this.processPluginAfterActions(context, (p, c) => p.afterMapReduce(c));
         return context.result;

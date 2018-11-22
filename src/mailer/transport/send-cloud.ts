@@ -1,4 +1,4 @@
-const scTransport = require('nodemailer-sendcloud-transport');
+const scTransport = require("nodemailer-sendcloud-transport");
 import { ITransport } from "./i-transport";
 
 export class SendCloud implements ITransport {
@@ -21,7 +21,7 @@ export class SendCloud implements ITransport {
         this._version = this.instance.version;
     }
 
-   public async send(mail: any): Promise<void> {
-        return await this.instance.send(mail);
+   public send(mail: any, callback: (err: Error | null, info: any) => void): void {
+        return  this.instance.send(mail, callback);
    }
 }

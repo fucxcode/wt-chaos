@@ -1,15 +1,15 @@
-import { Router, Context, RouterMiddleware, DEFAULT_ROUTER_KEY } from "../router";
+import { Router, Context, RouterMiddleware, DEFAULT_ROUTER_KEY, RouterHandler } from "../router";
 import { getFacadeMiddlewares, getMethodMiddlewares } from "./decorator-middlewares";
 import { getRoutePrefixes, getMethodRoutes } from "./decorator-route";
 import * as $path from "path";
-import { IContainer, getDefaultContainer } from "../container";
+import { Container, ContainerPool } from "../container";
 
-const resolveRouter = function <TContext extends Context<TState>, TState>(router?: Router<TContext, TState>, container?: IContainer): Router<TContext, TState> {
+const resolveRouter = function <TContext extends Context<TState>, TState>(router?: Router<TContext, TState>, container?: Container): Router<TContext, TState> {
     if (router) {
         return router;
     }
     else {
-        const c = container || getDefaultContainer();
+        const c = container || ContainerPool.getDefaultContainer();
         if (c) {
             const ct = c;
             const rt = ct.resolve<Router<TContext, TState>>(DEFAULT_ROUTER_KEY);
@@ -26,7 +26,7 @@ const resolveRouter = function <TContext extends Context<TState>, TState>(router
     }
 };
 
-const facade = function <TContext extends Context<TState>, TState>(router?: Router<TContext, TState>, container?: IContainer) {
+const facade = function <TContext extends Context<TState>, TState>(router?: Router<TContext, TState>, container?: Container) {
     return function (target: any) {
         // save a reference to the original constructor
         const origin = target;
@@ -57,8 +57,8 @@ const facade = function <TContext extends Context<TState>, TState>(router?: Rout
                     const method = options.method;
                     const path = $path.join(`/`, ...prefixes, options.path);
                     const middlewares = facadeMiddlewares.concat(methodMiddlewares.get(propertyKey) || []);
-                    const handler = (instance as any)[propertyKey].bind(instance) as RouterMiddleware<TContext, TState>;
-                    r.route(method, path, ...middlewares.concat(handler));
+                    const handler = (instance as any)[propertyKey].bind(instance) as RouterHandler<TContext, TState>;
+                    r.route(method, path, middlewares, handler);
                 }
                 else {
                     throw new Error(`Cannot set route for ${instance.constructor.name}.${options.method} due to no method was specified.`);
@@ -67,6 +67,10 @@ const facade = function <TContext extends Context<TState>, TState>(router?: Rout
             return instance;
         };
         f.prototype = origin.prototype;
+        // copy reflect metadata items to the new constructor
+        for (const key of Reflect.getMetadataKeys(origin)) {
+            Reflect.defineMetadata(key, Reflect.getMetadata(key, origin), f);
+        }
         return f;
     };
 };

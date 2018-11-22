@@ -1,1 +1,1 @@
-export * from "./sample-logger";
+export * from "./event-logger";

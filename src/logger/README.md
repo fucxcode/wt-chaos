@@ -1,5 +1,7 @@
 # event-logger
 
+## example
+
 ```javascript
 import { Controller } from "./controller";
 import { Provider } from "./logger";

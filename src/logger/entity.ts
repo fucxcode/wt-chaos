@@ -1,6 +1,7 @@
 interface Id {
     toString(): string;
 }
+
 type Operator = { id: Id; name: string };
 type Timestamp = number;
 type Pid = number;

@@ -1,7 +1,7 @@
 import { IBaseEntity, Level, ISource } from "./entity";
 import { Provider } from "./logger";
 import { IReporter, ConsoleReport, QueryOptions } from "./report";
-import { Entity } from "../../repository/entities";
+import { Entity } from "../repository/entities";
 
 export type OutPut<T> = ISource & IBaseEntity<T> & Entity;
 

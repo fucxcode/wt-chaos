@@ -1,6 +1,6 @@
 import { IReporter } from "./interfaces";
 import { OutPut } from "../controller";
-import { MongoDBDriver, InsertOneOptions, MongoDBSession } from "../../../repository";
+import { MongoDBDriver, InsertOneOptions, MongoDBSession } from "../../repository";
 
 class MongoReport implements IReporter {
     public driver: MongoDBDriver;

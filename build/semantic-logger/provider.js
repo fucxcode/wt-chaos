@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const entity_1 = require("./entity");
 const os_1 = require("os");
+const entity_1 = require("./entity");
 /**
  * Logger
  * @template TMsg
@@ -31,7 +31,7 @@ class Provider {
         return this;
     }
     /**
-     * Unregisters provider
+     * unregister provider
      * @returns true if unregister
      */
     unregister() {
@@ -48,10 +48,10 @@ class Provider {
         return this.enabled;
     }
     /**
-     * Disabeles provider
-     * @returns disabele
+     * disable provider
+     * @returns disable
      */
-    disabele() {
+    disable() {
         this.enabled = false;
         return this;
     }
@@ -74,24 +74,22 @@ class Provider {
      * @returns log
      * @public
      */
-    async log(level, msg) {
+    async log(level, teamId, msg) {
         if (!this.ctrl) {
             throw new Error("No controller register");
         }
-        const baseEntity = this.buildBaseEntity(level, msg);
+        const baseEntity = this.buildBaseEntity(level, teamId, msg);
         const extended = this.metaEntity.toJSON();
         return this.ctrl.log(Object.assign({}, extended, baseEntity));
     }
     /**
-     * Builds base entity
-     * @template TMsg
      * @param level
+     * @param teamId
      * @param msg
-     * @returns base entity
-     * @protected
      */
-    buildBaseEntity(level, msg) {
+    buildBaseEntity(level, teamId, msg) {
         const baseEntity = {
+            teamId: teamId,
             hostname: os_1.hostname(),
             pid: process.pid,
             channel: this.channel,

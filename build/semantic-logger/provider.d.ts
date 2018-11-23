@@ -1,4 +1,5 @@
-import { IBaseEntity, Level, TEntry } from "./entity";
+import { BaseEntity, TEntry } from "./entity";
+import { Level } from "./level";
 import { Controller } from "./controller";
 /**
  * Logger
@@ -22,7 +23,7 @@ declare class Provider<TExtends> {
      */
     register(ctrl: Controller): this;
     /**
-     * Unregisters provider
+     * unregister provider
      * @returns true if unregister
      */
     unregister(): boolean;
@@ -32,10 +33,10 @@ declare class Provider<TExtends> {
      */
     isEnable(): boolean;
     /**
-     * Disabeles provider
-     * @returns disabele
+     * disable provider
+     * @returns disable
      */
-    disabele(): Provider<TExtends>;
+    disable(): Provider<TExtends>;
     /**
      * Sets provider
      * @param key
@@ -52,15 +53,12 @@ declare class Provider<TExtends> {
      * @returns log
      * @public
      */
-    log<TMsg>(level: Level, msg: TMsg): Promise<any>;
+    log<TMsg>(level: Level, teamId: string, msg: TMsg): Promise<any>;
     /**
-     * Builds base entity
-     * @template TMsg
      * @param level
+     * @param teamId
      * @param msg
-     * @returns base entity
-     * @protected
      */
-    protected buildBaseEntity<TMsg>(level: Level, msg: TMsg): IBaseEntity<TMsg>;
+    protected buildBaseEntity<TMsg>(level: Level, teamId: string, msg: TMsg): BaseEntity<TMsg>;
 }
 export { Provider };

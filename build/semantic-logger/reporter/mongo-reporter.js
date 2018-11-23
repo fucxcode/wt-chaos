@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class MongoReport {
+    // TODO: make driver optional; if true, pull an instance from container
     constructor(driver, collection, insertOpts) {
         this.driver = driver;
         this.collection = collection;
@@ -12,4 +13,4 @@ class MongoReport {
     }
 }
 exports.MongoReport = MongoReport;
-//# sourceMappingURL=mongo.js.map
+//# sourceMappingURL=mongo-reporter.js.map

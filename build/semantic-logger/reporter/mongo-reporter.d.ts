@@ -1,7 +1,7 @@
-import { IReporter } from "./interfaces";
+import { Reporter } from "./interfaces";
 import { OutPut } from "../controller";
 import { MongoDBDriver, InsertOneOptions, MongoDBSession } from "../../repository";
-declare class MongoReport implements IReporter {
+declare class MongoReport implements Reporter {
     driver: MongoDBDriver;
     collection: string;
     insertOptions: InsertOneOptions<MongoDBSession> | undefined;

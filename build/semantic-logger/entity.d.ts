@@ -1,23 +1,15 @@
-interface Id {
-    toString(): string;
-}
+import { UID, Timestamp } from "../constants";
+import { Level } from "./level";
 declare type Operator = {
-    id: Id;
-    name: string;
+    id: UID;
 };
-declare type Timestamp = number;
 declare type Pid = number;
-export declare enum Level {
-    ciritical = 0,
-    error = 1,
-    warn = 2,
-    info = 3,
-    verbose = 4
+declare type TeamId = string;
+export interface Source {
+    sourceName: string;
 }
-export interface ISource {
-    source_name: string;
-}
-export interface IBaseEntity<T> {
+export interface BaseEntity<T> {
+    teamId: TeamId;
     hostname: string;
     pid: Pid;
     channel: string;
@@ -25,22 +17,21 @@ export interface IBaseEntity<T> {
     timestamp: Timestamp;
     msg: T;
 }
-interface IEventEntity {
+export interface MetaEntity {
     operator: Operator;
-    keyword: string;
-    event: number;
-    task: string;
-    opcode: number;
+    keyword?: string;
+    opcode?: string;
+    task?: string;
+    event?: number;
 }
-export declare type PreDefineEntity<T> = IBaseEntity<T> & IEventEntity;
-interface IJSON {
-    toJSON(): any;
+interface ToJSON<T> {
+    toJSON(): T;
 }
-declare class TEntry<T> implements IJSON {
+declare class TEntry<T> implements ToJSON<T> {
     private _data;
     constructor(data?: T);
     withField(key: keyof T, value: any): TEntry<T>;
     withFields(fields: {}): TEntry<T>;
-    toJSON(): any;
+    toJSON(): T;
 }
 export { TEntry };

@@ -1,12 +1,13 @@
-import { IBaseEntity, Level, ISource } from "./entity";
+import { BaseEntity, Source } from "./entity";
+import { Level } from "./level";
 import { Provider } from "./provider";
-import { IReporter, QueryOptions } from "./report";
+import { Reporter, QueryOptions } from "./reporter";
 import { Entity } from "../repository/entities";
-export declare type OutPut<T> = ISource & IBaseEntity<T> & Entity;
+export declare type OutPut<T> = Source & BaseEntity<T> & Entity;
 /**
- * Icontroller
+ * Controller
  */
-export interface IController {
+export interface Controller {
     /**
      * @param name
      * @returns Provider
@@ -14,10 +15,10 @@ export interface IController {
     getLogger(name: string): Provider<any>;
     /**
      * @template T
-     * @param entriy
+     * @param entity
      * @returns log
      */
-    log<T>(entriy: IBaseEntity<T>): Promise<any>;
+    log<T>(entity: BaseEntity<T>): Promise<any>;
     /**
      * @param level
      * @returns true if level enable
@@ -45,7 +46,7 @@ export interface IController {
      */
     removeProvider(name: string): boolean;
 }
-declare class Controller implements IController {
+declare class ProviderController implements Controller {
     private static _single;
     /**
      * Creates controller singleton
@@ -53,12 +54,12 @@ declare class Controller implements IController {
      * @param level
      * @returns {Controller}
      */
-    static create(name: string, level: Level, reporters?: IReporter[]): Controller;
+    static create(name: string, level: Level, reporters?: Reporter[]): Controller;
     readonly name: string;
     readonly level: Level;
-    reporters: IReporter[];
+    reporters: Reporter[];
     providers: Map<string, Provider<any>>;
-    constructor(name: string, level: Level, reporters?: IReporter[]);
+    constructor(name: string, level: Level, reporters?: Reporter[]);
     /**
      * Gets logger
      * @param {String} channel
@@ -67,50 +68,54 @@ declare class Controller implements IController {
     getLogger(channel: string): Provider<any>;
     /**
      * @description disable the provider by name
-     * @param name
+     * @param {String} name
      * @return {Controller}
      */
-    disableProider(name: string): Controller;
+    disableProvider(name: string): Controller;
     /**
-     * Add provider
-     * @param name
-     * @param provider
+     * @description Add provider
+     * @param {String} name
+     * @param {Provider} provider
      * @returns {this}
      */
     addProvider(name: string, provider: Provider<any>): Controller;
     /**
-     * Removes provider
+     * @description Removes provider
      * @param {String} name
      * @returns {this}
      */
     removeProvider(name: string): boolean;
     /**
-     * Determines whether provider has
+     * @description Determines whether provider has
      * @param {String} name
-     * @returns true if has provider
+     * @returns {Boolean} true if has provider
      */
     hasProvider(name: string): boolean;
     /**
-     * Get provider
-     * @param name
-     * @returns provider
+     * @description Get provider
+     * @param {String} name
+     * @returns {Provider} provider
      */
     getProvider(name: string): Provider<any> | undefined;
+    /**
+     * @param entity
+     * @private
+     */
     protected _log<TMsgtype>(entity: OutPut<TMsgtype>): Promise<OutPut<TMsgtype>[]>;
     /**
-     * Logs controller
-     * @template TMsgtype
+     * @description Logs controller
+     * @template <TMsgtype>
      * @param entity
      * @returns {Promise}
      */
-    log<TMsgtype>(entity: IBaseEntity<TMsgtype>): Promise<OutPut<TMsgtype>[]>;
+    log<TMsgtype>(entity: BaseEntity<TMsgtype>): Promise<OutPut<TMsgtype>[]>;
     /**
      * Determines whether provider enable is
      * @template TMsgtype
      * @param entity
      * @returns true if provider enable
      */
-    isProviderEnable<TMsgtype>(entity: IBaseEntity<TMsgtype>): boolean;
+    isProviderEnable<TMsgtype>(entity: BaseEntity<TMsgtype>): boolean;
     /**
      * Determines whether level enable is
      * @param level
@@ -119,10 +124,10 @@ declare class Controller implements IController {
     isLevelEnable(level: Level): boolean;
     /**
      * TODO: support query options
-     * Querys log from drvier
+     * Query log from driver
      * @param opts
      * @returns query
      */
     query(opts: QueryOptions): Promise<any>;
 }
-export { Controller };
+export { ProviderController };

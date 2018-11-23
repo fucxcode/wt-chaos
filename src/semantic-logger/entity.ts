@@ -1,24 +1,16 @@
-interface Id {
-    toString(): string;
-}
+import { UID, Timestamp } from "../constants";
+import { Level } from "./level";
 
-type Operator = { id: Id; name: string };
-type Timestamp = number;
+type Operator = { id: UID };
 type Pid = number;
+type TeamId = string;
 
-export enum Level {
-    ciritical,
-    error,
-    warn,
-    info,
-    verbose
+export interface Source {
+    sourceName: string;
 }
 
-export interface ISource {
-    source_name: string;
-}
-
-export interface IBaseEntity<T> {
+export interface BaseEntity<T> {
+    teamId: TeamId;
     hostname: string;
     pid: Pid;
     channel: string;
@@ -27,15 +19,17 @@ export interface IBaseEntity<T> {
     msg: T;
 }
 
-interface IEventEntity {
+export interface MetaEntity {
     operator: Operator;
-    keyword: string;
-    event: number;
-    task: string;
-    opcode: number;
-}
 
-export type PreDefineEntity<T> = IBaseEntity<T> & IEventEntity;
+    keyword?: string;
+
+    opcode?: string;
+
+    task?: string;
+
+    event?: number;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 function defineProps(obj: object, key: string | symbol | number, value: any) {
@@ -46,11 +40,11 @@ function defineProps(obj: object, key: string | symbol | number, value: any) {
     });
 }
 
-interface IJSON {
-    toJSON(): any;
+interface ToJSON<T> {
+    toJSON(): T;
 }
 
-class TEntry<T> implements IJSON {
+class TEntry<T> implements ToJSON<T> {
     private _data: T | null;
 
     constructor(data?: T) {
@@ -68,8 +62,8 @@ class TEntry<T> implements IJSON {
         return new TEntry<T>(data);
     }
 
-    public toJSON(): any {
-        return this._data;
+    public toJSON(): T {
+        return this._data as T;
     }
 }
 

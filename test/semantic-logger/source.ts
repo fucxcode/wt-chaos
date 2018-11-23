@@ -1,4 +1,4 @@
-import { Provider, IReporter, OutPut, Controller, Level } from "../../src/semantic-logger";
+import { Provider, Reporter, OutPut, Level, ProviderController } from "../../src/semantic-logger";
 
 export interface Action {
     task: string;
@@ -14,7 +14,7 @@ export class TestProvider extends Provider<Action> {
     }
 }
 
-export class TestReporter implements IReporter {
+export class TestReporter implements Reporter {
     public storage: any[];
 
     constructor() {
@@ -29,4 +29,4 @@ export class TestReporter implements IReporter {
 
 export const testReporter = new TestReporter();
 
-export const controller = Controller.create("test.source", Level.verbose, [testReporter]);
+export const controller = ProviderController.create("test.source", Level.verbose, [testReporter]);

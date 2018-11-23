@@ -10,6 +10,12 @@ import { ConsoleReport, MongoReport } from "./report";
 import * as mongodb from "mongodb";
 import { MongoDBDriver } from "../../repository";
 
+interface IEvent {
+    opcode: string;
+    keyworkd: string;
+    eventId: number;
+}
+
 const mongoClient = new mongodb.MongoClient("mongodb://localhost:27017", {
     useNewUrlParser: true
 });
@@ -25,10 +31,12 @@ mongoClient.connect(err => {
         new MongoReport(mongoDriver, "etw")
     ]);
 
-    class MissionProvider extends Provider {
+    class MissionProvider extends Provider<IEvent> {
         constructor() {
             super("mission");
-            this.set("opCode", "start").register(globalCtrl);
+            this.set("opcode", "start")
+                .set("eventId", 1)
+                .register(globalCtrl);
         }
 
         public async startProjectSuccess(msg: string): Promise<any> {

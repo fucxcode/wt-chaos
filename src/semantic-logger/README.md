@@ -4,7 +4,7 @@
 
 ```javascript
 import { Controller } from "./controller";
-import { Provider } from "./logger";
+import { Provider } from "./provider";
 import { Level } from "./entity";
 import { ConsoleReport, MongoReport } from "./report";
 import * as mongodb from "mongodb";
@@ -41,12 +41,8 @@ mongoClient.connect(err => {
     }
 
     const missonProvider = new MissionProvider();
-    missonProvider.startProjectSuccess("haha").then(result => {
-        console.log("haha result ===>", result);
-    });
-    missonProvider.startProjectFail("auth error").then(result => {
-        console.log("auth error result", result);
-    });
+    missonProvider.startProjectSuccess("create project success");
+    missonProvider.startProjectFail("auth error");
 });
 
 mongoClient.on("error", err => {

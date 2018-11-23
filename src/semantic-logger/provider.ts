@@ -6,8 +6,8 @@ import { Controller } from "./controller";
  * Logger
  * @template TMsg
  */
-class Provider {
-    protected _metaEntity: TEntry<any> = new TEntry();
+class Provider<TExtends> {
+    protected metaEntity: TEntry<TExtends> = new TEntry();
 
     public enabled: boolean = true;
     public readonly channel: string;
@@ -20,9 +20,17 @@ class Provider {
     }
 
     /**
+     * Get provider current entity
+     * @public
+     */
+    public getEntity(): TEntry<TExtends> {
+        return this.metaEntity;
+    }
+
+    /**
      * Registers provider
      * @param ctrl
-     * @returns {This}
+     * @returns {Provider}
      */
     public register(ctrl: Controller) {
         this.ctrl = ctrl;
@@ -53,7 +61,7 @@ class Provider {
      * Disabeles provider
      * @returns disabele
      */
-    public disabele(): Provider {
+    public disabele(): Provider<TExtends> {
         this.enabled = false;
         return this;
     }
@@ -65,8 +73,8 @@ class Provider {
      * @returns set
      * @public
      */
-    public set(key: any, value: any): Provider {
-        this._metaEntity = this._metaEntity.withField(key, value);
+    public set(key: keyof TExtends, value: any): Provider<TExtends> {
+        this.metaEntity = this.metaEntity.withField(key, value);
         return this;
     }
 
@@ -80,13 +88,10 @@ class Provider {
      */
     public async log<TMsg>(level: Level, msg: TMsg): Promise<any> {
         if (!this.ctrl) {
-            console.error("no controller set");
             throw new Error("No controller register");
         }
-
         const baseEntity: IBaseEntity<TMsg> = this.buildBaseEntity(level, msg);
-
-        const extended = this._metaEntity.toJSON();
+        const extended = this.metaEntity.toJSON();
 
         return this.ctrl.log(Object.assign({}, extended, baseEntity));
     }

@@ -1,5 +1,6 @@
 import { IBaseEntity, Level, ISource } from "./entity";
-import { Provider } from "./logger";
+// import { Provider } from "./provider";
+import { Provider } from "./provider";
 import { IReporter, ConsoleReport, QueryOptions } from "./report";
 import { Entity } from "../repository/entities";
 
@@ -13,7 +14,7 @@ export interface IController {
      * @param name
      * @returns Provider
      */
-    getLogger(name: string): Provider;
+    getLogger(name: string): Provider<any>;
 
     /**
      * @template T
@@ -39,7 +40,7 @@ export interface IController {
      * @param provider
      * @returns provider
      */
-    addProvider(name: string, provider: Provider): Controller;
+    addProvider(name: string, provider: Provider<any>): Controller;
 
     /**
      * @param name
@@ -76,7 +77,7 @@ class Controller implements IController {
     public readonly level: Level;
 
     public reporters: IReporter[];
-    public providers: Map<string, Provider> = new Map<string, Provider>();
+    public providers: Map<string, Provider<any>> = new Map<string, Provider<any>>();
 
     constructor(name: string, level: Level, reporters?: IReporter[]) {
         this.name = name;
@@ -93,7 +94,7 @@ class Controller implements IController {
      * @param {String} channel
      * @returns {Provider}
      */
-    getLogger(channel: string): Provider {
+    getLogger(channel: string): Provider<any> {
         let provider = this.getProvider(channel);
         if (!provider) {
             provider = new Provider(channel);
@@ -103,12 +104,26 @@ class Controller implements IController {
     }
 
     /**
+     * @description disable the provider by name
+     * @param name
+     * @return {Controller}
+     */
+    public disableProider(name: string): Controller {
+        const provider = this.providers.get(name);
+        if (!provider) {
+            return this;
+        }
+        provider.disabele();
+        return this;
+    }
+
+    /**
      * Add provider
      * @param name
      * @param provider
      * @returns {this}
      */
-    addProvider(name: string, provider: Provider): Controller {
+    public addProvider(name: string, provider: Provider<any>): Controller {
         this.providers.set(name, provider);
         return this;
     }
@@ -136,7 +151,7 @@ class Controller implements IController {
      * @param name
      * @returns provider
      */
-    public getProvider(name: string): Provider | undefined {
+    public getProvider(name: string): Provider<any> | undefined {
         return this.providers.get(name);
     }
 

@@ -16,13 +16,11 @@ class SmsSender {
         return new SmsSender(service);
     }
     static getService(options) {
-        switch (options.appKey) {
+        switch (options.platform) {
             case Platform.yunPian:
                 return new yunpian_1.YunPian(options.appKey);
-                break;
             default:
                 return new yunpian_1.YunPian(options.appKey);
-                break;
         }
     }
     async sendVerificationCode(templateId, mobile, code, minutes) {

@@ -85,7 +85,7 @@ class Controller implements IController {
 
         this.reporters = reporters || [];
         if (this.reporters.length === 0) {
-            this.reporters.push(new ConsoleReport({ pretty: true, indent: 4 }));
+            this.reporters.push(new ConsoleReport({}));
         }
     }
 

@@ -11,7 +11,7 @@ class Controller {
         this.level = level;
         this.reporters = reporters || [];
         if (this.reporters.length === 0) {
-            this.reporters.push(new report_1.ConsoleReport({ pretty: true, indent: 4 }));
+            this.reporters.push(new report_1.ConsoleReport({}));
         }
     }
     /**

@@ -115,8 +115,7 @@ class MyFacade {
     @route("ping", HttpMethod.GET)
     // @ts-ignore
     public async ping(ctx: Context<State>): Promise<string> {
-        const result = this._service.lower(this._pong);
-        return result;
+        return "PONG!";
     }
 
     @route("say", HttpMethod.POST)

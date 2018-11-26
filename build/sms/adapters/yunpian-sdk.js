@@ -68,4 +68,4 @@ class YunPianSdk {
     }
 }
 exports.YunPianSdk = YunPianSdk;
-//# sourceMappingURL=yunpan-sdk.js.map
+//# sourceMappingURL=yunpian-sdk.js.map

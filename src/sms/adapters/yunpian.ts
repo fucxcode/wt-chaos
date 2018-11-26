@@ -1,4 +1,4 @@
-import { YunPianSdk } from "./yunpan-sdk";
+import { YunPianSdk } from "./yunpian-sdk";
 import { SmsInterface } from "../base";
 
 const defaultMinutes = 3;

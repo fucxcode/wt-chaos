@@ -31,8 +31,13 @@ export class YunPianSdk {
                 })
             });
         } 
-        catch (error) {
-            return error;
+        catch (e) {
+            if (e.error) {
+                return e.error;
+            }
+            else {
+                return e;
+            }
         }
         
     }
@@ -76,8 +81,13 @@ export class YunPianSdk {
         try {
             return await request.post(options);
         } 
-        catch (error) {
-            return error;
+        catch (e) {
+            if (e.error) {
+                return e.error;
+            }
+            else {
+                return e;
+            }
         }
         
     }

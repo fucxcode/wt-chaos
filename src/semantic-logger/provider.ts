@@ -1,5 +1,6 @@
-import { IBaseEntity, Level, TEntry } from "./entity";
 import { hostname } from "os";
+import { BaseEntity, TEntry } from "./entity";
+import { Level } from "./level";
 import { Controller } from "./controller";
 
 /**
@@ -39,7 +40,7 @@ class Provider<TExtends> {
     }
 
     /**
-     * Unregisters provider
+     * unregister provider
      * @returns true if unregister
      */
     public unregister(): boolean {
@@ -58,10 +59,10 @@ class Provider<TExtends> {
     }
 
     /**
-     * Disabeles provider
-     * @returns disabele
+     * disable provider
+     * @returns disable
      */
-    public disabele(): Provider<TExtends> {
+    public disable(): Provider<TExtends> {
         this.enabled = false;
         return this;
     }
@@ -86,26 +87,24 @@ class Provider<TExtends> {
      * @returns log
      * @public
      */
-    public async log<TMsg>(level: Level, msg: TMsg): Promise<any> {
+    public async log<TMsg>(level: Level, teamId: string, msg: TMsg): Promise<any> {
         if (!this.ctrl) {
             throw new Error("No controller register");
         }
-        const baseEntity: IBaseEntity<TMsg> = this.buildBaseEntity(level, msg);
+        const baseEntity: BaseEntity<TMsg> = this.buildBaseEntity(level, teamId, msg);
         const extended = this.metaEntity.toJSON();
 
         return this.ctrl.log(Object.assign({}, extended, baseEntity));
     }
 
     /**
-     * Builds base entity
-     * @template TMsg
      * @param level
+     * @param teamId
      * @param msg
-     * @returns base entity
-     * @protected
      */
-    protected buildBaseEntity<TMsg>(level: Level, msg: TMsg): IBaseEntity<TMsg> {
-        const baseEntity: IBaseEntity<TMsg> = {
+    protected buildBaseEntity<TMsg>(level: Level, teamId: string, msg: TMsg): BaseEntity<TMsg> {
+        const baseEntity: BaseEntity<TMsg> = {
+            teamId: teamId,
             hostname: hostname(),
             pid: process.pid,
             channel: this.channel,

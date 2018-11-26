@@ -1,17 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-// import { Provider } from "./provider";
 const provider_1 = require("./provider");
-const report_1 = require("./report");
+const reporter_1 = require("./reporter");
 // Controller
-class Controller {
+class ProviderController {
     constructor(name, level, reporters) {
         this.providers = new Map();
         this.name = name;
         this.level = level;
         this.reporters = reporters || [];
         if (this.reporters.length === 0) {
-            this.reporters.push(new report_1.ConsoleReport({}));
+            this.reporters.push(new reporter_1.ConsoleReport({}));
         }
     }
     /**
@@ -22,7 +21,7 @@ class Controller {
      */
     static create(name, level, reporters) {
         if (!this._single) {
-            this._single = new Controller(name, level, reporters);
+            this._single = new ProviderController(name, level, reporters);
         }
         return this._single;
     }
@@ -41,21 +40,21 @@ class Controller {
     }
     /**
      * @description disable the provider by name
-     * @param name
+     * @param {String} name
      * @return {Controller}
      */
-    disableProider(name) {
+    disableProvider(name) {
         const provider = this.providers.get(name);
         if (!provider) {
             return this;
         }
-        provider.disabele();
+        provider.disable();
         return this;
     }
     /**
-     * Add provider
-     * @param name
-     * @param provider
+     * @description Add provider
+     * @param {String} name
+     * @param {Provider} provider
      * @returns {this}
      */
     addProvider(name, provider) {
@@ -63,7 +62,7 @@ class Controller {
         return this;
     }
     /**
-     * Removes provider
+     * @description Removes provider
      * @param {String} name
      * @returns {this}
      */
@@ -71,21 +70,25 @@ class Controller {
         return this.providers.delete(name);
     }
     /**
-     * Determines whether provider has
+     * @description Determines whether provider has
      * @param {String} name
-     * @returns true if has provider
+     * @returns {Boolean} true if has provider
      */
     hasProvider(name) {
         return this.providers.has(name);
     }
     /**
-     * Get provider
-     * @param name
-     * @returns provider
+     * @description Get provider
+     * @param {String} name
+     * @returns {Provider} provider
      */
     getProvider(name) {
         return this.providers.get(name);
     }
+    /**
+     * @param entity
+     * @private
+     */
     async _log(entity) {
         // return Promise.resolve(entity);
         const promiseAll = [];
@@ -95,13 +98,13 @@ class Controller {
         return Promise.all(promiseAll);
     }
     /**
-     * Logs controller
-     * @template TMsgtype
+     * @description Logs controller
+     * @template <TMsgtype>
      * @param entity
      * @returns {Promise}
      */
     async log(entity) {
-        const outPut = Object.assign({}, { source_name: this.name }, entity);
+        const outPut = Object.assign({}, { sourceName: this.name }, entity);
         const provider = this.providers.get(entity.channel);
         if (!this.isLevelEnable(entity.level) || !provider || !provider.isEnable()) {
             return Promise.resolve([outPut]);
@@ -131,7 +134,7 @@ class Controller {
     }
     /**
      * TODO: support query options
-     * Querys log from drvier
+     * Query log from driver
      * @param opts
      * @returns query
      */
@@ -139,5 +142,5 @@ class Controller {
         return Promise.resolve(opts);
     }
 }
-exports.Controller = Controller;
+exports.ProviderController = ProviderController;
 //# sourceMappingURL=controller.js.map

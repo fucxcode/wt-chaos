@@ -66,6 +66,15 @@ class KoaContext extends context_1.Context {
     get protocol() {
         return this._ctx.protocol;
     }
+    get path() {
+        return this._ctx.path;
+    }
+    get hostname() {
+        return this._ctx.hostname;
+    }
+    get originalUrl() {
+        return this._ctx.originalUrl;
+    }
     json(data) {
         this._ctx.body = data;
         return this;
@@ -107,32 +116,15 @@ class KoaRouter extends router_1.Router {
             handlers.push(async (ctx, next) => {
                 const context = new KoaContext(ctx, next);
                 const data = await handler(context);
-                if (data) {
-                    ctx.body = {
-                        oid: context.oid,
-                        code: errors_1.WTCode.ok,
-                        data: data
-                    };
-                }
+                ctx.body = {
+                    oid: context.oid,
+                    code: errors_1.WTCode.ok,
+                    data: data
+                };
                 // in koa we MUST invoke `await next()` regardless if multiple handlers registered
                 await next();
             });
             fn.call(this._router, path, ...handlers);
-            // fn.call(this._router, path, ..._.map(handlers, handler => {
-            //     return async (ctx: Koa.Context, next: INextFunction) => {
-            //         const context = new KoaContext<T>(ctx, next);
-            //         const data = await handler(context);
-            //         if (data) {
-            //             ctx.body = {
-            //                 oid: context.oid,
-            //                 code: WTCode.ok,
-            //                 data: data
-            //             };
-            //         }
-            //         // in koa we MUST invoke `await next()` regardless if multiple handlers registered
-            //         await next();
-            //     };
-            // }));
         }
         else {
             throw new Error(`Koa does not support method "${method}"`);

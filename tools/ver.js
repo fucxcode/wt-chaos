@@ -39,7 +39,7 @@ if (argv.upgrade) {
     }
 
     const ver_string = `${version.major}.${version.minor}.${version.patch}-${version.build}`;
-    console.log(`Next version is ${ver_string}.`);
+    console.log(`Next version is ${ver_string}`);
 
     if (argv.save) {
         packageJson.version = ver_string;

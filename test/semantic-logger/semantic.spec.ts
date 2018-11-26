@@ -1,6 +1,6 @@
 import { TestProvider, controller, testReporter } from "./source";
 import * as assert from "assert";
-import { Controller, Level } from "../../src/semantic-logger";
+import { ProviderController, Level } from "../../src/semantic-logger";
 
 describe("Provider test suits", () => {
     let testProvider: TestProvider;
@@ -13,7 +13,7 @@ describe("Provider test suits", () => {
     it("1. provider properties", () => {
         assert.ok(testProvider.channel === "test", "provider channel error");
         assert.ok(testProvider.enabled === true, "provider enabled error");
-        assert.ok(testProvider.ctrl instanceof Controller, "registed to controller error");
+        assert.ok(testProvider.ctrl instanceof ProviderController, "registed to controller error");
 
         assert.doesNotThrow(() => {
             testProvider.channel === "anthor";
@@ -25,7 +25,7 @@ describe("Provider test suits", () => {
     it("2. set provider properties", () => {
         assert.ok(testProvider.ctrl !== undefined, "provider's set controller error");
         testProvider.set("keyword", "success");
-        testProvider.disabele();
+        testProvider.disable();
 
         assert.ok(!testProvider.enabled, "provider can not be disabled");
 
@@ -41,7 +41,7 @@ describe("Provider test suits", () => {
     });
 
     it("3. log function report interface", () => {
-        testProvider.log(Level.warn, "hello");
+        testProvider.log(Level.warn, "xxxxx", "hello");
         assert.ok(testReporter.storage.length === 1, "the message can not be reported");
     });
 

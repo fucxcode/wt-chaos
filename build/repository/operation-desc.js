@@ -27,6 +27,9 @@ class OperationDescription {
         this._uid = uid;
         this._path = path;
     }
+    static from(operationContext) {
+        return new OperationDescription(operationContext.oid, operationContext.team, operationContext.uid, operationContext.path);
+    }
 }
 exports.OperationDescription = OperationDescription;
 //# sourceMappingURL=operation-desc.js.map

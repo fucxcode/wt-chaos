@@ -21,6 +21,9 @@ declare abstract class Context<T> {
     abstract readonly ips: string[];
     abstract readonly host: string;
     abstract readonly protocol: string;
+    abstract readonly path: string;
+    abstract readonly hostname: string;
+    abstract readonly originalUrl: string;
     abstract json(data: any): Context<T>;
     abstract redirect(url: string, alt?: string): void;
 }

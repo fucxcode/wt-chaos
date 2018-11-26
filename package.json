@@ -1,12 +1,12 @@
 {
   "name": "wt-chaos",
-  "version": "1.0.2",
+  "version": "1.0.4-201811261054",
   "description": "",
   "main": "build/index.js",
   "scripts": {
     "clean": "rm -rf ./build",
     "build": "tsc",
-    "rebuild": "npm run-script clean && npm run-script build",
+    "rebuild": "node ./tools/ver.js --upgrade --save && npm run-script clean && npm run-script build",
     "test": "npm run-script rebuild && node --require ts-node/register/transpile-only test/bootstrap.ts",
     "cti": "cti ./src",
     "ver": "node ./tools/ver.js"

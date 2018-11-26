@@ -1,5 +1,5 @@
-import { IReporter, OutPut } from "./interfaces";
-declare class ConsoleReport implements IReporter {
+import { Reporter, OutPut } from "./interfaces";
+declare class ConsoleReport implements Reporter {
     pretty: boolean;
     indent: number;
     constructor(opts: {

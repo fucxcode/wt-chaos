@@ -1,6 +1,6 @@
-import { IReporter, OutPut } from "./interfaces";
+import { Reporter, OutPut } from "./interfaces";
 
-class ConsoleReport implements IReporter {
+class ConsoleReport implements Reporter {
     public pretty: boolean;
     public indent: number;
 

@@ -20,4 +20,4 @@ class ConsoleReport {
     }
 }
 exports.ConsoleReport = ConsoleReport;
-//# sourceMappingURL=consloe.js.map
+//# sourceMappingURL=console-reporter.js.map

@@ -76,6 +76,18 @@ class KoaContext<T> extends Context<T> {
         return this._ctx.protocol;
     }
 
+    public get path(): string {
+        return this._ctx.path;
+    }
+
+    public get hostname(): string {
+        return this._ctx.hostname;
+    }
+
+    public get originalUrl(): string {
+        return this._ctx.originalUrl;
+    }
+
     public json(data: any): KoaContext<T> {
         this._ctx.body = data;
         return this;
@@ -128,33 +140,15 @@ class KoaRouter<T> extends Router<KoaContext<T>, T> {
             handlers.push(async (ctx: Koa.Context, next: INextFunction) => {
                 const context = new KoaContext<T>(ctx, next);
                 const data = await handler(context);
-                if (data) {
-                    ctx.body = {
-                        oid: context.oid,
-                        code: WTCode.ok,
-                        data: data
-                    };
-                }
+                ctx.body = {
+                    oid: context.oid,
+                    code: WTCode.ok,
+                    data: data
+                };
                 // in koa we MUST invoke `await next()` regardless if multiple handlers registered
                 await next();
             });
             fn.call(this._router, path, ...handlers);
-
-            // fn.call(this._router, path, ..._.map(handlers, handler => {
-            //     return async (ctx: Koa.Context, next: INextFunction) => {
-            //         const context = new KoaContext<T>(ctx, next);
-            //         const data = await handler(context);
-            //         if (data) {
-            //             ctx.body = {
-            //                 oid: context.oid,
-            //                 code: WTCode.ok,
-            //                 data: data
-            //             };
-            //         }
-            //         // in koa we MUST invoke `await next()` regardless if multiple handlers registered
-            //         await next();
-            //     };
-            // }));
         }
         else {
             throw new Error(`Koa does not support method "${method}"`);

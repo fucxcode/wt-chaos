@@ -119,6 +119,18 @@ class ExpressContext<T> extends Context<T> {
         return this._req.protocol;
     }
 
+    public get path(): string {
+        return this._req.path;
+    }
+
+    public get hostname(): string {
+        return this._req.hostname;
+    }
+
+    public get originalUrl(): string {
+        return this._req.originalUrl;
+    }
+
     public json(data: any): ExpressContext<T> {
         this._res.json(data);
         return this;
@@ -201,25 +213,6 @@ class ExpressRouter<T> extends Router<ExpressContext<T>, T> {
                 });
             }
             fn.call(this._app, path, ...handlers);
-
-
-            // fn.call(this._app, path, ..._.map(handlers, handler => {
-            //     return (req: ExpressRequest, res: express.Response, next: express.NextFunction) => {
-            //         const context = new ExpressContext<T>(req, res, next);
-            //         Promise.resolve(handler(context)).then(data => {
-            //             if (data && !res.finished) {
-            //                 res.json({
-            //                     oid: context.oid,
-            //                     code: WTCode.ok,
-            //                     data: data
-            //                 });
-            //             }
-            //             next();
-            //         }).catch(error => {
-            //             next(error);
-            //         });
-            //     };
-            // }));
         }
         else {
             throw new Error(`Express does not support method "${method}"`);

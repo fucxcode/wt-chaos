@@ -1,8 +1,8 @@
 import { OutPut } from "../controller";
-interface IReporter {
+interface Reporter {
     report<T>(entity: OutPut<T>): Promise<OutPut<T>>;
 }
-interface IQueryer {
+interface Querier {
     query<T>(opts: QueryOptions): Promise<OutPut<T>>;
 }
 interface QueryOptions {
@@ -12,4 +12,4 @@ interface QueryOptions {
     range?: Array<number>;
     fields: any;
 }
-export { IReporter, IQueryer, OutPut, QueryOptions };
+export { Reporter, Querier, OutPut, QueryOptions };

@@ -1,15 +1,15 @@
-import { IBaseEntity, Level, ISource } from "./entity";
-// import { Provider } from "./provider";
+import { BaseEntity, Source } from "./entity";
+import { Level } from "./level";
 import { Provider } from "./provider";
-import { IReporter, ConsoleReport, QueryOptions } from "./report";
+import { Reporter, ConsoleReport, QueryOptions } from "./reporter";
 import { Entity } from "../repository/entities";
 
-export type OutPut<T> = ISource & IBaseEntity<T> & Entity;
+export type OutPut<T> = Source & BaseEntity<T> & Entity;
 
 /**
- * Icontroller
+ * Controller
  */
-export interface IController {
+export interface Controller {
     /**
      * @param name
      * @returns Provider
@@ -18,10 +18,10 @@ export interface IController {
 
     /**
      * @template T
-     * @param entriy
+     * @param entity
      * @returns log
      */
-    log<T>(entriy: IBaseEntity<T>): Promise<any>;
+    log<T>(entity: BaseEntity<T>): Promise<any>;
 
     /**
      * @param level
@@ -56,7 +56,7 @@ export interface IController {
 }
 
 // Controller
-class Controller implements IController {
+class ProviderController implements Controller {
     // singleton
     private static _single: Controller | null;
 
@@ -66,9 +66,9 @@ class Controller implements IController {
      * @param level
      * @returns {Controller}
      */
-    public static create(name: string, level: Level, reporters?: IReporter[]): Controller {
+    public static create(name: string, level: Level, reporters?: Reporter[]): Controller {
         if (!this._single) {
-            this._single = new Controller(name, level, reporters);
+            this._single = new ProviderController(name, level, reporters);
         }
         return this._single;
     }
@@ -76,10 +76,10 @@ class Controller implements IController {
     public readonly name: string;
     public readonly level: Level;
 
-    public reporters: IReporter[];
+    public reporters: Reporter[];
     public providers: Map<string, Provider<any>> = new Map<string, Provider<any>>();
 
-    constructor(name: string, level: Level, reporters?: IReporter[]) {
+    constructor(name: string, level: Level, reporters?: Reporter[]) {
         this.name = name;
         this.level = level;
 
@@ -105,22 +105,22 @@ class Controller implements IController {
 
     /**
      * @description disable the provider by name
-     * @param name
+     * @param {String} name
      * @return {Controller}
      */
-    public disableProider(name: string): Controller {
+    public disableProvider(name: string): Controller {
         const provider = this.providers.get(name);
         if (!provider) {
             return this;
         }
-        provider.disabele();
+        provider.disable();
         return this;
     }
 
     /**
-     * Add provider
-     * @param name
-     * @param provider
+     * @description Add provider
+     * @param {String} name
+     * @param {Provider} provider
      * @returns {this}
      */
     public addProvider(name: string, provider: Provider<any>): Controller {
@@ -129,7 +129,7 @@ class Controller implements IController {
     }
 
     /**
-     * Removes provider
+     * @description Removes provider
      * @param {String} name
      * @returns {this}
      */
@@ -138,23 +138,27 @@ class Controller implements IController {
     }
 
     /**
-     * Determines whether provider has
+     * @description Determines whether provider has
      * @param {String} name
-     * @returns true if has provider
+     * @returns {Boolean} true if has provider
      */
     public hasProvider(name: string): boolean {
         return this.providers.has(name);
     }
 
     /**
-     * Get provider
-     * @param name
-     * @returns provider
+     * @description Get provider
+     * @param {String} name
+     * @returns {Provider} provider
      */
     public getProvider(name: string): Provider<any> | undefined {
         return this.providers.get(name);
     }
 
+    /**
+     * @param entity
+     * @private
+     */
     protected async _log<TMsgtype>(entity: OutPut<TMsgtype>): Promise<OutPut<TMsgtype>[]> {
         // return Promise.resolve(entity);
         const promiseAll: Promise<any>[] = [];
@@ -165,13 +169,13 @@ class Controller implements IController {
     }
 
     /**
-     * Logs controller
-     * @template TMsgtype
+     * @description Logs controller
+     * @template <TMsgtype>
      * @param entity
      * @returns {Promise}
      */
-    public async log<TMsgtype>(entity: IBaseEntity<TMsgtype>): Promise<OutPut<TMsgtype>[]> {
-        const outPut: OutPut<TMsgtype> = Object.assign({}, { source_name: this.name }, entity);
+    public async log<TMsgtype>(entity: BaseEntity<TMsgtype>): Promise<OutPut<TMsgtype>[]> {
+        const outPut: OutPut<TMsgtype> = Object.assign({}, { sourceName: this.name }, entity);
 
         const provider = this.providers.get(entity.channel);
 
@@ -188,7 +192,7 @@ class Controller implements IController {
      * @param entity
      * @returns true if provider enable
      */
-    public isProviderEnable<TMsgtype>(entity: IBaseEntity<TMsgtype>): boolean {
+    public isProviderEnable<TMsgtype>(entity: BaseEntity<TMsgtype>): boolean {
         const provider = this.getProvider(entity.channel);
         if (!provider) {
             return false;
@@ -207,7 +211,7 @@ class Controller implements IController {
 
     /**
      * TODO: support query options
-     * Querys log from drvier
+     * Query log from driver
      * @param opts
      * @returns query
      */
@@ -216,4 +220,4 @@ class Controller implements IController {
     }
 }
 
-export { Controller };
+export { ProviderController };

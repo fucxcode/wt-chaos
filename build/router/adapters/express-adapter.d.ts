@@ -24,6 +24,9 @@ declare class ExpressContext<T> extends Context<T> {
     readonly ips: string[];
     readonly host: string;
     readonly protocol: string;
+    readonly path: string;
+    readonly hostname: string;
+    readonly originalUrl: string;
     json(data: any): ExpressContext<T>;
     redirect(url: string, alt?: string): void;
 }

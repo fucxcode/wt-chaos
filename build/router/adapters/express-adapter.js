@@ -83,6 +83,15 @@ class ExpressContext extends context_1.Context {
     get protocol() {
         return this._req.protocol;
     }
+    get path() {
+        return this._req.path;
+    }
+    get hostname() {
+        return this._req.hostname;
+    }
+    get originalUrl() {
+        return this._req.originalUrl;
+    }
     json(data) {
         this._res.json(data);
         return this;

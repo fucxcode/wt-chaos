@@ -18,10 +18,10 @@ class YunPianSdk {
     static getInstance(appKey) {
         return new YunPianSdk(appKey);
     }
-    async _post(path, data) {
+    async _post(path, data, url) {
         try {
-            return await request.post({
-                url: `${this.BASE_URL}${path}`,
+            return request.post({
+                url: url ? url : `${this.BASE_URL}${path}`,
                 headers: {
                     "Accept": "application/json;charset=utf-8",
                     "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
@@ -31,12 +31,12 @@ class YunPianSdk {
                 })
             });
         }
-        catch (e) {
-            if (e.error) {
-                return e.error;
+        catch (errors) {
+            if (errors.StatusCodeError) {
+                return errors.response.body;
             }
             else {
-                return e;
+                throw new Error(`request error`);
             }
         }
     }
@@ -64,27 +64,7 @@ class YunPianSdk {
             mobile: mobile,
             code: code
         };
-        const options = {
-            url: "https://voice.yunpian.com/v2/voice/send.json",
-            headers: {
-                "Accept": "application/json;charset=utf-8",
-                "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
-            },
-            form: _.assign(data, {
-                apikey: this.appKey
-            })
-        };
-        try {
-            return await request.post(options);
-        }
-        catch (e) {
-            if (e.error) {
-                return e.error;
-            }
-            else {
-                return e;
-            }
-        }
+        return this._post("", data, "https://voice.yunpian.com/v2/voice/send.json");
     }
 }
 exports.YunPianSdk = YunPianSdk;

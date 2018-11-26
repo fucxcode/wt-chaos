@@ -107,13 +107,11 @@ class KoaRouter extends router_1.Router {
             handlers.push(async (ctx, next) => {
                 const context = new KoaContext(ctx, next);
                 const data = await handler(context);
-                if (data) {
-                    ctx.body = {
-                        oid: context.oid,
-                        code: errors_1.WTCode.ok,
-                        data: data
-                    };
-                }
+                ctx.body = {
+                    oid: context.oid,
+                    code: errors_1.WTCode.ok,
+                    data: data
+                };
                 // in koa we MUST invoke `await next()` regardless if multiple handlers registered
                 await next();
             });

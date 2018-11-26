@@ -157,23 +157,6 @@ class ExpressRouter extends router_1.Router {
                 });
             }
             fn.call(this._app, path, ...handlers);
-            // fn.call(this._app, path, ..._.map(handlers, handler => {
-            //     return (req: ExpressRequest, res: express.Response, next: express.NextFunction) => {
-            //         const context = new ExpressContext<T>(req, res, next);
-            //         Promise.resolve(handler(context)).then(data => {
-            //             if (data && !res.finished) {
-            //                 res.json({
-            //                     oid: context.oid,
-            //                     code: WTCode.ok,
-            //                     data: data
-            //                 });
-            //             }
-            //             next();
-            //         }).catch(error => {
-            //             next(error);
-            //         });
-            //     };
-            // }));
         }
         else {
             throw new Error(`Express does not support method "${method}"`);

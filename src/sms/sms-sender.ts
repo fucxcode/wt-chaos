@@ -30,13 +30,11 @@ export class SmsSender {
     }
 
     private static getService(options: SmsOptions): SmsInterface {
-        switch (options.appKey) {
+        switch (options.platform) {
             case Platform.yunPian:
                 return new YunPian(options.appKey);
-                break;
             default:
                 return new YunPian(options.appKey);
-                break;
         }
 
     }

@@ -19,16 +19,22 @@ export class YunPianSdk {
     }
 
     private async _post(path: string, data: object) {
-        return await request.post({
-            url: `${this.BASE_URL}${path}`,
-            headers: {
-                "Accept": "application/json;charset=utf-8",
-                "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
-            },
-            form: _.assign(data, {
-                apikey: this.appKey
-            })
-        });
+        try {
+            return await request.post({
+                url: `${this.BASE_URL}${path}`,
+                headers: {
+                    "Accept": "application/json;charset=utf-8",
+                    "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
+                },
+                form: _.assign(data, {
+                    apikey: this.appKey
+                })
+            });
+        } 
+        catch (error) {
+            return error;
+        }
+        
     }
 
     private getSMSTemplateValue(values: any): any {
@@ -67,6 +73,12 @@ export class YunPianSdk {
                 apikey: this.appKey
             })
         };
-        return await request.post(options);
+        try {
+            return await request.post(options);
+        } 
+        catch (error) {
+            return error;
+        }
+        
     }
 }

@@ -8,7 +8,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const _ = __importStar(require("../../utilities"));
-const qs = require("querystring");
 const request = __importStar(require("request-promise"));
 class YunPianSdk {
     constructor(appKey) {
@@ -19,20 +18,21 @@ class YunPianSdk {
         return new YunPianSdk(appKey);
     }
     async _post(path, data, url) {
+        const options = {
+            url: url ? url : `${this.BASE_URL}${path}`,
+            headers: {
+                "Accept": "application/json;charset=utf-8",
+                "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
+            },
+            form: _.assign(data, {
+                apikey: this.appKey
+            })
+        };
         try {
-            return request.post({
-                url: url ? url : `${this.BASE_URL}${path}`,
-                headers: {
-                    "Accept": "application/json;charset=utf-8",
-                    "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
-                },
-                form: _.assign(data, {
-                    apikey: this.appKey
-                })
-            });
+            return await request.post(options);
         }
         catch (errors) {
-            if (errors.StatusCodeError) {
+            if (errors && errors.response) {
                 return errors.response.body;
             }
             else {

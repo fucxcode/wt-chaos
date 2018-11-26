@@ -1,5 +1,4 @@
 import * as _ from "../../utilities";
-const qs = require("querystring");
 import * as request from "request-promise";
 
 
@@ -19,20 +18,21 @@ export class YunPianSdk {
     }
 
     private async _post(path: string, data: object, url?: string): Promise<any> {
+        const options = {
+            url: url ? url : `${this.BASE_URL}${path}`,
+            headers: {
+                "Accept": "application/json;charset=utf-8",
+                "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
+            },
+            form: _.assign(data, {
+                apikey: this.appKey
+            })
+        };
         try {
-            return request.post({
-                url: url ? url : `${this.BASE_URL}${path}`,
-                headers: {
-                    "Accept": "application/json;charset=utf-8",
-                    "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
-                },
-                form: _.assign(data, {
-                    apikey: this.appKey
-                })
-            });
+            return await request.post(options);
         }
         catch (errors) {
-            if (errors.StatusCodeError) {
+            if (errors && errors.response) {
                 return errors.response.body;
             }
             else {

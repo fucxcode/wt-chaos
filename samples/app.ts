@@ -5,6 +5,7 @@ import * as _ from "../src/utilities";
 import { route, facade, middlewares } from "../src/facade";
 import { HttpMethod } from "../src/constants";
 import { ContainerPool, injectable, inject } from "../src/container";
+import { WTError, WTCode } from "../src";
 
 const container = ContainerPool.registerContainer();
 
@@ -133,33 +134,77 @@ class Service {
 
 // const myFacade = container.resolve<MyFacade>(MyFacade);
 
-@facade()
-// @ts-ignore
-class C1 {
-    constructor() {
-        console.log("C1");
-    }
-    public echo(message: string): string {
-        return message;
-    }
-}
+// @facade()
+// // @ts-ignore
+// class C1 {
+//     constructor() {
+//         console.log("C1");
+//     }
+//     public echo(message: string): string {
+//         return message;
+//     }
+// }
+
+// @facade()
+// // @ts-ignore
+// class C2 extends C1 {
+//     constructor() {
+//         super();
+//         console.log("C2");
+//     }
+
+//     @route("ping", HttpMethod.GET)
+//     // @ts-ignore
+//     public async ping(ctx: Context<State>): Promise<string> {
+//         return "PONG!";
+//     }
+// }
+
+// new C2();
 
 @facade()
 // @ts-ignore
-class C2 extends C1 {
-    constructor() {
-        super();
-        console.log("C2");
+class Facade {
+
+    @route("/wt-error", HttpMethod.GET)
+    // @ts-ignore
+    public async wtError(): Promise<void> {
+        throw new WTError(WTCode.forbidden, "aaa", "x", "y");
+    }
+
+    @route("/error", HttpMethod.GET)
+    // @ts-ignore
+    public async error(): Promise<void> {
+        throw new Error("bbb");
     }
 
     @route("ping", HttpMethod.GET)
     // @ts-ignore
-    public async ping(ctx: Context<State>): Promise<string> {
+    public async ping(): Promise<string> {
         return "PONG!";
     }
+
 }
 
-new C2();
+router.use(async (ctx, next) => {
+    return await next().catch(error => {
+        if (error.toHttpResponseValue) {
+            const wtError = <WTError>error;
+            ctx.body = wtError.toHttpResponseValue();
+        }
+        else {
+            console.log(error);
+            ctx.body = {
+                code: WTCode.internalError,
+                message:
+                    error.message ||
+                    `router middleware error ${ctx.originalUrl}`
+            };
+        }
+    });
+});
+
+container.resolve<Facade>(Facade);
 
 app.listen(22222, () => {
     console.log(`ready`);

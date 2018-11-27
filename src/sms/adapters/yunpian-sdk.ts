@@ -1,5 +1,4 @@
 import * as _ from "../../utilities";
-const qs = require("querystring");
 import * as request from "request-promise";
 
 
@@ -18,9 +17,9 @@ export class YunPianSdk {
         return new YunPianSdk(appKey);
     }
 
-    private async _post(path: string, data: object) {
-        return await request.post({
-            url: `${this.BASE_URL}${path}`,
+    private async _post(path: string, data: object, url?: string): Promise<any> {
+        const options = {
+            url: url ? url : `${this.BASE_URL}${path}`,
             headers: {
                 "Accept": "application/json;charset=utf-8",
                 "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
@@ -28,7 +27,19 @@ export class YunPianSdk {
             form: _.assign(data, {
                 apikey: this.appKey
             })
-        });
+        };
+        try {
+            return await request.post(options);
+        }
+        catch (errors) {
+            if (errors && errors.response) {
+                return errors.response.body;
+            }
+            else {
+                throw new Error(`request error`);
+            }
+        }
+        
     }
 
     private getSMSTemplateValue(values: any): any {
@@ -57,16 +68,6 @@ export class YunPianSdk {
             mobile: mobile,
             code: code
         };
-        const options = {
-            url: "https://voice.yunpian.com/v2/voice/send.json",
-            headers: {
-                "Accept": "application/json;charset=utf-8",
-                "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
-            },
-            form: _.assign(data, {
-                apikey: this.appKey
-            })
-        };
-        return await request.post(options);
+        return this._post("", data, "https://voice.yunpian.com/v2/voice/send.json");
     }
 }

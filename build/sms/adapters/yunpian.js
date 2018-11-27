@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const yunpan_sdk_1 = require("./yunpan-sdk");
+const yunpian_sdk_1 = require("./yunpian-sdk");
 const defaultMinutes = 3;
 class YunPian {
     constructor(appKey) {
         this.appKey = appKey;
-        this.yunPianSdk = yunpan_sdk_1.YunPianSdk.getInstance(this.appKey);
+        this.yunPianSdk = yunpian_sdk_1.YunPianSdk.getInstance(this.appKey);
     }
     async sendVerificationCode(templateId, mobile, code, minutes) {
         return await this.yunPianSdk.sendTemplateSMS(templateId, mobile, {

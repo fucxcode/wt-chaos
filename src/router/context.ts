@@ -1,8 +1,6 @@
-import http, { ServerResponse, IncomingHttpHeaders } from "http";
+import http, { IncomingHttpHeaders } from "http";
 import * as uuid from "node-uuid";
-import { INextFunction } from "./router";
 import * as _ from "../utilities";
-import { ISomeObject } from "../constants";
 import { Cookies } from "./cookies";
 
 abstract class Context<T> {
@@ -28,17 +26,11 @@ abstract class Context<T> {
         return this._response;
     }
 
-    // private _next?: INextFunction;
-    // public get next(): INextFunction {
-    //     return this._next || Promise.resolve;
-    // }
-
     constructor(stateResolver: () => T, request?: http.IncomingMessage, response?: http.ServerResponse, oidResolver: () => string = uuid.v4) {
         this._oid = oidResolver();
         this._state = stateResolver();
         this._request = request;
         this._response = response;
-        // this._next = next;
     }
 
     public abstract get headers(): IncomingHttpHeaders;
@@ -64,6 +56,12 @@ abstract class Context<T> {
     public abstract get host(): string;
 
     public abstract get protocol(): string;
+
+    public abstract get path(): string;
+
+    public abstract get hostname(): string;
+
+    public abstract get originalUrl(): string;
 
     public abstract json(data: any): Context<T>;
 

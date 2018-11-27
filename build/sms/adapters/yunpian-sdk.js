@@ -8,7 +8,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const _ = __importStar(require("../../utilities"));
-const qs = require("querystring");
 const request = __importStar(require("request-promise"));
 class YunPianSdk {
     constructor(appKey) {
@@ -18,9 +17,9 @@ class YunPianSdk {
     static getInstance(appKey) {
         return new YunPianSdk(appKey);
     }
-    async _post(path, data) {
-        return await request.post({
-            url: `${this.BASE_URL}${path}`,
+    async _post(path, data, url) {
+        const options = {
+            url: url ? url : `${this.BASE_URL}${path}`,
             headers: {
                 "Accept": "application/json;charset=utf-8",
                 "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
@@ -28,7 +27,18 @@ class YunPianSdk {
             form: _.assign(data, {
                 apikey: this.appKey
             })
-        });
+        };
+        try {
+            return await request.post(options);
+        }
+        catch (errors) {
+            if (errors && errors.response) {
+                return errors.response.body;
+            }
+            else {
+                throw new Error(`request error`);
+            }
+        }
     }
     getSMSTemplateValue(values) {
         return _.reduce(values, (result, value, key) => {
@@ -54,18 +64,8 @@ class YunPianSdk {
             mobile: mobile,
             code: code
         };
-        const options = {
-            url: "https://voice.yunpian.com/v2/voice/send.json",
-            headers: {
-                "Accept": "application/json;charset=utf-8",
-                "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
-            },
-            form: _.assign(data, {
-                apikey: this.appKey
-            })
-        };
-        return await request.post(options);
+        return this._post("", data, "https://voice.yunpian.com/v2/voice/send.json");
     }
 }
 exports.YunPianSdk = YunPianSdk;
-//# sourceMappingURL=yunpan-sdk.js.map
+//# sourceMappingURL=yunpian-sdk.js.map

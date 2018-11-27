@@ -22,6 +22,9 @@ declare class KoaContext<T> extends Context<T> {
     readonly ips: string[];
     readonly host: string;
     readonly protocol: string;
+    readonly path: string;
+    readonly hostname: string;
+    readonly originalUrl: string;
     json(data: any): KoaContext<T>;
     redirect(url: string, alt?: string): void;
 }

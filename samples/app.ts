@@ -87,51 +87,79 @@ class Service {
 
 }
 
-@injectable()
+// @injectable()
+// @facade()
+// @route("sys/internal")
+// @middlewares(async (ctx: Context<State>, next: INextFunction) => {
+//     ctx.state.uid = "123";
+//     await next();
+// })
+// @middlewares(async (ctx: Context<State>, next: INextFunction) => {
+//     ctx.state.role = "NB";
+//     await next();
+// })
+// // @ts-ignore
+// class MyFacade {
+
+//     @inject()
+//     // @ts-ignore
+//     private _service: Service;
+
+//     private _pong = "PONG!";
+
+//     private _data = {
+//         name: "Shaun Xu",
+//         dep: "wt-fp"
+//     };
+
+//     @route("ping", HttpMethod.GET)
+//     // @ts-ignore
+//     public async ping(ctx: Context<State>): Promise<string> {
+//         return "PONG!";
+//     }
+
+//     @route("say", HttpMethod.POST)
+//     // @ts-ignore
+//     public async say(ctx: Context<State>): Promise<any> {
+//         return {
+//             oid: ctx.oid,
+//             state: ctx.state,
+//             incoming: ctx.body,
+//             data: this._data
+//         };
+//     }
+
+// }
+
+// const myFacade = container.resolve<MyFacade>(MyFacade);
+
 @facade()
-@route("sys/internal")
-@middlewares(async (ctx: Context<State>, next: INextFunction) => {
-    ctx.state.uid = "123";
-    await next();
-})
-@middlewares(async (ctx: Context<State>, next: INextFunction) => {
-    ctx.state.role = "NB";
-    await next();
-})
 // @ts-ignore
-class MyFacade {
+class C1 {
+    constructor() {
+        console.log("C1");
+    }
+    public echo(message: string): string {
+        return message;
+    }
+}
 
-    @inject()
-    // @ts-ignore
-    private _service: Service;
-
-    private _pong = "PONG!";
-
-    private _data = {
-        name: "Shaun Xu",
-        dep: "wt-fp"
-    };
+@facade()
+// @ts-ignore
+class C2 extends C1 {
+    constructor() {
+        super();
+        console.log("C2");
+    }
 
     @route("ping", HttpMethod.GET)
     // @ts-ignore
     public async ping(ctx: Context<State>): Promise<string> {
         return "PONG!";
     }
-
-    @route("say", HttpMethod.POST)
-    // @ts-ignore
-    public async say(ctx: Context<State>): Promise<any> {
-        return {
-            oid: ctx.oid,
-            state: ctx.state,
-            incoming: ctx.body,
-            data: this._data
-        };
-    }
-
 }
 
-const myFacade = container.resolve<MyFacade>(MyFacade);
+new C2();
 
 app.listen(22222, () => {
     console.log(`ready`);

@@ -24,6 +24,18 @@ describe("facade", () => {
 
     class TestContext extends Context<TestState> {
 
+        public get path(): string {
+            throw new Error("not implemented");
+        }
+
+        public get hostname(): string {
+            throw new Error("not implemented");
+        }
+
+        public get originalUrl(): string {
+            throw new Error("not implemented");
+        }
+
         public get statusCode(): number {
             throw new Error("not implemented");
         }
@@ -97,7 +109,7 @@ describe("facade", () => {
         }
 
         constructor(prefix: string = "") {
-            super(prefix);
+            super(prefix, false);
 
             this._routes = [];
         }
@@ -154,7 +166,7 @@ describe("facade", () => {
         // @ts-ignore
         class TestFacade {
 
-            @route("handler1", HttpMethod.GET)
+            @route("/handler1", HttpMethod.GET)
             // @ts-ignore
             public async handler1(ctx: Context<TestState>): Promise<void> {
                 ctx.state.traces.push(expect_traces[0]);
@@ -182,7 +194,7 @@ describe("facade", () => {
         // @ts-ignore
         class TestFacade {
 
-            @route("handler1", HttpMethod.GET)
+            @route("/handler1", HttpMethod.GET)
             // @ts-ignore
             public async handler1(ctx: Context<TestState>): Promise<void> {
                 throw new Error("not implemented");
@@ -210,7 +222,7 @@ describe("facade", () => {
         // @ts-ignore
         class TestFacade {
 
-            @route("handler1", HttpMethod.GET)
+            @route("/handler1", HttpMethod.GET)
             // @ts-ignore
             public async handler1(ctx: Context<TestState>): Promise<void> {
                 throw new Error("not implemented");
@@ -242,7 +254,7 @@ describe("facade", () => {
         // @ts-ignore
         class TestFacade {
 
-            @route("handler1", HttpMethod.GET)
+            @route("/handler1", HttpMethod.GET)
             // @ts-ignore
             public async handler1(ctx: Context<TestState>): Promise<void> {
                 ctx.state.traces.push(expect_traces[0]);
@@ -273,7 +285,7 @@ describe("facade", () => {
         // @ts-ignore
         class TestFacade {
 
-            @route("handler/1", HttpMethod.GET)
+            @route("/handler/1", HttpMethod.GET)
             // @ts-ignore
             public async handler1(ctx: Context<TestState>): Promise<void> {
                 ctx.state.traces.push(expect_traces[0]);
@@ -307,13 +319,13 @@ describe("facade", () => {
         // @ts-ignore
         class TestFacade {
 
-            @route("handler", HttpMethod.GET)
+            @route("/handler", HttpMethod.GET)
             // @ts-ignore
             public async handler_get(ctx: Context<TestState>): Promise<void> {
                 ctx.state.traces.push(expect_traces_get[0]);
             }
 
-            @route("handler", HttpMethod.PUT)
+            @route("/handler", HttpMethod.PUT)
             // @ts-ignore
             public async handler_put(ctx: Context<TestState>): Promise<void> {
                 ctx.state.traces.push(expect_traces_put[0]);
@@ -376,7 +388,7 @@ describe("facade", () => {
         // @ts-ignore
         class TestFacade {
 
-            @route("handler", HttpMethod.GET)
+            @route("/handler", HttpMethod.GET)
             @middlewares(
                 async (ctx: Context<TestState>) => {
                     ctx.state.traces.push(expect_traces[4]);
@@ -402,6 +414,81 @@ describe("facade", () => {
         }
 
         new TestFacade();
+        await router.receive("/handler", HttpMethod.GET, state);
+
+        assert.strictEqual(state.traces.length, expect_traces.length);
+        for (let i = 0; i < state.traces.length; i++) {
+            const actual_trace = state.traces[i];
+            const expect_trace = expect_traces[i];
+            assert.strictEqual(actual_trace, expect_trace);
+        }
+
+    });
+
+    it.skip(`facade middleware: sub-classes. > handler: parent and sub middlewares then handler`, async () => {
+
+        const expect_traces: string[] = [
+            uuid.v4(),
+            uuid.v4(),
+            uuid.v4(),
+            uuid.v4(),
+            uuid.v4(),
+            uuid.v4(),
+            uuid.v4()
+        ];
+        const state = new TestState();
+
+        @facade(router)
+        @middlewares(
+            async (ctx: Context<TestState>) => {
+                ctx.state.traces.push(expect_traces[0]);
+            }
+        )
+        @middlewares(
+            async (ctx: Context<TestState>) => {
+                ctx.state.traces.push(expect_traces[1]);
+            }
+        )
+        // @ts-ignore
+        class Class1 {
+        }
+
+        @facade(router)
+        @middlewares(
+            async (ctx: Context<TestState>) => {
+                ctx.state.traces.push(expect_traces[2]);
+            }
+        )
+        @middlewares(
+            async (ctx: Context<TestState>) => {
+                ctx.state.traces.push(expect_traces[3]);
+            }
+        )
+        // @ts-ignore
+        class Class2 extends Class1 {
+        }
+
+        @facade(router)
+        @middlewares(
+            async (ctx: Context<TestState>) => {
+                ctx.state.traces.push(expect_traces[4]);
+            }
+        )
+        @middlewares(
+            async (ctx: Context<TestState>) => {
+                ctx.state.traces.push(expect_traces[5]);
+            }
+        )
+        // @ts-ignore
+        class Class3 extends Class2 {
+            @route("/handler", HttpMethod.GET)
+            // @ts-ignore
+            public async handler(ctx: Context<TestState>): Promise<void> {
+                ctx.state.traces.push(expect_traces[6]);
+            }
+        }
+
+        new Class3();
         await router.receive("/handler", HttpMethod.GET, state);
 
         assert.strictEqual(state.traces.length, expect_traces.length);

@@ -34,6 +34,30 @@ const resolveRouter = function (router, container) {
     }
 };
 const facade = function (router, container) {
+    return container_1.injectable(container, undefined, undefined, (instance) => {
+        // try resolve router from container if not specified
+        const r = resolveRouter(router, container);
+        // register routes for method decorated by "route" and "middleware" with incoming parameter "router"
+        const prefixes = decorator_route_1.getRoutePrefixes(instance.constructor);
+        const facadeMiddlewares = decorator_middlewares_1.getFacadeMiddlewares(instance.constructor);
+        const methodMiddlewares = decorator_middlewares_1.getMethodMiddlewares(instance);
+        const routes = decorator_route_1.getMethodRoutes(instance);
+        routes.forEach((options, propertyKey) => {
+            if (options.method) {
+                const method = options.method;
+                const path = $path.join(`/`, ...prefixes, options.path);
+                const middlewares = facadeMiddlewares.concat(methodMiddlewares.get(propertyKey) || []);
+                const handler = instance[propertyKey].bind(instance);
+                r.route(method, path, middlewares, handler);
+            }
+            else {
+                throw new Error(`Cannot set route for ${instance.constructor.name}.${options.method} due to no method was specified.`);
+            }
+        });
+    });
+};
+exports.facade = facade;
+const facadeOld = function (router, container) {
     return function (target) {
         // save a reference to the original constructor
         const origin = target;
@@ -81,5 +105,4 @@ const facade = function (router, container) {
         return f;
     };
 };
-exports.facade = facade;
 //# sourceMappingURL=decorator-facade.js.map

@@ -18,10 +18,13 @@ class Resolver {
         return this._lifecycle;
     }
 
+    private _postInstantiate: (instance: any) => void;
+
     private _object: any;
 
-    constructor(container: Container, ctor?: Function, paramTypes: ParamType[] = [], propTypes: PropertyType[] = [], lifecycle: Lifecycles = Lifecycles.singleton, object?: any) {
+    constructor(container: Container, ctor?: Function, paramTypes: ParamType[] = [], propTypes: PropertyType[] = [], lifecycle: Lifecycles = Lifecycles.singleton, object?: any, postInstantiate: (instance: any) => void = () => { }) {
         this._container = container;
+        this._postInstantiate = postInstantiate;
         if (object) {
             this._object = object;
             this._lifecycle = Lifecycles.singleton;
@@ -62,12 +65,14 @@ class Resolver {
         if (this._lifecycle === Lifecycles.instantiate) {
             const instance = this.instantiate(params);
             this.injectProperties(instance);
+            this._postInstantiate(instance);
             return instance;
         }
         else {
             if (_.isUndefined(this._object)) {
                 this._object = this.instantiate(params);
                 this.injectProperties(this._object);
+                this._postInstantiate(this._object);
             }
             return this._object;
         }
@@ -92,19 +97,19 @@ class ContainerImpl implements Container {
         this._activationHandler = activationHandler;
     }
 
-    private registerInternal(type: Type, ctor: Function | undefined, lifecycle: Lifecycles, paramTypes?: ParamType[], propTypes?: PropertyType[], instance?: any): Resolver {
-        const item = new Resolver(this, ctor, paramTypes, propTypes, lifecycle, instance);
+    private registerInternal(type: Type, ctor: Function | undefined, lifecycle: Lifecycles, paramTypes: ParamType[] | undefined, propTypes: PropertyType[] | undefined, instance: any | undefined, postInstantiate: (instance: any) => void): Resolver {
+        const item = new Resolver(this, ctor, paramTypes, propTypes, lifecycle, instance, postInstantiate);
         this._resolvers.set(type, item);
         return item;
     }
 
-    public registerType(type: Type, ctor: Function | undefined, lifecycle: Lifecycles = Lifecycles.singleton, paramTypes?: ParamType[], propTypes?: PropertyType[]): Container {
-        this.registerInternal(type, ctor, lifecycle, paramTypes, propTypes);
+    public registerType(type: Type, ctor: Function | undefined, lifecycle: Lifecycles = Lifecycles.singleton, paramTypes?: ParamType[], propTypes?: PropertyType[], postInstantiate: (instance: any) => void = () => { }): Container {
+        this.registerInternal(type, ctor, lifecycle, paramTypes, propTypes, undefined, postInstantiate);
         return this;
     }
 
     public registerInstance(type: Symbol, instance: any): Container {
-        this.registerInternal(type, undefined, Lifecycles.singleton, undefined, undefined, instance);
+        this.registerInternal(type, undefined, Lifecycles.singleton, undefined, undefined, instance, () => { });
         return this;
     }
 

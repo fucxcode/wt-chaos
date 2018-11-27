@@ -14,8 +14,9 @@ class Resolver {
     get lifecycle() {
         return this._lifecycle;
     }
-    constructor(container, ctor, paramTypes = [], propTypes = [], lifecycle = container_1.Lifecycles.singleton, object) {
+    constructor(container, ctor, paramTypes = [], propTypes = [], lifecycle = container_1.Lifecycles.singleton, object, postInstantiate = () => { }) {
         this._container = container;
+        this._postInstantiate = postInstantiate;
         if (object) {
             this._object = object;
             this._lifecycle = container_1.Lifecycles.singleton;
@@ -53,12 +54,14 @@ class Resolver {
         if (this._lifecycle === container_1.Lifecycles.instantiate) {
             const instance = this.instantiate(params);
             this.injectProperties(instance);
+            this._postInstantiate(instance);
             return instance;
         }
         else {
             if (_.isUndefined(this._object)) {
                 this._object = this.instantiate(params);
                 this.injectProperties(this._object);
+                this._postInstantiate(this._object);
             }
             return this._object;
         }
@@ -73,17 +76,17 @@ class ContainerImpl {
         this._resolvers = new Map();
         this._activationHandler = activationHandler;
     }
-    registerInternal(type, ctor, lifecycle, paramTypes, propTypes, instance) {
-        const item = new Resolver(this, ctor, paramTypes, propTypes, lifecycle, instance);
+    registerInternal(type, ctor, lifecycle, paramTypes, propTypes, instance, postInstantiate) {
+        const item = new Resolver(this, ctor, paramTypes, propTypes, lifecycle, instance, postInstantiate);
         this._resolvers.set(type, item);
         return item;
     }
-    registerType(type, ctor, lifecycle = container_1.Lifecycles.singleton, paramTypes, propTypes) {
-        this.registerInternal(type, ctor, lifecycle, paramTypes, propTypes);
+    registerType(type, ctor, lifecycle = container_1.Lifecycles.singleton, paramTypes, propTypes, postInstantiate = () => { }) {
+        this.registerInternal(type, ctor, lifecycle, paramTypes, propTypes, undefined, postInstantiate);
         return this;
     }
     registerInstance(type, instance) {
-        this.registerInternal(type, undefined, container_1.Lifecycles.singleton, undefined, undefined, instance);
+        this.registerInternal(type, undefined, container_1.Lifecycles.singleton, undefined, undefined, instance, () => { });
         return this;
     }
     unregister(type) {

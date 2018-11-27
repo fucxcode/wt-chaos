@@ -2,9 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const repository_1 = require("../../repository");
 class MongoReport {
-    get driver() {
-        return this._driverProvider();
-    }
     // // TODO: make driver optional; if true, pull an instance from container
     constructor(collection, driverProvider, insertOpts) {
         this.collection = collection;

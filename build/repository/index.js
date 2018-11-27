@@ -10,4 +10,5 @@ __export(require("./find-by-page-next-result"));
 __export(require("./operation-desc"));
 __export(require("./repository-biz"));
 __export(require("./repository"));
+__export(require("./decorators"));
 //# sourceMappingURL=index.js.map

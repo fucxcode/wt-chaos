@@ -5,6 +5,7 @@ import * as _ from "../src/utilities";
 import { route, facade, middlewares } from "../src/facade";
 import { HttpMethod } from "../src/constants";
 import { ContainerPool, injectable, inject } from "../src/container";
+import { WTError, WTCode } from "../src";
 
 const container = ContainerPool.registerContainer();
 
@@ -87,51 +88,123 @@ class Service {
 
 }
 
-@injectable()
+// @injectable()
+// @facade()
+// @route("sys/internal")
+// @middlewares(async (ctx: Context<State>, next: INextFunction) => {
+//     ctx.state.uid = "123";
+//     await next();
+// })
+// @middlewares(async (ctx: Context<State>, next: INextFunction) => {
+//     ctx.state.role = "NB";
+//     await next();
+// })
+// // @ts-ignore
+// class MyFacade {
+
+//     @inject()
+//     // @ts-ignore
+//     private _service: Service;
+
+//     private _pong = "PONG!";
+
+//     private _data = {
+//         name: "Shaun Xu",
+//         dep: "wt-fp"
+//     };
+
+//     @route("ping", HttpMethod.GET)
+//     // @ts-ignore
+//     public async ping(ctx: Context<State>): Promise<string> {
+//         return "PONG!";
+//     }
+
+//     @route("say", HttpMethod.POST)
+//     // @ts-ignore
+//     public async say(ctx: Context<State>): Promise<any> {
+//         return {
+//             oid: ctx.oid,
+//             state: ctx.state,
+//             incoming: ctx.body,
+//             data: this._data
+//         };
+//     }
+
+// }
+
+// const myFacade = container.resolve<MyFacade>(MyFacade);
+
+// @facade()
+// // @ts-ignore
+// class C1 {
+//     constructor() {
+//         console.log("C1");
+//     }
+//     public echo(message: string): string {
+//         return message;
+//     }
+// }
+
+// @facade()
+// // @ts-ignore
+// class C2 extends C1 {
+//     constructor() {
+//         super();
+//         console.log("C2");
+//     }
+
+//     @route("ping", HttpMethod.GET)
+//     // @ts-ignore
+//     public async ping(ctx: Context<State>): Promise<string> {
+//         return "PONG!";
+//     }
+// }
+
+// new C2();
+
 @facade()
-@route("sys/internal")
-@middlewares(async (ctx: Context<State>, next: INextFunction) => {
-    ctx.state.uid = "123";
-    await next();
-})
-@middlewares(async (ctx: Context<State>, next: INextFunction) => {
-    ctx.state.role = "NB";
-    await next();
-})
 // @ts-ignore
-class MyFacade {
+class Facade {
 
-    @inject()
+    @route("/wt-error", HttpMethod.GET)
     // @ts-ignore
-    private _service: Service;
+    public async wtError(): Promise<void> {
+        throw new WTError(WTCode.forbidden, "aaa", "x", "y");
+    }
 
-    private _pong = "PONG!";
-
-    private _data = {
-        name: "Shaun Xu",
-        dep: "wt-fp"
-    };
+    @route("/error", HttpMethod.GET)
+    // @ts-ignore
+    public async error(): Promise<void> {
+        throw new Error("bbb");
+    }
 
     @route("ping", HttpMethod.GET)
     // @ts-ignore
-    public async ping(ctx: Context<State>): Promise<string> {
+    public async ping(): Promise<string> {
         return "PONG!";
-    }
-
-    @route("say", HttpMethod.POST)
-    // @ts-ignore
-    public async say(ctx: Context<State>): Promise<any> {
-        return {
-            oid: ctx.oid,
-            state: ctx.state,
-            incoming: ctx.body,
-            data: this._data
-        };
     }
 
 }
 
-const myFacade = container.resolve<MyFacade>(MyFacade);
+router.use(async (ctx, next) => {
+    return await next().catch(error => {
+        if (error.toHttpResponseValue) {
+            const wtError = <WTError>error;
+            ctx.body = wtError.toHttpResponseValue();
+        }
+        else {
+            console.log(error);
+            ctx.body = {
+                code: WTCode.internalError,
+                message:
+                    error.message ||
+                    `router middleware error ${ctx.originalUrl}`
+            };
+        }
+    });
+});
+
+container.resolve<Facade>(Facade);
 
 app.listen(22222, () => {
     console.log(`ready`);

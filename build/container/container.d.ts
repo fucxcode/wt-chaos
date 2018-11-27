@@ -21,7 +21,7 @@ declare class PropertyType {
 }
 interface Container {
     key: Symbol;
-    registerType(type: Type, ctor: Function, lifecycle?: Lifecycles, paramTypes?: ParamType[], propTypes?: PropertyType[]): Container;
+    registerType(type: Type, ctor: Function, lifecycle?: Lifecycles, paramTypes?: ParamType[], propTypes?: PropertyType[], postInstantiate?: (instance: any) => void): Container;
     registerInstance(type: Symbol, instance: any): Container;
     unregister(type: Type): boolean;
     clear(): void;

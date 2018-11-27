@@ -1,7 +1,7 @@
 import { Container, Lifecycles, Type, ParamType } from "../container";
 import { ContainerPool } from "../container-pool";
 
-const injectable = function (container?: Container, lifecycle: Lifecycles = Lifecycles.singleton, type?: Type) {
+const injectable = function (container?: Container, lifecycle: Lifecycles = Lifecycles.singleton, type?: Type, postInstantiate?: (instance: any) => void) {
     let realContainer: Container;
     if (container) {
         realContainer = container;
@@ -28,7 +28,7 @@ const injectable = function (container?: Container, lifecycle: Lifecycles = Life
         }
 
         const propTypes = Reflect.getMetadata(`wt-injected-props`, target) || [];
-        realContainer.registerType(type || target, target, lifecycle, paramTypes, propTypes);
+        realContainer.registerType(type || target, target, lifecycle, paramTypes, propTypes, postInstantiate);
         return target;
     };
 };

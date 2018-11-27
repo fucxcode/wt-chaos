@@ -1,6 +1,6 @@
 {
   "name": "wt-chaos",
-  "version": "1.0.4-201811271009",
+  "version": "1.0.4-201811271538",
   "description": "",
   "main": "build/index.js",
   "scripts": {

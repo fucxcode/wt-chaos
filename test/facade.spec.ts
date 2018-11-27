@@ -6,6 +6,7 @@ import { facade, route, middlewares } from "../src/facade";
 import * as uuid from "node-uuid";
 import { assert } from "chai";
 import { Cookies } from "../src/router/cookies";
+import { ContainerPool } from "../src/container";
 
 describe("facade", () => {
 
@@ -152,6 +153,8 @@ describe("facade", () => {
     const router = new TestRouter();
 
     beforeEach(async () => {
+        ContainerPool.clearContainers();
+        ContainerPool.registerContainer();
         router.clear();
     });
 
@@ -174,7 +177,7 @@ describe("facade", () => {
 
         }
 
-        new TestFacade();
+        ContainerPool.getDefaultContainer().resolve<TestFacade>(TestFacade);
         await router.receive("/handler1", HttpMethod.GET, state);
 
         assert.strictEqual(state.traces.length, expect_traces.length);
@@ -202,7 +205,7 @@ describe("facade", () => {
 
         }
 
-        new TestFacade();
+        ContainerPool.getDefaultContainer().resolve<TestFacade>(TestFacade);
         try {
             await router.receive("/handler1_miss", HttpMethod.GET, state);
             assert.fail();
@@ -230,7 +233,7 @@ describe("facade", () => {
 
         }
 
-        new TestFacade();
+        ContainerPool.getDefaultContainer().resolve<TestFacade>(TestFacade);
         try {
             await router.receive("/handler1", HttpMethod.PUT, state);
             assert.fail();
@@ -262,7 +265,7 @@ describe("facade", () => {
 
         }
 
-        new TestFacade();
+        ContainerPool.getDefaultContainer().resolve<TestFacade>(TestFacade);
         await router.receive("/api/handler1", HttpMethod.GET, state);
         assert.strictEqual(state.traces.length, expect_traces.length);
         for (let i = 0; i < state.traces.length; i++) {
@@ -293,7 +296,7 @@ describe("facade", () => {
 
         }
 
-        new TestFacade();
+        ContainerPool.getDefaultContainer().resolve<TestFacade>(TestFacade);
         await router.receive("/api/v1/test/handler/1", HttpMethod.GET, state);
         assert.strictEqual(state.traces.length, expect_traces.length);
         for (let i = 0; i < state.traces.length; i++) {
@@ -333,7 +336,7 @@ describe("facade", () => {
 
         }
 
-        new TestFacade();
+        ContainerPool.getDefaultContainer().resolve<TestFacade>(TestFacade);
         await router.receive("/handler", HttpMethod.GET, state_get);
         await router.receive("/handler", HttpMethod.PUT, state_put);
 
@@ -413,7 +416,7 @@ describe("facade", () => {
 
         }
 
-        new TestFacade();
+        ContainerPool.getDefaultContainer().resolve<TestFacade>(TestFacade);
         await router.receive("/handler", HttpMethod.GET, state);
 
         assert.strictEqual(state.traces.length, expect_traces.length);
@@ -425,7 +428,7 @@ describe("facade", () => {
 
     });
 
-    it.skip(`facade middleware: sub-classes. > handler: parent and sub middlewares then handler`, async () => {
+    it(`facade middleware: sub-classes. > handler: parent and sub middlewares then handler`, async () => {
 
         const expect_traces: string[] = [
             uuid.v4(),
@@ -488,8 +491,50 @@ describe("facade", () => {
             }
         }
 
-        new Class3();
+        ContainerPool.getDefaultContainer().resolve<Class3>(Class3);
         await router.receive("/handler", HttpMethod.GET, state);
+
+        assert.strictEqual(state.traces.length, expect_traces.length);
+        for (let i = 0; i < state.traces.length; i++) {
+            const actual_trace = state.traces[i];
+            const expect_trace = expect_traces[i];
+            assert.strictEqual(actual_trace, expect_trace);
+        }
+
+    });
+
+    it(`facade route: sub-classes. > handler: parent and sub route path appended then handler`, async () => {
+
+        const expect_traces: string[] = [
+            uuid.v4()
+        ];
+        const state = new TestState();
+
+        @facade(router)
+        @route("/cls1")
+        // @ts-ignore
+        class Class1 {
+        }
+
+        @facade(router)
+        @route("/cls2")
+        // @ts-ignore
+        class Class2 extends Class1 {
+        }
+
+        @facade(router)
+        @route("/cls3")
+        // @ts-ignore
+        class Class3 extends Class2 {
+            @route("/handler", HttpMethod.GET)
+            // @ts-ignore
+            public async handler(ctx: Context<TestState>): Promise<void> {
+                ctx.state.traces.push(expect_traces[0]);
+            }
+        }
+
+        ContainerPool.getDefaultContainer().resolve<Class3>(Class3);
+        await router.receive("/cls1/cls2/cls3/handler", HttpMethod.GET, state);
 
         assert.strictEqual(state.traces.length, expect_traces.length);
         for (let i = 0; i < state.traces.length; i++) {

@@ -2,7 +2,7 @@ import { Router, Context, RouterMiddleware, DEFAULT_ROUTER_KEY, RouterHandler } 
 import { getFacadeMiddlewares, getMethodMiddlewares } from "./decorator-middlewares";
 import { getRoutePrefixes, getMethodRoutes } from "./decorator-route";
 import * as $path from "path";
-import { Container, ContainerPool } from "../container";
+import { Container, ContainerPool, injectable, Lifecycles } from "../container";
 
 const resolveRouter = function <TContext extends Context<TState>, TState>(router?: Router<TContext, TState>, container?: Container): Router<TContext, TState> {
     if (router) {
@@ -27,6 +27,30 @@ const resolveRouter = function <TContext extends Context<TState>, TState>(router
 };
 
 const facade = function <TContext extends Context<TState>, TState>(router?: Router<TContext, TState>, container?: Container) {
+    return injectable(container, undefined, undefined, (instance: any) => {
+        // try resolve router from container if not specified
+        const r = resolveRouter(router, container);
+        // register routes for method decorated by "route" and "middleware" with incoming parameter "router"
+        const prefixes = getRoutePrefixes(instance.constructor);
+        const facadeMiddlewares = getFacadeMiddlewares<TContext, TState>(instance.constructor);
+        const methodMiddlewares = getMethodMiddlewares<TContext, TState>(instance);
+        const routes = getMethodRoutes(instance);
+        routes.forEach((options, propertyKey) => {
+            if (options.method) {
+                const method = options.method;
+                const path = $path.join(`/`, ...prefixes, options.path);
+                const middlewares = facadeMiddlewares.concat(methodMiddlewares.get(propertyKey) || []);
+                const handler = (instance as any)[propertyKey].bind(instance) as RouterHandler<TContext, TState>;
+                r.route(method, path, middlewares, handler);
+            }
+            else {
+                throw new Error(`Cannot set route for ${instance.constructor.name}.${options.method} due to no method was specified.`);
+            }
+        });
+    });
+};
+
+const facadeOld = function <TContext extends Context<TState>, TState>(router?: Router<TContext, TState>, container?: Container) {
     return function (target: any) {
         // save a reference to the original constructor
         const origin = target;

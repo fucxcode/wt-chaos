@@ -7,12 +7,11 @@ import { Controller } from "./controller";
  * Logger
  * @template TMsg
  */
-class Provider<TExtends> {
-    protected metaEntity: TEntry<TExtends> = new TEntry();
+class Provider<TExtends extends object> {
+    protected metaEntity: TEntry<TExtends> = new TEntry<TExtends>();
 
     public enabled: boolean = true;
     public readonly channel: string;
-
     public ctrl: Controller | undefined;
 
     constructor(channel: string, ctrl?: Controller) {
@@ -87,13 +86,12 @@ class Provider<TExtends> {
      * @returns log
      * @public
      */
-    public async log<TMsg>(level: Level, teamId: string, msg: TMsg): Promise<any> {
+    public async log<TMsg extends object>(level: Level, teamId: string, msg: TMsg): Promise<any> {
         if (!this.ctrl) {
-            throw new Error("No controller register");
+            throw new Error("No controller for logging");
         }
         const baseEntity: BaseEntity<TMsg> = this.buildBaseEntity(level, teamId, msg);
         const extended = this.metaEntity.toJSON();
-
         return this.ctrl.log(Object.assign({}, extended, baseEntity));
     }
 

@@ -5,7 +5,7 @@ import { Controller } from "./controller";
  * Logger
  * @template TMsg
  */
-declare class Provider<TExtends> {
+declare class Provider<TExtends extends object> {
     protected metaEntity: TEntry<TExtends>;
     enabled: boolean;
     readonly channel: string;
@@ -53,7 +53,7 @@ declare class Provider<TExtends> {
      * @returns log
      * @public
      */
-    log<TMsg>(level: Level, teamId: string, msg: TMsg): Promise<any>;
+    log<TMsg extends object>(level: Level, teamId: string, msg: TMsg): Promise<any>;
     /**
      * @param level
      * @param teamId

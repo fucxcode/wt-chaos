@@ -1,18 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class ConsoleReport {
-    constructor(opts) {
-        this.pretty = opts.pretty || false;
-        this.indent = opts.indent || 2;
+    constructor(pretty, indent) {
+        this.pretty = pretty || false;
+        this.indent = indent || 2;
     }
     async report(entity) {
         try {
             let outStr;
-            outStr = this.pretty ? JSON.stringify(entity, null, this.indent) + "\n" : JSON.stringify(entity);
-            process.stdout.write(outStr);
+            outStr = this.pretty ? JSON.stringify(entity, null, this.indent) : JSON.stringify(entity);
+            process.stdout.write(outStr + "\n");
         }
         catch (err) {
-            throw err;
+            return Promise.reject(err);
         }
         finally {
             return Promise.resolve(entity);

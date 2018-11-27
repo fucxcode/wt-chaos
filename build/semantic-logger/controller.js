@@ -2,15 +2,24 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const provider_1 = require("./provider");
 const reporter_1 = require("./reporter");
+function isQuerier(query) {
+    return typeof query.query === "function";
+}
 // Controller
 class ProviderController {
     constructor(name, level, reporters) {
         this.providers = new Map();
+        this.querier = null;
         this.name = name;
         this.level = level;
         this.reporters = reporters || [];
         if (this.reporters.length === 0) {
-            this.reporters.push(new reporter_1.ConsoleReport({}));
+            this.reporters.push(new reporter_1.ConsoleReport());
+        }
+        for (const reporter in this.reporters) {
+            if (isQuerier(reporter)) {
+                this.querier = reporter;
+            }
         }
     }
     /**
@@ -133,13 +142,20 @@ class ProviderController {
         return this.level >= level;
     }
     /**
-     * TODO: support query options
      * Query log from driver
      * @param opts
      * @returns query
      */
     query(opts) {
-        return Promise.resolve(opts);
+        if (!this.querier) {
+            throw new Error("Can not query any log");
+        }
+        const condition = {
+            skip: opts.skip || 10,
+            limit: opts.limit || 20,
+            fields: opts.fields
+        };
+        return this.querier.query(condition);
     }
 }
 exports.ProviderController = ProviderController;

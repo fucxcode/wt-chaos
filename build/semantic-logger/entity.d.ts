@@ -27,11 +27,12 @@ export interface MetaEntity {
 interface ToJSON<T> {
     toJSON(): T;
 }
-declare class TEntry<T> implements ToJSON<T> {
+declare type ValueOf<T> = T[keyof T];
+declare class TEntry<T extends object> implements ToJSON<T> {
     private _data;
     constructor(data?: T);
-    withField(key: keyof T, value: any): TEntry<T>;
-    withFields(fields: {}): TEntry<T>;
+    withField(key: keyof T, value: ValueOf<T>): TEntry<T>;
+    withFields(fields: object): TEntry<T>;
     toJSON(): T;
 }
 export { TEntry };

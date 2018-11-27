@@ -76,7 +76,7 @@ class Provider {
      */
     async log(level, teamId, msg) {
         if (!this.ctrl) {
-            throw new Error("No controller register");
+            throw new Error("No controller for logging");
         }
         const baseEntity = this.buildBaseEntity(level, teamId, msg);
         const extended = this.metaEntity.toJSON();

@@ -5,7 +5,7 @@ interface Reporter {
 }
 
 interface Querier {
-    query<T>(opts: QueryOptions): Promise<OutPut<T>>;
+    query<T>(opts: QueryOptions): Promise<Partial<T>[]>;
 }
 
 interface QueryOptions {

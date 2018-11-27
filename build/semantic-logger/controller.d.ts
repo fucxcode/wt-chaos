@@ -1,7 +1,7 @@
 import { BaseEntity, Source } from "./entity";
 import { Level } from "./level";
 import { Provider } from "./provider";
-import { Reporter, QueryOptions } from "./reporter";
+import { Reporter, QueryOptions, Querier } from "./reporter";
 import { Entity } from "../repository/entities";
 export declare type OutPut<T> = Source & BaseEntity<T> & Entity;
 /**
@@ -59,6 +59,7 @@ declare class ProviderController implements Controller {
     readonly level: Level;
     reporters: Reporter[];
     providers: Map<string, Provider<any>>;
+    querier: Querier | null;
     constructor(name: string, level: Level, reporters?: Reporter[]);
     /**
      * Gets logger
@@ -123,7 +124,6 @@ declare class ProviderController implements Controller {
      */
     isLevelEnable(level: Level): boolean;
     /**
-     * TODO: support query options
      * Query log from driver
      * @param opts
      * @returns query

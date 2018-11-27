@@ -1,10 +1,14 @@
 import { BaseEntity, Source } from "./entity";
 import { Level } from "./level";
 import { Provider } from "./provider";
-import { Reporter, ConsoleReport, QueryOptions } from "./reporter";
+import { Reporter, ConsoleReport, QueryOptions, Querier } from "./reporter";
 import { Entity } from "../repository/entities";
 
 export type OutPut<T> = Source & BaseEntity<T> & Entity;
+
+function isQuerier(query: any): query is Querier {
+    return typeof query.query === "function";
+}
 
 /**
  * Controller
@@ -75,9 +79,10 @@ class ProviderController implements Controller {
 
     public readonly name: string;
     public readonly level: Level;
-
     public reporters: Reporter[];
     public providers: Map<string, Provider<any>> = new Map<string, Provider<any>>();
+
+    public querier: Querier | null = null;
 
     constructor(name: string, level: Level, reporters?: Reporter[]) {
         this.name = name;
@@ -85,7 +90,13 @@ class ProviderController implements Controller {
 
         this.reporters = reporters || [];
         if (this.reporters.length === 0) {
-            this.reporters.push(new ConsoleReport({}));
+            this.reporters.push(new ConsoleReport());
+        }
+
+        for (const reporter in this.reporters) {
+            if (isQuerier(reporter)) {
+                this.querier = reporter;
+            }
         }
     }
 
@@ -210,13 +221,22 @@ class ProviderController implements Controller {
     }
 
     /**
-     * TODO: support query options
      * Query log from driver
      * @param opts
      * @returns query
      */
     public query(opts: QueryOptions): Promise<any> {
-        return Promise.resolve(opts);
+        if (!this.querier) {
+            throw new Error("Can not query any log");
+        }
+
+        const condition: QueryOptions = {
+            skip: opts.skip || 10,
+            limit: opts.limit || 20,
+            fields: opts.fields
+        };
+
+        return this.querier.query(condition);
     }
 }
 

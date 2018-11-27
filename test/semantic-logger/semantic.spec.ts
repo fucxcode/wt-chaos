@@ -13,7 +13,7 @@ describe("Provider test suits", () => {
     it("1. provider properties", () => {
         assert.ok(testProvider.channel === "test", "provider channel error");
         assert.ok(testProvider.enabled === true, "provider enabled error");
-        assert.ok(testProvider.ctrl instanceof ProviderController, "registed to controller error");
+        assert.ok(testProvider.ctrl instanceof ProviderController, "registered to controller error");
 
         assert.doesNotThrow(() => {
             testProvider.channel === "anthor";
@@ -41,7 +41,7 @@ describe("Provider test suits", () => {
     });
 
     it("3. log function report interface", () => {
-        testProvider.log(Level.warn, "xxxxx", "hello");
+        testProvider.log(Level.warn, "xxxxx", { hello: "world" });
         assert.ok(testReporter.storage.length === 1, "the message can not be reported");
     });
 
@@ -55,7 +55,7 @@ describe("Provider test suits", () => {
         assert.deepEqual(controller.getLogger("test"), testProvider, "can not add provider to controller");
     });
 
-    it("6: constroller#hasProvider", () => {
+    it("6: controller#hasProvider", () => {
         assert.ok(controller.hasProvider("test") === true, "controller does not has provider");
     });
 

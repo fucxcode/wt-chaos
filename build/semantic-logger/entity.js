@@ -10,7 +10,7 @@ function defineProps(obj, key, value) {
 }
 class TEntry {
     constructor(data) {
-        this._data = data || Object.create(null);
+        this._data = data || {};
     }
     withField(key, value) {
         const obj = Object.create(null);

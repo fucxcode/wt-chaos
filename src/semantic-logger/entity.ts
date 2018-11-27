@@ -1,5 +1,6 @@
 import { UID, Timestamp } from "../constants";
 import { Level } from "./level";
+import Reflect from "reflect-metadata";
 
 type Operator = { id: UID };
 type Pid = number;
@@ -44,20 +45,22 @@ interface ToJSON<T> {
     toJSON(): T;
 }
 
-class TEntry<T> implements ToJSON<T> {
-    private _data: T | null;
+type ValueOf<T> = T[keyof T];
+
+class TEntry<T extends object> implements ToJSON<T> {
+    private _data: T;
 
     constructor(data?: T) {
-        this._data = data || <T>Object.create(null);
+        this._data = data || <T>{};
     }
 
-    public withField(key: keyof T, value: any): TEntry<T> {
+    public withField(key: keyof T, value: ValueOf<T>): TEntry<T> {
         const obj = Object.create(null);
         defineProps(obj, key, value);
         return this.withFields(obj);
     }
 
-    public withFields(fields: {}): TEntry<T> {
+    public withFields(fields: object): TEntry<T> {
         const data = Object.assign({}, this._data, fields);
         return new TEntry<T>(data);
     }

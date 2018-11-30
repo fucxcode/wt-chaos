@@ -1,13 +1,14 @@
 {
   "name": "wt-chaos",
-  "version": "1.0.4-201811271655",
+  "version": "1.0.4-201811301407",
   "description": "",
   "main": "build/index.js",
   "scripts": {
     "clean": "rm -rf ./build",
     "build": "tsc",
     "rebuild": "node ./tools/ver.js --upgrade --save && npm run-script clean && npm run-script build",
-    "test": "npm run-script rebuild && node --require ts-node/register/transpile-only test/bootstrap.ts",
+    "test-only": "node --require ts-node/register/transpile-only test/bootstrap.ts",
+    "test": "npm run-script rebuild && npm run-script test-only",
     "cti": "cti ./src",
     "ver": "node ./tools/ver.js"
   },
@@ -28,16 +29,15 @@
     "@types/chai": "^4.1.7",
     "@types/express": "^4.16.0",
     "@types/ioredis": "^4.0.4",
-    "@types/koa": "^2.0.46",
-    "@types/koa-bodyparser": "^5.0.1",
+    "@types/koa": "^2.0.47",
+    "@types/koa-bodyparser": "^5.0.2",
     "@types/koa-router": "^7.0.35",
     "@types/lodash": "^4.14.118",
     "@types/minimist": "^1.2.0",
     "@types/mocha": "^5.2.5",
     "@types/moment": "^2.13.0",
     "@types/moment-timezone": "^0.5.9",
-    "@types/mongodb": "^3.1.14",
-    "@types/mongoose": "^5.3.1",
+    "@types/mongodb": "^3.1.15",
     "@types/mustache": "^0.8.32",
     "@types/node-uuid": "0.0.28",
     "@types/nodemailer": "^4.6.5",
@@ -56,7 +56,7 @@
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
     "typemoq": "^2.1.0",
-    "typescript": "^3.1.6"
+    "typescript": "^3.2.1"
   },
   "dependencies": {
     "body-parser": "^1.18.3",

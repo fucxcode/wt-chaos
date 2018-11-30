@@ -7,6 +7,20 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Test",
+            "runtimeArgs": [
+                "-r",
+                "ts-node/register/transpile-only"
+            ],
+            "args": [
+                "${workspaceFolder}/test/bootstrap.ts",
+                "--s",
+                "repository-apply-default-values"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Start Sample",
             "runtimeArgs": [
                 "-r",

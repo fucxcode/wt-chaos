@@ -204,7 +204,7 @@ class MongoDBDriver implements Driver<MongoDBSession, MongoDBId> {
             if (auto) {
                 session.startTransaction();
             }
-            const result: TResult = await action.call(thisArg, session);
+            const result: TResult | undefined = await action.call(thisArg, session);
             if (auto && session.inTransaction()) {
                 await session.commitTransaction();
             }

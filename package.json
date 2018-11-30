@@ -10,7 +10,7 @@
     "test-only": "node --require ts-node/register/transpile-only test/bootstrap.ts",
     "test": "npm run-script rebuild && npm run-script test-only",
     "cti": "cti ./src",
-    "pub": "node ./tools/ver.js --upgrade patch --save && npm run-script rebuild && cd ./build && npm publish"
+    "pub": "node ./tools/ver.js --upgrade patch --save && npm run-script test && cd ./build && npm publish"
   },
   "repository": {
     "type": "git",

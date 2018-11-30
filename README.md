@@ -1,12 +1,15 @@
-# wt-chaos
-
+# rebuild & test
 ```
-npm run-script clean
-npm run-script build
-npm run-script rebuild
-
-npm test
-npm test -- [-s SPEC_NAME] [-s SPEC_NAME] ...
+npm run-script test
 ```
 
-run `npm run-script rebuild` before push a new version
+# test without build
+```
+npm run-script test-only
+```
+
+# publish
+```
+npm run-script pub
+```
+This will update the patch version, rebuild, test and then publish to npm. Do NOT forget to run `git push` to save the latest version information to github.

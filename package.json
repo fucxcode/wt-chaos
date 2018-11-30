@@ -1,12 +1,12 @@
 {
   "name": "@worktile/wt-chaos",
-  "version": "1.1.2",
+  "version": "1.1.0",
   "description": "Infrastructure for Worktile",
   "main": "index.js",
   "scripts": {
     "clean": "rm -rf ./build",
     "build": "tsc && cp ./package.json ./build/ && cp ./LICENSE ./build/ && cp ./README.md ./build/",
-    "rebuild": "node ./tools/ver.js --upgrade --save && npm run-script clean && npm run-script build",
+    "rebuild": "npm run-script clean && npm run-script build",
     "test-only": "node --require ts-node/register/transpile-only test/bootstrap.ts",
     "test": "npm run-script rebuild && npm run-script test-only",
     "cti": "cti ./src",

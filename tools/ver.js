@@ -38,7 +38,7 @@ if (argv.upgrade) {
             break;
     }
 
-    const ver_string = `${version.major}.${version.minor}.${version.patch}-${version.build}`;
+    const ver_string = `${version.major}.${version.minor}.${version.patch}`;
     console.log(`Next version is ${ver_string}`);
 
     if (argv.save) {

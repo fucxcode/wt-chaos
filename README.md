@@ -12,4 +12,9 @@ npm run-script test-only
 ```
 npm run-script pub
 ```
-This will update the patch version, rebuild, test and then publish to npm. Do NOT forget to run `git push` to save the latest version information to github.
+This will the following commands:
+- update patch version
+- rebuild
+- test
+- commit and push the version changes in `package.json`
+- publish to `npm`

@@ -1,7 +1,7 @@
 {
-  "name": "wt-chaos",
-  "version": "1.0.4-201811301407",
-  "description": "",
+  "name": "@worktile/wt-chaos",
+  "version": "1.1.0-201811301457",
+  "description": "Infrastructure for Worktile",
   "main": "build/index.js",
   "scripts": {
     "clean": "rm -rf ./build",
@@ -18,7 +18,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "SEE LICENSE IN ./LICENSE",
   "bugs": {
     "url": "https://github.com/atinc/wt-chaos/issues"
   },

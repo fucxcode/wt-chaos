@@ -1,1 +1,0 @@
-{"version":3,"file":"wt-internal-error.js","sourceRoot":"","sources":["../../src/errors/wt-internal-error.ts"],"names":[],"mappings":";;AAAA,yCAAqC;AACrC,iCAAgC;AAEhC,MAAa,eAAgB,SAAQ,kBAAO;IACxC,YAAY,OAAe,EAAE,WAAiB,EAAE,WAAiB;QAC7D,KAAK,CAAC,aAAM,CAAC,aAAa,EAAE,OAAO,EAAE,WAAW,EAAE,WAAW,CAAC,CAAC;IACnE,CAAC;CACJ;AAJD,0CAIC"}

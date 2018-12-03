@@ -1,4 +1,3 @@
-import { SavePluginContext } from "./contexts/plugin-context-save";
 import { Entity } from "../entities";
 import { CountPluginContext } from "./contexts/plugin-context-count";
 import { FindOneByIdPluginContext } from "./contexts/plugin-context-find-one-by-id";
@@ -15,7 +14,9 @@ import { FindOneAndUpdateByEntityPluginContext } from "./contexts/plugin-context
 import { AggregatePluginContext } from "./contexts/plugin-context-aggregate";
 import { MapReducePluginContext } from "./contexts/plugin-context-map-reduce";
 import { UpdateByIdPluginContext } from "./contexts/plugin-context-update-by-id";
+import { InsertOnePluginContext } from "./contexts/plugin-context-insert-one";
 import { Session } from "../drivers";
+import { InsertManyPluginContext } from "./contexts/plugin-context-insert-many";
 
 abstract class Plugin {
 
@@ -28,11 +29,19 @@ abstract class Plugin {
         this._name = name;
     }
 
-    public async beforeSave<T extends Entity, TSession extends Session>(context: SavePluginContext<T, TSession>): Promise<void> {
+    public async beforeInsertOne<T extends Entity, TSession extends Session>(context: InsertOnePluginContext<T, TSession>): Promise<void> {
 
     }
 
-    public async afterSave<T extends Entity, TSession extends Session>(context: SavePluginContext<T, TSession>): Promise<void> {
+    public async afterInsertOne<T extends Entity, TSession extends Session>(context: InsertOnePluginContext<T, TSession>): Promise<void> {
+
+    }
+
+    public async beforeInsertMany<T extends Entity, TSession extends Session>(context: InsertManyPluginContext<T, TSession>): Promise<void> {
+
+    }
+
+    public async afterInsertMany<T extends Entity, TSession extends Session>(context: InsertManyPluginContext<T, TSession>): Promise<void> {
 
     }
 

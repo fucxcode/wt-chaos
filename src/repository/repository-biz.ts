@@ -1,7 +1,7 @@
 import { Session, Driver, FindOptions, UpdateOptions, UpdateResult, FindOneAndUpdateOptions } from "./drivers";
 import { Repository } from "./repository";
 import { BusinessEntity, Id } from "./entities";
-import { Plugin, SavePluginContext, CountPluginContext, ErasePluginContext } from "./plugins";
+import { Plugin, CountPluginContext, ErasePluginContext, InsertOnePluginContext, InsertManyPluginContext } from "./plugins";
 import * as _ from "../utilities";
 import { WTError, WTCode } from "../errors";
 import moment from "moment";
@@ -11,42 +11,50 @@ import { IncludesOptions } from "./drivers/includes-options";
 
 abstract class BusinessRepository<TSession extends Session, TID extends Id, TDriver extends Driver<TSession, TID>, TEntity extends BusinessEntity> extends Repository<TSession, TID, TDriver, TEntity> {
 
-    constructor(collectionName: string, driverProvider?: () => TDriver, plugins?: Plugin[]) {
-        super(collectionName, driverProvider, plugins);
+    constructor(EntityType: Function, collectionName?: string, driverProvider?: () => TDriver, plugins?: Plugin[]) {
+        super(EntityType, collectionName, driverProvider, plugins);
     }
 
-    protected async onSave(context: SavePluginContext<TEntity, TSession>): Promise<void> {
+    protected async onInsertOne(context: InsertOnePluginContext<TEntity, TSession>): Promise<void> {
         if (!context.operationDescription.team) {
             throw new WTError(WTCode.invalidInput, "cannot invoke onSave when operationDescription.team is nil", undefined, context.operationDescription);
         }
         if (!context.operationDescription.uid) {
             throw new WTError(WTCode.invalidInput, "cannot invoke onSave when operationDescription.uid is nil", undefined, context.operationDescription);
         }
-
         const team = context.operationDescription.team;
         const uid = context.operationDescription.uid;
         const now = moment().unix();
-        if (_.isArray(context.entityOrArray)) {
-            for (const entity of context.entityOrArray) {
-                entity.team = team;
-                entity.created_at = now;
-                entity.created_by = uid;
-                entity.updated_at = now;
-                entity.updated_by = uid;
-                entity.is_deleted = Is.no;
-                entity.is_archived = Is.no;
-            }
+        context.entity.team = team;
+        context.entity.created_at = now;
+        context.entity.created_by = uid;
+        context.entity.updated_at = now;
+        context.entity.updated_by = uid;
+        context.entity.is_deleted = Is.no;
+        context.entity.is_archived = Is.no;
+        await super.onInsertOne(context);
+    }
+
+    protected async onInsertMany(context: InsertManyPluginContext<TEntity, TSession>): Promise<void> {
+        if (!context.operationDescription.team) {
+            throw new WTError(WTCode.invalidInput, "cannot invoke onSave when operationDescription.team is nil", undefined, context.operationDescription);
         }
-        else {
-            context.entityOrArray.team = team;
-            context.entityOrArray.created_at = now;
-            context.entityOrArray.created_by = uid;
-            context.entityOrArray.updated_at = now;
-            context.entityOrArray.updated_by = uid;
-            context.entityOrArray.is_deleted = Is.no;
-            context.entityOrArray.is_archived = Is.no;
+        if (!context.operationDescription.uid) {
+            throw new WTError(WTCode.invalidInput, "cannot invoke onSave when operationDescription.uid is nil", undefined, context.operationDescription);
         }
-        await super.onSave(context);
+        const team = context.operationDescription.team;
+        const uid = context.operationDescription.uid;
+        const now = moment().unix();
+        for (const entity of context.entities) {
+            entity.team = team;
+            entity.created_at = now;
+            entity.created_by = uid;
+            entity.updated_at = now;
+            entity.updated_by = uid;
+            entity.is_deleted = Is.no;
+            entity.is_archived = Is.no;
+        }
+        await super.onInsertMany(context);
     }
 
     private combineCondition(condition: any, team: Id, options?: IncludesOptions): any {

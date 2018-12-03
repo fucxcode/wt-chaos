@@ -4,15 +4,15 @@ import { OperationDescription } from "../../operation-desc";
 import { Repository } from "../../repository";
 import { InsertManyOptions, InsertOneOptions, Session } from "../../drivers";
 
-class SavePluginContext<T extends Entity, TSession extends Session> extends PluginContext<Partial<T> | Partial<T>[] | undefined> {
+class InsertOnePluginContext<T extends Entity, TSession extends Session> extends PluginContext<Partial<T>| undefined> {
 
     constructor(operationDescription: OperationDescription, driverName: string, collectionName: string,
-        public entityOrArray: T | T[],
-        public options?: InsertOneOptions<TSession> | InsertManyOptions<TSession>
+        public entity: T,
+        public options?: InsertOneOptions<TSession>
     ) {
-        super(operationDescription, driverName, collectionName, "save", undefined);
+        super(operationDescription, driverName, collectionName, "insertOne", undefined);
     }
 
 }
 
-export { SavePluginContext };
+export { InsertOnePluginContext };

@@ -8,14 +8,15 @@ import * as uuid from "node-uuid";
 
 describe("read write strategy", () => {
 
-    interface TestEntity extends Entity {
+    class TestEntity implements Entity {
+        _id: MongoDBId;
         name?: string;
     }
 
     class TestRepository extends Repository<MongoDBSession, MongoDBId, MongoDBDriver, TestEntity> {
 
         constructor(driverProvider: () => MongoDBDriver, plugins: Plugin[] = []) {
-            super("__test_collection__", driverProvider, plugins);
+            super(TestEntity, "__test_collection__", driverProvider, plugins);
         }
 
     }

@@ -5,7 +5,6 @@ import * as _ from "../utilities";
 import { DEFAULT_PAGE_SIZE, DEFAULT_PAGE_SIZE_LIMIT } from "../constants";
 import { WTError, WTCode } from "../errors";
 import { Plugin } from "./plugins/plugin";
-import { SavePluginContext } from "./plugins/contexts/plugin-context-save";
 import { PluginContext } from "./plugins/contexts/plugin-context";
 import { CountPluginContext } from "./plugins/contexts/plugin-context-count";
 import { FindOnePluginContext } from "./plugins/contexts/plugin-context-find-one";
@@ -25,6 +24,9 @@ import { MapReducePluginContext } from "./plugins/contexts/plugin-context-map-re
 import { FindByPageIndexResult } from "./find-by-page-index-result";
 import { FindByPageNextResult } from "./find-by-page-next-result";
 import { DriverExtensions } from "./drivers/driver-extensions";
+import { getCollectionName } from "./decorators";
+import { InsertOnePluginContext } from "./plugins/contexts/plugin-context-insert-one";
+import { InsertManyPluginContext } from "./plugins/contexts/plugin-context-insert-many";
 
 abstract class Repository<TSession extends Session, TID extends Id, TDriver extends Driver<TSession, TID>, TEntity extends Entity> {
 
@@ -38,13 +40,16 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
         return this._plugins;
     }
 
+    private _entityType: Function;
+
     private _collectionName: string;
     public get collectionName(): string {
         return this._collectionName;
     }
 
-    constructor(collectionName: string, driverProvider: () => TDriver = DriverExtensions.getDefault, plugins: Plugin[] = []) {
-        this._collectionName = collectionName;
+    constructor(EntityType: Function, collectionName?: string, driverProvider: () => TDriver = DriverExtensions.getDefault, plugins: Plugin[] = []) {
+        this._entityType = EntityType;
+        this._collectionName = collectionName || getCollectionName(EntityType);
         this._driverProvider = driverProvider;
         this._plugins = plugins;
     }
@@ -63,21 +68,35 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
         }
     }
 
-    protected async onSave(context: SavePluginContext<TEntity, TSession>): Promise<void> {
-        context.result = _.isArray(context.entityOrArray) ?
-            await this.driver.insertMany(this._collectionName, context.entityOrArray, context.options) :
-            await this.driver.insertOne(this._collectionName, context.entityOrArray, context.options);
+    protected async onInsertOne(context: InsertOnePluginContext<TEntity, TSession>): Promise<void> {
+        context.result = await this.driver.insertOne(this._collectionName, context.entity, context.options);
     }
 
-    public async save(operationDescription: OperationDescription, entityOrArray: TEntity | TEntity[], options?: InsertOneOptions<TSession> | InsertManyOptions<TSession>): Promise<Partial<TEntity> | Partial<TEntity>[] | undefined> {
-        const context = new SavePluginContext<TEntity, TSession>(operationDescription, this._driverProvider.name, this._collectionName, entityOrArray, options);
-        await this.processPluginBeforeActions<Partial<TEntity> | Partial<TEntity>[] | undefined, SavePluginContext<TEntity, TSession>>(context, (p, c) => p.beforeSave(c));
+    public async insertOne(operationDescription: OperationDescription, entity: TEntity, options?: InsertOneOptions<TSession>): Promise<Partial<TEntity>| undefined> {
+        const context = new InsertOnePluginContext<TEntity, TSession>(operationDescription, this._driverProvider.name, this._collectionName, entity, options);
+        await this.processPluginBeforeActions<Partial<TEntity> | undefined, InsertOnePluginContext<TEntity, TSession>>(context, (p, c) => p.beforeInsertOne(c));
 
         if (!context.cancel) {
-            await this.onSave(context);
+            await this.onInsertOne(context);
         }
 
-        await this.processPluginAfterActions<Partial<TEntity> | Partial<TEntity>[] | undefined, SavePluginContext<TEntity, TSession>>(context, (p, c) => p.afterSave(c));
+        await this.processPluginAfterActions<Partial<TEntity> | undefined, InsertOnePluginContext<TEntity, TSession>>(context, (p, c) => p.afterInsertOne(c));
+        return context.result;
+    }
+
+    protected async onInsertMany(context: InsertManyPluginContext<TEntity, TSession>): Promise<void> {
+        context.result = await this.driver.insertMany(this._collectionName, context.entities, context.options);
+    }
+
+    public async insertMany(operationDescription: OperationDescription, entities: TEntity[], options?: InsertOneOptions<TSession>): Promise<Partial<TEntity>[] | undefined> {
+        const context = new InsertManyPluginContext<TEntity, TSession>(operationDescription, this._driverProvider.name, this._collectionName, entities, options);
+        await this.processPluginBeforeActions<Partial<TEntity>[] | undefined, InsertManyPluginContext<TEntity, TSession>>(context, (p, c) => p.beforeInsertMany(c));
+
+        if (!context.cancel) {
+            await this.onInsertMany(context);
+        }
+
+        await this.processPluginAfterActions<Partial<TEntity>[] | undefined, InsertManyPluginContext<TEntity, TSession>>(context, (p, c) => p.afterInsertMany(c));
         return context.result;
     }
 

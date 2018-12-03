@@ -211,7 +211,9 @@ class InMemoryDbDriver implements Driver<InMemoryDbSession, InMemoryDbId> {
 
 }
 
-interface ProductEntity extends Entity {
+class ProductEntity implements Entity {
+
+    _id?: InMemoryDbId;
 
     name?: string;
 
@@ -226,7 +228,7 @@ class ProductRepository extends Repository<InMemoryDbSession, InMemoryDbId, InMe
     }
 
     constructor(driverProvider: () => InMemoryDbDriver) {
-        super("products", driverProvider);
+        super(ProductEntity, "products", driverProvider);
     }
 
 }
@@ -256,7 +258,7 @@ describe("repository: in-mem-db", () => {
         };
         const od = new OperationDescription(uuid.v4(), team, uid);
 
-        const result = await repository.save(od, product) as ProductEntity;
+        const result = await repository.insertOne(od, product) as ProductEntity;
 
         assert.ok(result);
         assert.ok(result._id);
@@ -281,7 +283,7 @@ describe("repository: in-mem-db", () => {
         }
         const od = new OperationDescription(uuid.v4(), team, uid);
 
-        const result = await repository.save(od, products) as ProductEntity[];
+        const result = await repository.insertMany(od, products) as ProductEntity[];
 
         assert.ok(result);
         assert.strictEqual(result.length, products.length);
@@ -308,7 +310,7 @@ describe("repository: in-mem-db", () => {
                 name: uuid.v4(),
                 price: _.random(0, 1, true) > 0.5 ? price_sp : _.random(0, 999)
             };
-            await repository.save(od, product);
+            await repository.insertOne(od, product);
         }
 
         const count = await repository.count(od);
@@ -332,7 +334,7 @@ describe("repository: in-mem-db", () => {
             else {
                 product.price = _.random(0, 999);
             }
-            await repository.save(od, product);
+            await repository.insertOne(od, product);
         }
 
         const count = await repository.count(od, {
@@ -351,7 +353,7 @@ describe("repository: in-mem-db", () => {
             };
             products.push(product);
         }
-        await repository.save(od, products);
+        await repository.insertMany(od, products);
 
         const expect_entity = _.sample(products);
         const actual_entity = await repository.findOne(od, {
@@ -373,7 +375,7 @@ describe("repository: in-mem-db", () => {
             };
             products.push(product);
         }
-        await repository.save(od, products);
+        await repository.insertMany(od, products);
 
         const expect_entity = _.sample(products);
         const actual_entity = await repository.findOneById(od, expect_entity._id);
@@ -393,7 +395,7 @@ describe("repository: in-mem-db", () => {
             };
             products.push(product);
         }
-        await repository.save(od, products);
+        await repository.insertMany(od, products);
 
         const expect_entities = _.sampleSize(products, 10);
         const actual_entities = await repository.findByIds(od, _.map(expect_entities, x => x._id));
@@ -425,7 +427,7 @@ describe("repository: in-mem-db", () => {
             }
             products.push(product);
         }
-        await repository.save(od, products);
+        await repository.insertMany(od, products);
 
         const new_name = uuid.v4();
         await repository.update(od, undefined, {
@@ -457,7 +459,7 @@ describe("repository: in-mem-db", () => {
             }
             products.push(product);
         }
-        await repository.save(od, products);
+        await repository.insertMany(od, products);
 
         const new_name = uuid.v4();
         await repository.update(od, undefined, {
@@ -487,7 +489,7 @@ describe("repository: in-mem-db", () => {
             }
             products.push(product);
         }
-        await repository.save(od, products);
+        await repository.insertMany(od, products);
 
         const new_name = uuid.v4();
         await repository.update(od,
@@ -526,7 +528,7 @@ describe("repository: in-mem-db", () => {
             }
             products.push(product);
         }
-        await repository.save(od, products);
+        await repository.insertMany(od, products);
 
         const new_name = uuid.v4();
         await repository.update(od,

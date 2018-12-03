@@ -20,7 +20,7 @@ const defaultValue = function <T>(value: () => T, arrayGenericType?: Function) {
     };
 };
 
-const applyDefaultValues = function <T extends Object>(type: Function, object: T): T {
+const applyEntityDefaultValues = function <T extends Object>(type: Function, object: T): T {
     const defaults: Map<string, DefaultValueEntry> = Reflect.getMetadata("wt-entity-defaults", type);
     if (defaults) {
         for (const [key, entry] of defaults.entries()) {
@@ -30,10 +30,10 @@ const applyDefaultValues = function <T extends Object>(type: Function, object: T
             if (_.isUndefined(_.get(object, key)) && !_.isUndefined(entry.value)) {
                 if (_.isArray(entry.value)) {
                     // "_.isArray" MUST be checked before "_.isObject" since an array always be an object
-                    _.set(object, key, _.map(entry.value, x => applyDefaultValues(entry.type, x)));
+                    _.set(object, key, _.map(entry.value, x => applyEntityDefaultValues(entry.type, x)));
                 }
                 else if (_.isObject(entry.value)) {
-                    _.set(object, key, applyDefaultValues(entry.type, entry.value));
+                    _.set(object, key, applyEntityDefaultValues(entry.type, entry.value));
                 }
                 else {
                     _.set(object, key, entry.value);
@@ -44,4 +44,4 @@ const applyDefaultValues = function <T extends Object>(type: Function, object: T
     return object;
 };
 
-export { defaultValue, applyDefaultValues };
+export { defaultValue, applyEntityDefaultValues as applyDefaultValues };

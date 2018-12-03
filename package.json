@@ -1,6 +1,6 @@
 {
   "name": "@worktile/wt-chaos",
-  "version": "1.1.8",
+  "version": "2.0.0",
   "description": "Infrastructure for Worktile",
   "main": "index.js",
   "scripts": {
@@ -10,14 +10,16 @@
     "test-only": "node --require ts-node/register/transpile-only test/bootstrap.ts",
     "test": "npm run-script rebuild && npm run-script test-only",
     "cti": "cti ./src",
-    "pub": "node ./tools/ver.js --upgrade patch --save && npm run-script test && git add . && git commit -m \"pub\" && git push && cd ./build && npm publish"
+    "pub-major": "node ./tools/ver.js --upgrade major --save && npm run-script test && git add . && git commit -m \"pub\" && git push && cd ./build && npm publish",
+    "pub-minor": "node ./tools/ver.js --upgrade minor --save && npm run-script test && git add . && git commit -m \"pub\" && git push && cd ./build && npm publish",
+    "pub-patch": "node ./tools/ver.js --upgrade patch --save && npm run-script test && git add . && git commit -m \"pub\" && git push && cd ./build && npm publish"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/atinc/wt-chaos.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Worktile Inc. <worktile.com>",
   "license": "SEE LICENSE IN ./LICENSE",
   "bugs": {
     "url": "https://github.com/atinc/wt-chaos/issues"

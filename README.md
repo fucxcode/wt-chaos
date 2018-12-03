@@ -1,3 +1,8 @@
+# versioning and backward capability principle
+- major version: breaking changes without backward capability
+- minor version: new interface added and/or existing interface modification but keep existing ones backward capability
+- patch version: implementation modification with no interface change
+
 # rebuild & test
 ```
 npm run-script test

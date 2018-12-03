@@ -4,6 +4,7 @@ import * as fs from "fs";
 import * as mustache from "mustache";
 import { WTInvalidInputError } from "../../errors";
 import Mail = require("nodemailer/lib/mailer");
+import * as util from "util";
 
 const SPAM_LIST = [
     "奔跑吧",
@@ -76,14 +77,15 @@ export class TPLResolver implements IOptionsResolver {
     }
 
     private async resolveLayout(layout: string): Promise<string | undefined> {
-        const content = fs.readFileSync(path.resolve(<string>this.config.layout, layout), "utf-8");
+        const readFileAsync = util.promisify(fs.readFile).bind(fs);
+        const content = await readFileAsync(path.resolve(<string>this.config.layout, layout), "utf-8");
         return content;
     }
 
     private async resolveTemplate(template: string): Promise<string> {
         let content: string;
-        content = fs.readFileSync(path.resolve(<string>this.config.template, template), "utf-8");
-
+        const readFileAsync = util.promisify(fs.readFile).bind(fs);
+        content = await readFileAsync(path.resolve(<string>this.config.template, template), "utf-8");
         return content;
     }
 

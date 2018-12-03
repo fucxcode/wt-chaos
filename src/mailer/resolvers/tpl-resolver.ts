@@ -78,14 +78,14 @@ export class TPLResolver implements IOptionsResolver {
 
     private async resolveLayout(layout: string): Promise<string | undefined> {
         const readFileAsync = util.promisify(fs.readFile).bind(fs);
-        const content = await readFileAsync(path.resolve(<string>this.config.layout, layout), "utf-8");
+        const content = (await readFileAsync(path.resolve(<string>this.config.layout, layout), "utf-8")).toString();
         return content;
     }
 
     private async resolveTemplate(template: string): Promise<string> {
         let content: string;
         const readFileAsync = util.promisify(fs.readFile).bind(fs);
-        content = await readFileAsync(path.resolve(<string>this.config.template, template), "utf-8");
+        content = (await readFileAsync(path.resolve(<string>this.config.template, template), "utf-8")).toString();
         return content;
     }
 

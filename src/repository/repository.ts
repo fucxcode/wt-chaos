@@ -24,7 +24,7 @@ import { MapReducePluginContext } from "./plugins/contexts/plugin-context-map-re
 import { FindByPageIndexResult } from "./find-by-page-index-result";
 import { FindByPageNextResult } from "./find-by-page-next-result";
 import { DriverExtensions } from "./drivers/driver-extensions";
-import { getCollectionName } from "./decorators";
+import { getCollectionName, applyDefaultValues } from "./decorators";
 import { InsertOnePluginContext } from "./plugins/contexts/plugin-context-insert-one";
 import { InsertManyPluginContext } from "./plugins/contexts/plugin-context-insert-many";
 
@@ -72,8 +72,13 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
         context.result = await this.driver.insertOne(this._collectionName, context.entity, context.options);
     }
 
-    public async insertOne(operationDescription: OperationDescription, entity: TEntity, options?: InsertOneOptions<TSession>): Promise<Partial<TEntity>| undefined> {
-        const context = new InsertOnePluginContext<TEntity, TSession>(operationDescription, this._driverProvider.name, this._collectionName, entity, options);
+    public async insertOne(operationDescription: OperationDescription, entity: TEntity, options?: InsertOneOptions<TSession>): Promise<Partial<TEntity> | undefined> {
+        const context = new InsertOnePluginContext<TEntity, TSession>(
+            operationDescription,
+            this._driverProvider.name,
+            this._collectionName,
+            applyDefaultValues(this._entityType, entity, operationDescription, (id?: Id) => this._driverProvider().parseId(id, true)),
+            options);
         await this.processPluginBeforeActions<Partial<TEntity> | undefined, InsertOnePluginContext<TEntity, TSession>>(context, (p, c) => p.beforeInsertOne(c));
 
         if (!context.cancel) {
@@ -89,7 +94,12 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
     }
 
     public async insertMany(operationDescription: OperationDescription, entities: TEntity[], options?: InsertOneOptions<TSession>): Promise<Partial<TEntity>[] | undefined> {
-        const context = new InsertManyPluginContext<TEntity, TSession>(operationDescription, this._driverProvider.name, this._collectionName, entities, options);
+        const context = new InsertManyPluginContext<TEntity, TSession>(
+            operationDescription,
+            this._driverProvider.name,
+            this._collectionName,
+            _.map(entities, x => applyDefaultValues(this._entityType, x, operationDescription, (id?: Id) => this._driverProvider().parseId(id, true))),
+            options);
         await this.processPluginBeforeActions<Partial<TEntity>[] | undefined, InsertManyPluginContext<TEntity, TSession>>(context, (p, c) => p.beforeInsertMany(c));
 
         if (!context.cancel) {

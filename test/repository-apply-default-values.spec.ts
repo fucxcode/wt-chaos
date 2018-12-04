@@ -1,6 +1,10 @@
-import { defaultValue, applyDefaultValues } from "../src/repository";
+import { defaultValue, applyDefaultValues, OperationDescription, MongoDBId, Id, MongoDBDriver } from "../src/repository";
 import * as _ from "../src/utilities";
 import { assert } from "chai";
+import * as uuid from "node-uuid";
+import { UID } from "../src/constants";
+import * as TypeMoq from "typemoq";
+import * as mongodb from "mongodb";
 
 describe("repository: apply default values", () => {
 
@@ -41,7 +45,7 @@ describe("repository: apply default values", () => {
             stringPropNoDef: def.stringPropNoDef,
             numberPropNoDef: def.numberPropNoDef,
             booleanPropNoDef: def.booleanPropNoDef
-        });
+        }, undefined, undefined);
 
         assert.strictEqual(actual.stringProp, expects.stringProp);
         assert.strictEqual(actual.numberProp, expects.numberProp);
@@ -77,7 +81,7 @@ describe("repository: apply default values", () => {
 
         const actual = applyDefaultValues<Entity>(Entity, {
             numberProp: null
-        });
+        }, undefined, undefined);
 
         assert.strictEqual(actual.stringProp, expects.stringProp);
         assert.isNull(actual.numberProp);
@@ -111,7 +115,7 @@ describe("repository: apply default values", () => {
         const assignedString = _.randomString();
         const actual = applyDefaultValues<Entity>(Entity, {
             stringProp: assignedString
-        });
+        }, undefined, undefined);
 
         assert.strictEqual(actual.stringProp, assignedString);
         assert.strictEqual(actual.numberProp, expects.numberProp);
@@ -142,7 +146,7 @@ describe("repository: apply default values", () => {
 
         }
 
-        const actual = applyDefaultValues<Entity>(Entity, {});
+        const actual = applyDefaultValues<Entity>(Entity, {}, undefined, undefined);
 
         assert.strictEqual(actual.stringProp, expects.stringProp);
         assert.isUndefined(actual.numberProp);
@@ -173,7 +177,7 @@ describe("repository: apply default values", () => {
 
         }
 
-        const actual = applyDefaultValues<Entity>(Entity, {});
+        const actual = applyDefaultValues<Entity>(Entity, {}, undefined, undefined);
 
         assert.strictEqual(actual.stringProp, expects.stringProp);
         assert.isNull(actual.numberProp);
@@ -204,7 +208,7 @@ describe("repository: apply default values", () => {
 
         }
 
-        const actual = applyDefaultValues<Entity>(Entity, {});
+        const actual = applyDefaultValues<Entity>(Entity, {}, undefined, undefined);
 
         assert.strictEqual(actual.stringProp, expects.stringProp);
         assert.strictEqual(actual.numberProp, expects.numberProp);
@@ -229,7 +233,7 @@ describe("repository: apply default values", () => {
 
         }
 
-        const actual = applyDefaultValues<Entity>(Entity, {});
+        const actual = applyDefaultValues<Entity>(Entity, {}, undefined, undefined);
 
         assert.deepStrictEqual(actual.stringArray, expects);
     });
@@ -258,7 +262,7 @@ describe("repository: apply default values", () => {
         ];
         const actual = applyDefaultValues<Entity>(Entity, {
             stringArray: arr
-        });
+        }, undefined, undefined);
 
         assert.deepStrictEqual(actual.stringArray, arr);
     });
@@ -275,7 +279,7 @@ describe("repository: apply default values", () => {
 
         }
 
-        const actual = applyDefaultValues<Entity>(Entity, {});
+        const actual = applyDefaultValues<Entity>(Entity, {}, undefined, undefined);
 
         assert.deepStrictEqual(actual.stringArray, expects);
     });
@@ -312,7 +316,7 @@ describe("repository: apply default values", () => {
 
         }
 
-        const actual = applyDefaultValues<Entity>(Entity, {});
+        const actual = applyDefaultValues<Entity>(Entity, {}, undefined, undefined);
 
         assert.ok(actual.obj1);
         assert.deepStrictEqual(actual.obj1, expects);
@@ -344,7 +348,7 @@ describe("repository: apply default values", () => {
 
         }
 
-        const actual = applyDefaultValues<Entity>(Entity, {});
+        const actual = applyDefaultValues<Entity>(Entity, {}, undefined, undefined);
 
         assert.ok(actual.obj1);
         assert.deepStrictEqual(actual.obj1.arr, expects);
@@ -383,10 +387,131 @@ describe("repository: apply default values", () => {
 
         }
 
-        const actual = applyDefaultValues<Entity>(Entity, {});
+        const actual = applyDefaultValues<Entity>(Entity, {}, undefined, undefined);
 
         assert.ok(actual.obj1);
         assert.deepStrictEqual(actual.obj1.arr, expects);
+    });
+
+    it(`use operation description`, async () => {
+
+        const operationDescription = new OperationDescription(uuid.v4(), new MongoDBId(), uuid.v4());
+
+        class Entity {
+
+            @defaultValue(o => o.team)
+            // @ts-ignore
+            team?: Id;
+
+            @defaultValue(o => o.uid)
+            // @ts-ignore
+            created_by?: UID;
+
+        }
+
+        const actual = applyDefaultValues<Entity>(Entity, {}, operationDescription, undefined);
+
+        assert.strictEqual(actual.team.toString(), operationDescription.team.toString());
+        assert.strictEqual(actual.created_by, operationDescription.uid);
+    });
+
+    it(`use id resolver`, async () => {
+
+        const dbMock = TypeMoq.Mock.ofType<mongodb.Db>();
+        const clientMock = TypeMoq.Mock.ofType<mongodb.MongoClient>();
+        clientMock.setup(x => x.db(TypeMoq.It.isAny())).returns(() => dbMock.object);
+        const driver = new MongoDBDriver(clientMock.object, "__test__");
+
+        class Entity {
+
+            @defaultValue((od, ir) => ir())
+            // @ts-ignore
+            _id?: Id;
+
+        }
+
+        const actual = applyDefaultValues<Entity>(Entity, {}, undefined, (id?: Id) => driver.parseId(id, true));
+
+        assert.ok(actual._id);
+        assert.isTrue(_.isObjectId(actual._id));
+    });
+
+    it(`use parent class default values`, async () => {
+
+        const expects = {
+            stringProp: _.randomString(),
+            numberProp: _.random(0, 9999),
+            booleanProp: _.sample([true, false])
+        };
+
+        class Parent {
+
+            @defaultValue(() => expects.stringProp)
+            // @ts-ignore
+            stringProp?: string;
+
+            @defaultValue(() => expects.numberProp)
+            // @ts-ignore
+            numberProp?: number;
+
+            @defaultValue(() => expects.booleanProp)
+            // @ts-ignore
+            booleanProp?: boolean;
+
+        }
+
+        class Child extends Parent {
+
+        }
+
+        const actual = applyDefaultValues<Child>(Child, {}, undefined, undefined);
+
+        assert.strictEqual(actual.stringProp, expects.stringProp);
+        assert.strictEqual(actual.numberProp, expects.numberProp);
+        assert.strictEqual(actual.booleanProp, expects.booleanProp);
+    });
+
+    it(`override parent class default values`, async () => {
+
+        const expects_parent = {
+            stringProp: _.randomString(),
+            numberProp: _.random(0, 9999),
+            booleanProp: _.sample([true, false])
+        };
+
+        class Parent {
+
+            @defaultValue(() => expects_parent.stringProp)
+            // @ts-ignore
+            stringProp?: string;
+
+            @defaultValue(() => expects_parent.numberProp)
+            // @ts-ignore
+            numberProp?: number;
+
+            @defaultValue(() => expects_parent.booleanProp)
+            // @ts-ignore
+            booleanProp?: boolean;
+
+        }
+
+        const expects_child = {
+            stringProp: _.randomString()
+        };
+
+        class Child extends Parent {
+
+            @defaultValue(() => expects_child.stringProp)
+            // @ts-ignore
+            stringProp?: string;
+
+        }
+
+        const actual = applyDefaultValues<Child>(Child, {}, undefined, undefined);
+
+        assert.strictEqual(actual.stringProp, expects_child.stringProp);
+        assert.strictEqual(actual.numberProp, expects_parent.numberProp);
+        assert.strictEqual(actual.booleanProp, expects_parent.booleanProp);
     });
 
 });

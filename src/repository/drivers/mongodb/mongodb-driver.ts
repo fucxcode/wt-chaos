@@ -1,39 +1,26 @@
-import { Driver } from "./driver";
-import { Entity, Id } from "../entities";
-import { InsertOneOptions } from "./insert-one-options";
-import { InsertManyOptions } from "./insert-many-options";
-import { CountOptions } from "./count-options";
-import { FindOptions } from "./find-options";
-import { UpdateOptions } from "./update-options";
-import { DeleteOptions } from "./delete-options";
-import { FindOneAndUpdateOptions } from "./find-one-update-options";
-import { UpdateResult } from "./update-result";
-import { DeleteResult } from "./delete-result";
-import { BulkOperation } from "./bulk-operation";
-import { AggregateOptions } from "./aggregate-options";
-import { MapReduceOptions } from "./map-reduce-options";
+import { Driver } from "../driver";
+import { Entity, Id } from "../../entities";
+import { InsertOneOptions } from "../insert-one-options";
+import { InsertManyOptions } from "../insert-many-options";
+import { CountOptions } from "../count-options";
+import { FindOptions } from "../find-options";
+import { UpdateOptions } from "../update-options";
+import { DeleteOptions } from "../delete-options";
+import { FindOneAndUpdateOptions } from "../find-one-update-options";
+import { UpdateResult } from "../update-result";
+import { DeleteResult } from "../delete-result";
+import { BulkOperation } from "../bulk-operation";
+import { AggregateOptions } from "../aggregate-options";
+import { MapReduceOptions } from "../map-reduce-options";
 import * as mongodb from "mongodb";
-import { ReadPreference, ReadWriteStrategy } from "./read-preference";
-import * as _ from "../../utilities";
-import { Is } from "../../constants";
-import { FSyncOptions } from "./fsync-options";
-import { BulkWriteResult } from "./bulk-write-result";
-import { FindOperators } from "./find-operators";
-import { Session } from "./session";
-import { MaxTimeMsOptions } from "./max-time-ms-options";
-import { SessionOptions } from "./session-option";
-
-class MongoDBId extends mongodb.ObjectId implements Id {
-
-    constructor(id?: string | number | mongodb.ObjectId) {
-        super(id);
-    }
-
-    public toString(): string {
-        return super.toString();
-    }
-
-}
+import { ReadPreference, ReadWriteStrategy } from "../read-preference";
+import * as _ from "../../../utilities";
+import { Is } from "../../../constants";
+import { Session } from "../session";
+import { MaxTimeMsOptions } from "../max-time-ms-options";
+import { SessionOptions } from "../session-option";
+import { MongoDBId } from "./mongodb-id";
+import { MongoDBSession } from "./mongodb-session";
 
 class MongoDBDriver implements Driver<MongoDBSession, MongoDBId> {
 
@@ -223,60 +210,4 @@ class MongoDBDriver implements Driver<MongoDBSession, MongoDBId> {
 
 }
 
-class MongoDBSession implements Session {
-
-    private _session: mongodb.ClientSession;
-    public get session(): mongodb.ClientSession {
-        return this._session;
-    }
-
-    public get id(): any {
-        return this._session.id;
-    }
-
-    constructor(session: mongodb.ClientSession) {
-        this._session = session;
-    }
-
-    public inTransaction(): boolean {
-        return this._session.inTransaction();
-    }
-
-}
-
-// class MongoDBBulkOperation implements BulkOperation {
-    
-//     public get length(): number {
-//         return this._bulk.length;
-//     }
-
-//     public set length(value: number) {
-//         this._bulk.length = value;
-//     }
-
-//     private _bulk: mongodb.OrderedBulkOperation | mongodb.UnorderedBulkOperation;
-
-//     constructor(bulk: mongodb.OrderedBulkOperation | mongodb.UnorderedBulkOperation) {
-//         this._bulk = bulk;
-//     }
-
-//     public async execute(options?: FSyncOptions): Promise<BulkWriteResult> {
-//         const result = await this._bulk.execute(options);
-//         return _.pick(result, [
-//             "ok",
-//             "nInserted",
-//             "nUpdated",
-//             "nUpserted",
-//             "nModified",
-//             "nRemoved",
-//         ]);
-//     }
-
-//     public insert<T extends Entity>(doc: T): BulkOperation {
-//         this._bulk.insert(doc);
-//         return this;
-//     }
-
-// }
-
-export { MongoDBId, MongoDBDriver, MongoDBSession };
+export { MongoDBDriver };

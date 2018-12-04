@@ -16,7 +16,7 @@ export * from "./insert-many-options";
 export * from "./insert-one-options";
 export * from "./map-reduce-options";
 export * from "./max-time-ms-options";
-export * from "./mongodb-driver";
+export * from "./mongodb";
 export * from "./read-preference-options";
 export * from "./read-preference";
 export * from "./session-option";

@@ -23,33 +23,21 @@ type PartialDeep<T> = {
 
 type NotVoid = {} | null | undefined;
 
-type CommonIterator<T, TResult> = (value: T, keyOrIndex: string | number, collection: any) => TResult;
-
 type ListIterator<T, TResult> = (value: T, index: number, collection: List<T>) => TResult;
 
 type ObjectIterator<TObject, TResult> = (value: TObject[keyof TObject], key: string, collection: TObject) => TResult;
 
 type ObjectIteratee<TObject> = ObjectIterator<TObject, NotVoid> | string | [string, any] | PartialDeep<TObject[keyof TObject]>;
 
-type ObjectIteratorAsync<TObject, TResult> = (value: TObject[keyof TObject], key: string, collection: TObject) => Promise<TResult>;
-
 type ListIterateeCustom<T, TResult> = ListIterator<T, TResult> | string | object | [string, any] | PartialDeep<T>;
-
-type ListIteratorTypeGuard<T, S extends T> = (value: T, index: number, collection: List<T>) => value is S;
 
 type ListIteratee<T> = ListIterator<T, NotVoid> | string | [string, any] | PartialDeep<T>;
 
 type ValueIteratee<T> = ((value: T) => NotVoid) | string | [string, any] | PartialDeep<T>;
 
-type Comparator2<T1, T2> = (a: T1, b: T2) => boolean;
-
-type Comparator<T> = (a: T, b: T) => boolean;
-
 type Many<T> = T | T[];
 
 type MemoListIterator<T, TResult, TList> = (prev: TResult, curr: T, index: number, list: TList) => TResult;
-
-type PartialObject<T> = Partial<T>;
 
 type ObjectIterateeCustom<TObject, TResult> = ObjectIterator<TObject, TResult> | string | [string, any] | PartialDeep<TObject[keyof TObject]>;
 
@@ -351,4 +339,8 @@ export function isEqual(value: any, other: any): boolean {
 
 export function chunk<T>(arr?: T[], size?: number): T[][] {
     return _.chunk<T>(arr, size);
+}
+
+export function shuffle<T>(collection: List<T> | null | undefined): T[] {
+    return _.shuffle<T>(collection);
 }

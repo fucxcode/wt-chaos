@@ -2,7 +2,7 @@ import { Driver, Session, InsertOneOptions, InsertManyOptions, CountOptions, Fin
 import uuid from "node-uuid";
 import { Id, Entity } from "../src/repository/entities";
 import * as _ from "../src/utilities";
-import { Repository, OperationDescription } from "../src/repository";
+import { Repository, OperationDescription, collectionName } from "../src/repository";
 import { UID } from "../src/constants";
 import { assert } from "chai";
 
@@ -211,6 +211,8 @@ class InMemoryDbDriver implements Driver<InMemoryDbSession, InMemoryDbId> {
 
 }
 
+@collectionName("products")
+// @ts-ignore
 class ProductEntity implements Entity {
 
     _id?: InMemoryDbId;
@@ -228,7 +230,7 @@ class ProductRepository extends Repository<InMemoryDbSession, InMemoryDbId, InMe
     }
 
     constructor(driverProvider: () => InMemoryDbDriver) {
-        super(ProductEntity, "products", driverProvider);
+        super(ProductEntity, undefined, driverProvider);
     }
 
 }
@@ -494,7 +496,7 @@ describe("repository: in-mem-db", () => {
         const new_name = uuid.v4();
         await repository.update(od,
             {
-            price: price_sp
+                price: price_sp
             },
             {
                 name: new_name

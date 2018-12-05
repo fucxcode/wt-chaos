@@ -17,6 +17,7 @@ export * from "./insert-one-options";
 export * from "./map-reduce-options";
 export * from "./max-time-ms-options";
 export * from "./mongodb";
+export * from "./loki";
 export * from "./read-preference-options";
 export * from "./read-preference";
 export * from "./session-option";

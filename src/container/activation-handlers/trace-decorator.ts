@@ -74,7 +74,7 @@ class TraceOptions {
 
 const trace = function (enabled: boolean = true,
     oidResolver?: (...args: any[]) => string,
-    teamIdResolver?: (...args: any[]) => constants.ObjectID,
+    teamIdResolver?: (...args: any[]) => Id,
     uidResolver?: (...args: any[]) => string
 ) {
     return function (target: any, propertyKey: string, value: any) {

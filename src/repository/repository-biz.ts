@@ -285,7 +285,7 @@ abstract class BusinessRepository<TSession extends Session, TID extends Id, TDri
         }
 
         const { c, u } = this.getRestoreConditionAndUpdate(operationDescription.team, operationDescription.uid, condition);
-        return await this.updateById(operationDescription, ids, c, u, options);
+        return await this.updateByIds(operationDescription, ids, c, u, options);
     }
 
     private getArchiveConditionAndUpdate(team: Id, uid: UID, archivedOp: number, condition?: any): {

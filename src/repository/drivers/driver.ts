@@ -19,6 +19,10 @@ interface Driver<TSession extends Session, TID extends Id> {
 
     parseId(id?: Id, createWhenNil?: boolean): TID | null | undefined;
 
+    isValidId(id?: any): id is Id;
+
+    isEqualsIds(x?: Id, y?: Id): boolean;
+
     insertOne<T extends Entity>(collectionName: string, entity: T, options?: InsertOneOptions<TSession>): Promise<Partial<T>>;
 
     insertMany<T extends Entity>(collectionName: string, entities: T[], options?: InsertManyOptions<TSession>): Promise<Partial<T>[]>;
@@ -42,6 +46,8 @@ interface Driver<TSession extends Session, TID extends Id> {
     aggregate<T>(collectionName: string, pipeline: any[], options?: AggregateOptions<TSession>): Promise<Partial<T>[]>;
 
     mapReduce<T>(collectionName: string, map: Function | string, reduce: Function | string, options?: MapReduceOptions<TSession>): Promise<Partial<T>[]>;
+
+    dropCollection(collectionName: string): Promise<boolean>;
 
 }
 

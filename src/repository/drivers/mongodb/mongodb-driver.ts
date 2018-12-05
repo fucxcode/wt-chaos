@@ -96,6 +96,14 @@ class MongoDBDriver implements Driver<MongoDBSession, MongoDBId> {
         }
     }
 
+    public isValidId(id?: any): id is Id {
+        return mongodb.ObjectID.isValid(id);
+    }
+
+    public isEqualsIds(x?: Id, y?: Id): boolean {
+        return (x && y) ? x.equals(y) : false;
+    }
+
     public async insertOne<T extends Entity>(collectionName: string, entity: T, options?: InsertOneOptions<MongoDBSession>): Promise<Partial<T>> {
         entity._id = this.parseId(entity._id, true) as MongoDBId;
         await this._db.collection<T>(collectionName).insertOne(entity, this.mergeOptions(options));
@@ -205,6 +213,19 @@ class MongoDBDriver implements Driver<MongoDBSession, MongoDBId> {
         }
         finally {
             session.endSession();
+        }
+    }
+
+    public async dropCollection(collectionName: string): Promise<boolean> {
+        const collections = await this._db.listCollections(undefined, {
+            nameOnly: true
+        }).toArray();
+        if (_.some(collections, c => c.name === collectionName)) {
+            await this._db.dropCollection(collectionName);
+            return true;
+        }
+        else {
+            return false;
         }
     }
 

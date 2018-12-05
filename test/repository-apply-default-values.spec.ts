@@ -433,7 +433,7 @@ describe("repository: apply default values", () => {
         const actual = applyDefaultValues<Entity>(Entity, {}, undefined, (id?: Id) => driver.parseId(id, true));
 
         assert.ok(actual._id);
-        assert.isTrue(_.isObjectId(actual._id));
+        assert.isTrue(driver.isValidId(actual._id));
     });
 
     it(`use parent class default values`, async () => {

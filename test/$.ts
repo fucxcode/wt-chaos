@@ -1,5 +1,6 @@
-import * as assert from "assert";
+import { assert } from "chai";
 import * as randomstring from "randomstring";
+import { WTError } from "../src/errors/wt-error";
 
 class $ {
 
@@ -21,6 +22,48 @@ class $ {
         });
     }
 
+    public static async throwAsync<T>(fn: () => Promise<T>, expectedCode?: number, expectedMessage?: string): Promise<T> {
+        try {
+            const result = await fn();
+            assert.fail(undefined, undefined, "expect an error through but actually not");
+            return result;
+        }
+        catch (ex) {
+            assert.ok(ex);
+            if (expectedCode || expectedMessage) {
+                const error = ex as WTError;
+                if (expectedCode) {
+                    assert.strictEqual(expectedCode, error.code);
+                }
+                if (expectedMessage) {
+                    assert.strictEqual(expectedMessage, error.message);
+                }
+            }
+        }
+    }
+
+    public static async notThrowAsync<T>(fn: () => T, expectedCode?: number, expectedMessage?: string): Promise<T> {
+        try {
+            return await fn();
+        }
+        catch (ex) {
+            if (expectedCode || expectedMessage) {
+                if (ex) {
+                    const error = ex as WTError;
+                    if (expectedCode) {
+                        assert.notStrictEqual(expectedCode, error.code);
+                    }
+                    if (expectedMessage) {
+                        assert.notStrictEqual(expectedMessage, error.message);
+                    }
+                }
+            }
+            else {
+                assert.fail(undefined, undefined, ex);
+            }
+        }
+    }
+    
 }
 
 export { $ };

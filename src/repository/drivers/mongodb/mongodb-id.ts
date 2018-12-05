@@ -11,6 +11,10 @@ class MongoDBId extends mongodb.ObjectId implements Id {
         return super.toString();
     }
 
+    public equals(other: MongoDBId): boolean {
+        return this.toString() === other.toString();
+    }
+
 }
 
 export { MongoDBId };

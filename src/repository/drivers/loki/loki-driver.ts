@@ -19,6 +19,7 @@ import Loki from "lokijs";
 import * as _ from "../../../utilities";
 import { Is } from "../../../constants";
 import { LokiBulkOperation } from "./loki-bulk-operation";
+import { ObjectID } from "bson";
 
 class LokiDriver implements Driver<LokiSession, LokiId> {
 
@@ -46,6 +47,14 @@ class LokiDriver implements Driver<LokiSession, LokiId> {
         }
     }
 
+    public isValidId(id?: any): id is Id {
+        return _.isNumber(_.get(id, "_value"));
+    }
+
+    public isEqualsIds(x?: Id, y?: Id): boolean {
+        return (x && y) ? x.equals(y) : false;
+    }
+
     private getOrAddCollection<T extends Entity>(collectionName: string): Loki.Collection<T> {
         let collection = this._db.getCollection<T>(collectionName);
         if (!collection) {
@@ -68,14 +77,26 @@ class LokiDriver implements Driver<LokiSession, LokiId> {
         return entities;
     }
 
+    private parseCondition(condition: any): any {
+        return _.isEmpty(condition) ? undefined : condition;
+    }
+
     public async count(collectionName: string, condition: any | undefined, options?: CountOptions<LokiSession>): Promise<number> {
-        return this.getOrAddCollection<any>(collectionName).count(condition);
+        return this.getOrAddCollection<any>(collectionName).count(this.parseCondition(condition));
     }
 
     public async find<T extends Entity>(collectionName: string, condition: any | undefined, options?: FindOptions<T, LokiSession>): Promise<Partial<T>[]> {
-        let set = this.getOrAddCollection<T>(collectionName).chain().find(condition);
-        if (options && options.sort) {
-            set = set.simplesort(options.sort);
+        console.log(JSON.stringify(this.parseCondition(condition), null, 2));
+        let set = this.getOrAddCollection<T>(collectionName).chain().find(this.parseCondition(condition));
+        if (options && options.sort && _.some(options.sort)) {
+            const sorts: [keyof T, boolean][] = [];
+            for (const s of options.sort) {
+                sorts.push([
+                    s[0],
+                    s[1] === 1
+                ]);
+            }
+            set = set.compoundsort(sorts);
         }
         if (options && options.skip) {
             set = set.offset(options.skip);
@@ -121,7 +142,7 @@ class LokiDriver implements Driver<LokiSession, LokiId> {
             n: 0,
             nModified: 0
         };
-        const entity = this.getOrAddCollection<any>(collectionName).findOne(condition);
+        const entity = this.getOrAddCollection<any>(collectionName).findOne(this.parseCondition(condition));
         if (entity) {
             result.n = 1;
             if (this.update(collectionName, entity, update)) {
@@ -137,7 +158,7 @@ class LokiDriver implements Driver<LokiSession, LokiId> {
             n: 0,
             nModified: 0
         };
-        const entities = this.getOrAddCollection<any>(collectionName).find(condition);
+        const entities = this.getOrAddCollection<any>(collectionName).find(this.parseCondition(condition));
         if (entities) {
             result.n = entities.length;
             for (const entity of entities) {
@@ -158,7 +179,7 @@ class LokiDriver implements Driver<LokiSession, LokiId> {
             ok: Is.yes,
             n: 0
         };
-        const entity = this.getOrAddCollection(collectionName).findOne(condition);
+        const entity = this.getOrAddCollection(collectionName).findOne(this.parseCondition(condition));
         if (entity) {
             this.delete(collectionName, entity);
             result.n = 1;
@@ -171,7 +192,7 @@ class LokiDriver implements Driver<LokiSession, LokiId> {
             ok: Is.yes,
             n: 0
         };
-        const entities = this.getOrAddCollection(collectionName).find(condition);
+        const entities = this.getOrAddCollection(collectionName).find(this.parseCondition(condition));
         if (entities) {
             result.n = entities.length;
             for (const entity of entities) {
@@ -182,7 +203,7 @@ class LokiDriver implements Driver<LokiSession, LokiId> {
     }
 
     public async findOneAndUpdate<T extends Entity>(collectionName: string, condition: any, update: any, options?: FindOneAndUpdateOptions<T, LokiSession>): Promise<Partial<T> | undefined> {
-        const entity = this.getOrAddCollection<T>(collectionName).findOne(condition);
+        const entity = this.getOrAddCollection<T>(collectionName).findOne(this.parseCondition(condition));
         if (entity) {
             this.update(collectionName, entity, update);
             if (options && options.returnOriginal) {
@@ -210,6 +231,17 @@ class LokiDriver implements Driver<LokiSession, LokiId> {
 
     public async beginTransaction<TResult>(action: (session: Session) => Promise<TResult | undefined>, thisArg?: any, auto: boolean = true): Promise<TResult | undefined> {
         throw new Error("not implements");
+    }
+
+    public async dropCollection(collectionName: string): Promise<boolean> {
+        const collections = this._db.listCollections();
+        if (_.some(collections, x => x.name === collectionName)) {
+            this._db.removeCollection(collectionName);
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
 }

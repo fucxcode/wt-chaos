@@ -50,7 +50,7 @@ class ActivityTracingActivationHandler<TSession extends Session, TID extends Id,
                 uid: uid,
                 class_name: className,
                 method_name: methodName,
-                arguments: _.mapKeys(args, (value, key) => key.split(`$`).join(`__$__`).split(`.`).join(`__.__`))
+                arguments: _.mapKeys(this._driver, args, (value, key) => key.split(`$`).join(`__$__`).split(`.`).join(`__.__`))
             });
         }
         catch (ex) {

@@ -3,7 +3,7 @@ import * as _ from "./lodash-wrapper";
 import moment from "moment";
 import { ObjectID, Is, Projection, ObjectOrId } from "../constants";
 import * as mongodb from "mongodb";
-import { Id } from "../repository";
+import { Id, Session, Driver } from "../repository";
 import * as randomstring from "randomstring";
 import crypto from "crypto";
 
@@ -38,22 +38,7 @@ export function findEnumByValue(enums: any, value: any): {
     }
 }
 
-export function isObjectId(id: any): id is mongodb.ObjectId {
-    if (_.isEmpty(id)) {
-        return false;
-    }
-    if (_.isNumber(id)) {
-        return false;
-    }
-    const value = id.toString();
-    if (value.length === 24 && REGEX_OBJECT_ID.test(value)) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-export function mapKeys(object: any, iteratee: (sourceValue: any, sourceKey: string) => string, thisArg?: any): any {
+export function mapKeys<TSession extends Session, TID extends Id, TDriver extends Driver<TSession, TID>>(driver: TDriver, object: any, iteratee: (sourceValue: any, sourceKey: string) => string, thisArg?: any): any {
     let target: any;
     let sourceKey: string;
     let sourceValue: any;
@@ -65,7 +50,7 @@ export function mapKeys(object: any, iteratee: (sourceValue: any, sourceKey: str
             target.push(mapKeys(element, iteratee, thisArg));
         });
     }
-    else if (isObjectId(object)) {
+    else if (driver.isValidId(object)) {
         target = object;
     }
     else if (_.isObject(object)) {
@@ -94,10 +79,6 @@ export function updateMetadata<TValue, TUpdate>(metadataKey: string, metadataUpd
 
 export function convertToRegExp(keyword: any): RegExp {
     return new RegExp(keyword, "i");
-}
-
-export function objectIdEquals<TID extends Id>(x: TID, y: TID): boolean {
-    return (x && y) ? (x.toString() === y.toString()) : false;
 }
 
 /**
@@ -239,53 +220,6 @@ export function formatFromAndToTimeToTimestampSeconds(from?: string | number, to
     from = moment(toSafeDateTimeNumber(parseInt(<string>from)), "X").tz(timezone).startOf(unitOfTime).unix();
     to = moment(toSafeDateTimeNumber(parseInt(<string>to)), "X").tz(timezone).endOf(unitOfTime).unix();
     return [from, to];
-}
-
-export function getIdFromObjectOrId<T>(objectOrId: ObjectOrId<T>, idResolver: (obj: T) => mongodb.ObjectId): mongodb.ObjectId {
-    return isObjectId(objectOrId) ? objectOrId as mongodb.ObjectId : idResolver(objectOrId as T);
-}
-
-export function tryParseObjectId(id?: ObjectID | null | undefined, createIfNil: boolean = true, objectIdCreator: (id?: string | number | mongodb.ObjectId) => mongodb.ObjectId = (id) => new mongodb.ObjectId(id)): [boolean, mongodb.ObjectId | null | undefined] {
-    try {
-        return [true, parseObjectId(id, createIfNil, objectIdCreator)];
-    }
-    catch {
-        return [false, undefined];
-    }
-}
-
-/**
- * parse ObjectId from null, undefined, string or an existing ObjectId
- * it will throw exception when input `id` cannot be parsed
- * if `createIfNil = true` it will create a new ObjectId if `id` is falsy
- * otherwise it will return null or undefined based on input parameter `id`
- * especially, when input `id = ''` and `createIfNil = false` it will return null
- * the 3rd argument `objectIdCreator` should NOT be specified unless in unit test
- */
-export function parseObjectId(id?: ObjectID | null | undefined, createIfNil: boolean = true, objectIdCreator: (id?: string | number | mongodb.ObjectId) => mongodb.ObjectId = (id) => new mongodb.ObjectId(id)): mongodb.ObjectId | null | undefined {
-    let objectId: mongodb.ObjectId | null | undefined;
-    if (id) {
-        if (_.isString(id)) {
-            objectId = objectIdCreator(id);
-        }
-        else {
-            objectId = id;
-        }
-    }
-    else {
-        if (createIfNil) {
-            objectId = objectIdCreator();
-        }
-        else {
-            if (_.isNull(id) || _.isString(id)) {
-                objectId = null;
-            }
-            else {
-                // leave `objectID` as undefined
-            }
-        }
-    }
-    return objectId;
 }
 
 export function asyncify(fn: (...args: any[]) => any): (...args: any[]) => Promise<any> {

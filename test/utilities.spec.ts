@@ -3,6 +3,8 @@ import * as _ from "../src/utilities";
 import * as mongodb from "mongodb";
 import { Is } from "../src/constants";
 import { $ } from "./$";
+import { MongoDBDriver } from "../src/repository";
+import * as TypeMoq from "typemoq";
 
 describe("utilities", () => {
 
@@ -49,6 +51,11 @@ describe("utilities", () => {
         });
 
         it("_.some support mongodb.ObjectId[]", () => {
+            const dbMock = TypeMoq.Mock.ofType<mongodb.Db>();
+            const clientMock = TypeMoq.Mock.ofType<mongodb.MongoClient>();
+            clientMock.setup(x => x.db(TypeMoq.It.isAny())).returns(() => dbMock.object);
+            const driver = new MongoDBDriver(clientMock.object, "__test__");
+
             const id = new mongodb.ObjectId();
             const collection = [
                 new mongodb.ObjectId(),
@@ -56,7 +63,7 @@ describe("utilities", () => {
                 id,
                 new mongodb.ObjectId()
             ];
-            assert.isTrue(_.some(collection, x => _.objectIdEquals(x, id)));
+            assert.isTrue(_.some(collection, x => driver.isEqualsIds(x, id)));
         });
 
         it("_.md5 111111", () => {

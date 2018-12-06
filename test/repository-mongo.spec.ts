@@ -4,7 +4,7 @@ import { MongoDBDriver, Entity, defaultValue, collectionName, Repository, MongoD
 import * as uuid from "node-uuid";
 import * as _ from "../src/utilities";
 import { assert } from "chai";
-import { Timestamp, UID } from "../src/constants";
+import { Timestamp, UID, Is } from "../src/constants";
 import { WTCode } from "../src/errors";
 import { $ } from "./$";
 
@@ -62,7 +62,7 @@ describe("repository: mongodb memory server", () => {
     abstract class MongoDBRepository<T extends Entity> extends Repository<MongoDBSession, MongoDBId, MongoDBDriver, T> {
 
         constructor(EntityType: Function) {
-            super(EntityType, undefined, () => driver);
+            super(EntityType, undefined, () => driver, undefined, 10, 20);
         }
 
         public async findAll(operationDescription: OperationDescription): Promise<Partial<T>[]> {
@@ -427,6 +427,612 @@ describe("repository: mongodb memory server", () => {
         const actual_arr = await projectRepository.findByIds(operationDescription, []);
 
         assert.strictEqual(actual_arr.length, 0);
+    });
+
+    it(`findByPageIndex: total count = page size * page count`, async () => {
+        const operationDescription = createOperationDescription();
+        const page_size = _.random(2, 5);
+        const page_count = _.random(2, 5);
+        const total = page_size * page_count;
+        const expect_arr: ProjectEntity[] = [];
+        for (let i = 0; i < total; i++) {
+            expect_arr.push({
+                name: _.randomString()
+            });
+        }
+        await projectRepository.insertMany(operationDescription, expect_arr);
+
+        const actual_arr: ProjectEntity[] = [];
+        let page_index = 0;
+        while (true) {
+            const result = await projectRepository.findByPageIndex(operationDescription, undefined, page_index, page_size);
+
+            assert.strictEqual(result.count, total);
+            assert.strictEqual(result.pageIndex, page_index);
+            assert.strictEqual(result.pageSize, page_size);
+            assert.strictEqual(result.pageCount, _.ceil(total / page_size));
+            if (page_index < result.pageCount) {
+                const remain_length = total - page_index * page_size;
+                assert.strictEqual(result.entities.length, remain_length >= page_size ? page_size : remain_length);
+                for (const entity of result.entities) {
+                    actual_arr.push(entity);
+                }
+                page_index++;
+            }
+            else {
+                break;
+            }
+        }
+
+        assert.strictEqual(expect_arr.length, actual_arr.length);
+        for (let i = 0; i < expect_arr.length; i++) {
+            const expect = expect_arr[i];
+            const actual = _.find(actual_arr, x => x.name === expect.name);
+            assert.isTrue(driver.isEqualsIds(actual._id, expect._id));
+        }
+    });
+
+    it(`findByPageIndex: total count = page size * page count + 1`, async () => {
+        const operationDescription = createOperationDescription();
+        const page_size = _.random(2, 5);
+        const page_count = _.random(2, 5);
+        const total = page_size * page_count + 1;
+        const expect_arr: ProjectEntity[] = [];
+        for (let i = 0; i < total; i++) {
+            expect_arr.push({
+                name: _.randomString()
+            });
+        }
+        await projectRepository.insertMany(operationDescription, expect_arr);
+
+        const actual_arr: ProjectEntity[] = [];
+        let page_index = 0;
+        while (true) {
+            const result = await projectRepository.findByPageIndex(operationDescription, undefined, page_index, page_size);
+
+            assert.strictEqual(result.count, total);
+            assert.strictEqual(result.pageIndex, page_index);
+            assert.strictEqual(result.pageSize, page_size);
+            assert.strictEqual(result.pageCount, _.ceil(total / page_size));
+            if (page_index < result.pageCount) {
+                const remain_length = total - page_index * page_size;
+                assert.strictEqual(result.entities.length, remain_length >= page_size ? page_size : remain_length);
+                for (const entity of result.entities) {
+                    actual_arr.push(entity);
+                }
+                page_index++;
+            }
+            else {
+                break;
+            }
+        }
+
+        assert.strictEqual(expect_arr.length, actual_arr.length);
+        for (let i = 0; i < expect_arr.length; i++) {
+            const expect = expect_arr[i];
+            const actual = _.find(actual_arr, x => x.name === expect.name);
+            assert.isTrue(driver.isEqualsIds(actual._id, expect._id));
+        }
+    });
+
+    it(`findByPageIndex: page index = undefined, page index = 0`, async () => {
+        const operationDescription = createOperationDescription();
+        const page_size = _.random(2, 5);
+        const page_count = _.random(2, 5);
+        const total = page_size * page_count + 1;
+        const expect_arr: ProjectEntity[] = [];
+        for (let i = 0; i < total; i++) {
+            expect_arr.push({
+                name: _.randomString()
+            });
+        }
+        await projectRepository.insertMany(operationDescription, expect_arr);
+
+        const result = await projectRepository.findByPageIndex(operationDescription, undefined, undefined, page_size);
+        assert.strictEqual(result.count, total);
+        assert.strictEqual(result.pageIndex, 0);
+        assert.strictEqual(result.pageSize, page_size);
+        assert.strictEqual(result.pageCount, _.ceil(total / page_size));
+        assert.strictEqual(result.entities.length, page_size);
+        for (let i = 0; i < page_size; i++) {
+            const expect = expect_arr[i];
+            const actual = _.find(result.entities, x => x.name === expect.name);
+            assert.isTrue(driver.isEqualsIds(actual._id, expect._id));
+        }
+    });
+
+    it(`findByPageIndex: page index = negative value, page index = 0`, async () => {
+        const operationDescription = createOperationDescription();
+        const page_size = _.random(2, 5);
+        const page_count = _.random(2, 5);
+        const total = page_size * page_count + 1;
+        const expect_arr: ProjectEntity[] = [];
+        for (let i = 0; i < total; i++) {
+            expect_arr.push({
+                name: _.randomString()
+            });
+        }
+        await projectRepository.insertMany(operationDescription, expect_arr);
+
+        const result = await projectRepository.findByPageIndex(operationDescription, undefined, -1, page_size);
+        assert.strictEqual(result.count, total);
+        assert.strictEqual(result.pageIndex, 0);
+        assert.strictEqual(result.pageSize, page_size);
+        assert.strictEqual(result.pageCount, _.ceil(total / page_size));
+        assert.strictEqual(result.entities.length, page_size);
+        for (let i = 0; i < page_size; i++) {
+            const expect = expect_arr[i];
+            const actual = _.find(result.entities, x => x.name === expect.name);
+            assert.isTrue(driver.isEqualsIds(actual._id, expect._id));
+        }
+    });
+
+    it(`findByPageIndex: page size = undefined, page size = 10`, async () => {
+        const operationDescription = createOperationDescription();
+        const total = 21;
+        const expect_arr: ProjectEntity[] = [];
+        for (let i = 0; i < total; i++) {
+            expect_arr.push({
+                name: _.randomString()
+            });
+        }
+        await projectRepository.insertMany(operationDescription, expect_arr);
+
+        const page_size = 10;
+        const result = await projectRepository.findByPageIndex(operationDescription, undefined, undefined, undefined);
+        assert.strictEqual(result.count, total);
+        assert.strictEqual(result.pageIndex, 0);
+        assert.strictEqual(result.pageSize, page_size);
+        assert.strictEqual(result.pageCount, _.ceil(total / page_size));
+        assert.strictEqual(result.entities.length, page_size);
+        for (let i = 0; i < page_size; i++) {
+            const expect = expect_arr[i];
+            const actual = _.find(result.entities, x => x.name === expect.name);
+            assert.isTrue(driver.isEqualsIds(actual._id, expect._id));
+        }
+    });
+
+    it(`findByPageIndex: page size = negative value, page size = 10`, async () => {
+        const operationDescription = createOperationDescription();
+        const total = 21;
+        const expect_arr: ProjectEntity[] = [];
+        for (let i = 0; i < total; i++) {
+            expect_arr.push({
+                name: _.randomString()
+            });
+        }
+        await projectRepository.insertMany(operationDescription, expect_arr);
+
+        const page_size = 10;
+        const result = await projectRepository.findByPageIndex(operationDescription, undefined, undefined, -1);
+        assert.strictEqual(result.count, total);
+        assert.strictEqual(result.pageIndex, 0);
+        assert.strictEqual(result.pageSize, page_size);
+        assert.strictEqual(result.pageCount, _.ceil(total / page_size));
+        assert.strictEqual(result.entities.length, page_size);
+        for (let i = 0; i < page_size; i++) {
+            const expect = expect_arr[i];
+            const actual = _.find(result.entities, x => x.name === expect.name);
+            assert.isTrue(driver.isEqualsIds(actual._id, expect._id));
+        }
+    });
+
+    it(`findByPageIndex: page size = exceed max value (21), page size = 20`, async () => {
+        const operationDescription = createOperationDescription();
+        const total = 21;
+        const expect_arr: ProjectEntity[] = [];
+        for (let i = 0; i < total; i++) {
+            expect_arr.push({
+                name: _.randomString()
+            });
+        }
+        await projectRepository.insertMany(operationDescription, expect_arr);
+
+        const page_size = 20;
+        const result = await projectRepository.findByPageIndex(operationDescription, undefined, undefined, 21);
+        assert.strictEqual(result.count, total);
+        assert.strictEqual(result.pageIndex, 0);
+        assert.strictEqual(result.pageSize, page_size);
+        assert.strictEqual(result.pageCount, _.ceil(total / page_size));
+        assert.strictEqual(result.entities.length, page_size);
+        for (let i = 0; i < page_size; i++) {
+            const expect = expect_arr[i];
+            const actual = _.find(result.entities, x => x.name === expect.name);
+            assert.isTrue(driver.isEqualsIds(actual._id, expect._id));
+        }
+    });
+
+    it(`findByPageNext: total count = page size * page count`, async () => {
+        const operationDescription = createOperationDescription();
+        const page_size = _.random(2, 5);
+        const page_count = _.random(2, 5);
+        const total = page_size * page_count;
+        const expect_arr: ProjectEntity[] = [];
+        for (let i = 0; i < total; i++) {
+            expect_arr.push({
+                name: _.randomString()
+            });
+        }
+        await projectRepository.insertMany(operationDescription, expect_arr);
+
+        const actual_arr: ProjectEntity[] = [];
+        let page_index = 0;
+        while (true) {
+            const result = await projectRepository.findByPageNext(operationDescription, undefined, page_index, page_size);
+
+            assert.strictEqual(result.pageIndex, page_index);
+            assert.strictEqual(result.pageSize, page_size);
+            if (_.some(result.entities)) {
+                const remain_length = total - page_index * page_size;
+                assert.strictEqual(result.entities.length, remain_length >= page_size ? page_size : remain_length);
+                for (const entity of result.entities) {
+                    actual_arr.push(entity);
+                }
+            }
+
+            if (result.next) {
+                page_index++;
+            }
+            else {
+                break;
+            }
+        }
+
+        assert.strictEqual(expect_arr.length, actual_arr.length);
+        for (let i = 0; i < expect_arr.length; i++) {
+            const expect = expect_arr[i];
+            const actual = _.find(actual_arr, x => x.name === expect.name);
+            assert.isTrue(driver.isEqualsIds(actual._id, expect._id));
+        }
+    });
+
+    it(`findByPageNext: total count = page size * page count + 1`, async () => {
+        const operationDescription = createOperationDescription();
+        const page_size = _.random(2, 5);
+        const page_count = _.random(2, 5);
+        const total = page_size * page_count + 1;
+        const expect_arr: ProjectEntity[] = [];
+        for (let i = 0; i < total; i++) {
+            expect_arr.push({
+                name: _.randomString()
+            });
+        }
+        await projectRepository.insertMany(operationDescription, expect_arr);
+
+        const actual_arr: ProjectEntity[] = [];
+        let page_index = 0;
+        while (true) {
+            const result = await projectRepository.findByPageNext(operationDescription, undefined, page_index, page_size);
+
+            assert.strictEqual(result.pageIndex, page_index);
+            assert.strictEqual(result.pageSize, page_size);
+            if (_.some(result.entities)) {
+                const remain_length = total - page_index * page_size;
+                assert.strictEqual(result.entities.length, remain_length >= page_size ? page_size : remain_length);
+                for (const entity of result.entities) {
+                    actual_arr.push(entity);
+                }
+            }
+
+            if (result.next) {
+                page_index++;
+            }
+            else {
+                break;
+            }
+        }
+
+        assert.strictEqual(expect_arr.length, actual_arr.length);
+        for (let i = 0; i < expect_arr.length; i++) {
+            const expect = expect_arr[i];
+            const actual = _.find(actual_arr, x => x.name === expect.name);
+            assert.isTrue(driver.isEqualsIds(actual._id, expect._id));
+        }
+    });
+
+    it(`findByPageNext: page index = undefined, page index = 0`, async () => {
+        const operationDescription = createOperationDescription();
+        const page_size = _.random(2, 5);
+        const page_count = _.random(2, 5);
+        const total = page_size * page_count + 1;
+        const expect_arr: ProjectEntity[] = [];
+        for (let i = 0; i < total; i++) {
+            expect_arr.push({
+                name: _.randomString()
+            });
+        }
+        await projectRepository.insertMany(operationDescription, expect_arr);
+
+        const result = await projectRepository.findByPageNext(operationDescription, undefined, undefined, page_size);
+        assert.strictEqual(result.pageIndex, 0);
+        assert.strictEqual(result.pageSize, page_size);
+        assert.strictEqual(result.entities.length, page_size);
+        for (let i = 0; i < page_size; i++) {
+            const expect = expect_arr[i];
+            const actual = _.find(result.entities, x => x.name === expect.name);
+            assert.isTrue(driver.isEqualsIds(actual._id, expect._id));
+        }
+    });
+
+    it(`findByPageNext: page index = negative value, page index = 0`, async () => {
+        const operationDescription = createOperationDescription();
+        const page_size = _.random(2, 5);
+        const page_count = _.random(2, 5);
+        const total = page_size * page_count + 1;
+        const expect_arr: ProjectEntity[] = [];
+        for (let i = 0; i < total; i++) {
+            expect_arr.push({
+                name: _.randomString()
+            });
+        }
+        await projectRepository.insertMany(operationDescription, expect_arr);
+
+        const result = await projectRepository.findByPageNext(operationDescription, undefined, -1, page_size);
+        assert.strictEqual(result.pageIndex, 0);
+        assert.strictEqual(result.pageSize, page_size);
+        assert.strictEqual(result.entities.length, page_size);
+        for (let i = 0; i < page_size; i++) {
+            const expect = expect_arr[i];
+            const actual = _.find(result.entities, x => x.name === expect.name);
+            assert.isTrue(driver.isEqualsIds(actual._id, expect._id));
+        }
+    });
+
+    it(`findByPageNext: page size = undefined, page size = 10`, async () => {
+        const operationDescription = createOperationDescription();
+        const total = 21;
+        const expect_arr: ProjectEntity[] = [];
+        for (let i = 0; i < total; i++) {
+            expect_arr.push({
+                name: _.randomString()
+            });
+        }
+        await projectRepository.insertMany(operationDescription, expect_arr);
+
+        const page_size = 10;
+        const result = await projectRepository.findByPageNext(operationDescription, undefined, undefined, undefined);
+        assert.strictEqual(result.pageIndex, 0);
+        assert.strictEqual(result.pageSize, page_size);
+        assert.strictEqual(result.entities.length, page_size);
+        for (let i = 0; i < page_size; i++) {
+            const expect = expect_arr[i];
+            const actual = _.find(result.entities, x => x.name === expect.name);
+            assert.isTrue(driver.isEqualsIds(actual._id, expect._id));
+        }
+    });
+
+    it(`findByPageNext: page size = negative value, page size = 10`, async () => {
+        const operationDescription = createOperationDescription();
+        const total = 21;
+        const expect_arr: ProjectEntity[] = [];
+        for (let i = 0; i < total; i++) {
+            expect_arr.push({
+                name: _.randomString()
+            });
+        }
+        await projectRepository.insertMany(operationDescription, expect_arr);
+
+        const page_size = 10;
+        const result = await projectRepository.findByPageNext(operationDescription, undefined, undefined, -1);
+        assert.strictEqual(result.pageIndex, 0);
+        assert.strictEqual(result.pageSize, page_size);
+        assert.strictEqual(result.entities.length, page_size);
+        for (let i = 0; i < page_size; i++) {
+            const expect = expect_arr[i];
+            const actual = _.find(result.entities, x => x.name === expect.name);
+            assert.isTrue(driver.isEqualsIds(actual._id, expect._id));
+        }
+    });
+
+    it(`findByPageNext: page size = exceed max value (21), page size = 20`, async () => {
+        const operationDescription = createOperationDescription();
+        const total = 21;
+        const expect_arr: ProjectEntity[] = [];
+        for (let i = 0; i < total; i++) {
+            expect_arr.push({
+                name: _.randomString()
+            });
+        }
+        await projectRepository.insertMany(operationDescription, expect_arr);
+
+        const page_size = 20;
+        const result = await projectRepository.findByPageNext(operationDescription, undefined, undefined, 21);
+        assert.strictEqual(result.pageIndex, 0);
+        assert.strictEqual(result.pageSize, page_size);
+        assert.strictEqual(result.entities.length, page_size);
+        for (let i = 0; i < page_size; i++) {
+            const expect = expect_arr[i];
+            const actual = _.find(result.entities, x => x.name === expect.name);
+            assert.isTrue(driver.isEqualsIds(actual._id, expect._id));
+        }
+    });
+
+    it(`findByPageIndex: condition`, async () => {
+        const operationDescription = createOperationDescription();
+        const all_arr: ProjectEntity[] = [];
+        for (let i = 0; i < 10; i++) {
+            all_arr.push({ name: _.randomString() });
+        }
+        const expect_arr = _.sampleSize(all_arr, 5);
+        await projectRepository.insertMany(operationDescription, all_arr);
+
+        const condition = {
+            name: {
+                $in: _.map(expect_arr, x => x.name)
+            }
+        };
+        const actual_arr: ProjectEntity[] = [];
+        let page_index = 0;
+        while (true) {
+            const result = await projectRepository.findByPageIndex(operationDescription, condition, page_index, 2);
+            if (_.some(result.entities)) {
+                for (const entity of result.entities) {
+                    actual_arr.push(entity);
+                }
+            }
+            if (page_index < result.pageCount) {
+                page_index++;
+            }
+            else {
+                break;
+            }
+        }
+
+        assert.strictEqual(actual_arr.length, expect_arr.length);
+        for (let i = 0; i < expect_arr.length; i++) {
+            const expect = expect_arr[i];
+            const actual = _.find(actual_arr, a => a.name === expect.name);
+            assert.isTrue(driver.isEqualsIds(actual._id, expect._id));
+        }
+    });
+
+    it(`findByPageNext: condition`, async () => {
+        const operationDescription = createOperationDescription();
+        const all_arr: ProjectEntity[] = [];
+        for (let i = 0; i < 10; i++) {
+            all_arr.push({ name: _.randomString() });
+        }
+        const expect_arr = _.sampleSize(all_arr, 5);
+        await projectRepository.insertMany(operationDescription, all_arr);
+
+        const condition = {
+            name: {
+                $in: _.map(expect_arr, x => x.name)
+            }
+        };
+        const actual_arr: ProjectEntity[] = [];
+        let page_index = 0;
+        while (true) {
+            const result = await projectRepository.findByPageNext(operationDescription, condition, page_index, 2);
+            if (_.some(result.entities)) {
+                for (const entity of result.entities) {
+                    actual_arr.push(entity);
+                }
+            }
+            if (result.next) {
+                page_index++;
+            }
+            else {
+                break;
+            }
+        }
+
+        assert.strictEqual(actual_arr.length, expect_arr.length);
+        for (let i = 0; i < expect_arr.length; i++) {
+            const expect = expect_arr[i];
+            const actual = _.find(actual_arr, a => a.name === expect.name);
+            assert.isTrue(driver.isEqualsIds(actual._id, expect._id));
+        }
+    });
+
+    it(`update: condition match 2, multi = false, update the 1st one`, async () => {
+        const operationDescription = createOperationDescription();
+        const all_arr: ProjectEntity[] = [];
+        const search_name = _.randomString();
+        all_arr.push({ name: search_name });
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: search_name });
+        await projectRepository.insertMany(operationDescription, all_arr);
+
+        const update_name = _.randomString();
+        const result = await projectRepository.update(operationDescription,
+            {
+                name: search_name
+            },
+            {
+                name: update_name
+            }, false);
+        
+        assert.strictEqual(result.ok, Is.yes);
+        assert.strictEqual(result.n, 1);
+        assert.strictEqual(result.nModified, 1);
+
+        const actual_arr = await projectRepository.findAll(operationDescription);
+        {
+            const actual = _.find(actual_arr, x => driver.isEqualsIds(x._id, all_arr[0]._id));
+            assert.strictEqual(actual.name, update_name);
+        }
+        {
+            const actual = _.find(actual_arr, x => driver.isEqualsIds(x._id, all_arr[1]._id));
+            assert.strictEqual(actual.name, all_arr[1].name);
+        }
+        {
+            const actual = _.find(actual_arr, x => driver.isEqualsIds(x._id, all_arr[2]._id));
+            assert.strictEqual(actual.name, all_arr[2].name);
+        }
+    });
+
+    it(`update: condition match 2, multi = true, update the 2`, async () => {
+        const operationDescription = createOperationDescription();
+        const all_arr: ProjectEntity[] = [];
+        const search_name = _.randomString();
+        all_arr.push({ name: search_name });
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: search_name });
+        await projectRepository.insertMany(operationDescription, all_arr);
+
+        const update_name = _.randomString();
+        const result = await projectRepository.update(operationDescription,
+            {
+                name: search_name
+            },
+            {
+                name: update_name
+            }, true);
+
+        assert.strictEqual(result.ok, Is.yes);
+        assert.strictEqual(result.n, 2);
+        assert.strictEqual(result.nModified, 2);
+
+        const actual_arr = await projectRepository.findAll(operationDescription);
+        {
+            const actual = _.find(actual_arr, x => driver.isEqualsIds(x._id, all_arr[0]._id));
+            assert.strictEqual(actual.name, update_name);
+        }
+        {
+            const actual = _.find(actual_arr, x => driver.isEqualsIds(x._id, all_arr[1]._id));
+            assert.strictEqual(actual.name, all_arr[1].name);
+        }
+        {
+            const actual = _.find(actual_arr, x => driver.isEqualsIds(x._id, all_arr[2]._id));
+            assert.strictEqual(actual.name, update_name);
+        }
+    });
+
+    it(`update: condition match no, multi = true, update no`, async () => {
+        const operationDescription = createOperationDescription();
+        const all_arr: ProjectEntity[] = [];
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: _.randomString() });
+        await projectRepository.insertMany(operationDescription, all_arr);
+
+        const update_name = _.randomString();
+        const result = await projectRepository.update(operationDescription,
+            {
+                name: _.randomString()
+            },
+            {
+                name: update_name
+            }, true);
+
+        assert.strictEqual(result.ok, Is.yes);
+        assert.strictEqual(result.n, 0);
+        assert.strictEqual(result.nModified, 0);
+
+        const actual_arr = await projectRepository.findAll(operationDescription);
+        {
+            const actual = _.find(actual_arr, x => driver.isEqualsIds(x._id, all_arr[0]._id));
+            assert.strictEqual(actual.name, all_arr[0].name);
+        }
+        {
+            const actual = _.find(actual_arr, x => driver.isEqualsIds(x._id, all_arr[1]._id));
+            assert.strictEqual(actual.name, all_arr[1].name);
+        }
+        {
+            const actual = _.find(actual_arr, x => driver.isEqualsIds(x._id, all_arr[2]._id));
+            assert.strictEqual(actual.name, all_arr[2].name);
+        }
     });
 
 });

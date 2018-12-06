@@ -47,11 +47,17 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
         return this._collectionName;
     }
 
-    constructor(EntityType: Function, collectionName?: string, driverProvider: () => TDriver = DriverExtensions.getDefault, plugins: Plugin[] = []) {
+    private _defaultPageSize: number;
+
+    private _defaultPageSizeLimit: number;
+
+    constructor(EntityType: Function, collectionName?: string, driverProvider: () => TDriver = DriverExtensions.getDefault, plugins: Plugin[] = [], defaultPageSize: number = DEFAULT_PAGE_SIZE, pageSizeLimit: number = DEFAULT_PAGE_SIZE_LIMIT) {
         this._entityType = EntityType;
         this._collectionName = collectionName || getCollectionName(EntityType);
         this._driverProvider = driverProvider;
         this._plugins = plugins;
+        this._defaultPageSize = defaultPageSize;
+        this._defaultPageSizeLimit = pageSizeLimit;
     }
 
     private async processPluginBeforeActions<TResult, TContext extends PluginContext<TResult>>(context: TContext, action: (plugin: Plugin, context: TContext) => Promise<void>): Promise<void> {
@@ -187,7 +193,7 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
         return context.result;
     }
 
-    public async findByPageIndex(operationDescription: OperationDescription, condition?: any, pageIndex: number = 0, pageSize: number = DEFAULT_PAGE_SIZE, options: FindOptions<TEntity, TSession> = {}): Promise<FindByPageIndexResult<TEntity>> {
+    public async findByPageIndex(operationDescription: OperationDescription, condition?: any, pageIndex: number = 0, pageSize: number = this._defaultPageSize, options: FindOptions<TEntity, TSession> = {}): Promise<FindByPageIndexResult<TEntity>> {
         const context = new FindByPageIndexPluginContext<TEntity, TSession>(operationDescription, this._driverProvider.name, this._collectionName, condition, pageIndex, pageSize, options);
         await this.processPluginBeforeActions<FindByPageIndexResult<TEntity>, FindByPageIndexPluginContext<TEntity, TSession>>(context, (p, c) => p.beforeFindByPageIndex(c));
 
@@ -197,7 +203,7 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
             context.pageSize = Number(context.pageSize);
             // ensure `pageIndex`, `pageSize` are valid
             context.pageIndex = context.pageIndex >= 0 ? context.pageIndex : 0;
-            context.pageSize = context.pageSize > 0 ? (context.pageSize > DEFAULT_PAGE_SIZE_LIMIT ? context.pageSize = DEFAULT_PAGE_SIZE_LIMIT : context.pageSize) : DEFAULT_PAGE_SIZE;
+            context.pageSize = context.pageSize > 0 ? (context.pageSize > this._defaultPageSizeLimit ? context.pageSize = this._defaultPageSizeLimit : context.pageSize) : this._defaultPageSize;
 
             // build `skip` and `limit` based on `pageIndex` and `pageSize`
             const skip = context.pageIndex * context.pageSize;
@@ -228,7 +234,7 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
         return context.result;
     }
 
-    public async findByPageNext(operationDescription: OperationDescription, condition?: any, pageIndex: number = 0, pageSize: number = DEFAULT_PAGE_SIZE, options: FindOptions<TEntity, TSession> = {}): Promise<FindByPageNextResult<TEntity>> {
+    public async findByPageNext(operationDescription: OperationDescription, condition?: any, pageIndex: number = 0, pageSize: number = this._defaultPageSize, options: FindOptions<TEntity, TSession> = {}): Promise<FindByPageNextResult<TEntity>> {
         const context = new FindByPageNextPluginContext<TEntity, TSession>(operationDescription, this._driverProvider.name, this._collectionName, condition, pageIndex, pageSize, options);
         await this.processPluginBeforeActions<FindByPageNextResult<TEntity>, FindByPageNextPluginContext<TEntity, TSession>>(context, (p, c) => p.beforeFindByPageNext(c));
 
@@ -238,7 +244,7 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
             context.pageSize = Number(context.pageSize);
             // ensure `pageIndex`, `pageSize` are valid
             context.pageIndex = context.pageIndex >= 0 ? context.pageIndex : 0;
-            context.pageSize = context.pageSize > 0 ? (context.pageSize > DEFAULT_PAGE_SIZE_LIMIT ? context.pageSize = DEFAULT_PAGE_SIZE_LIMIT : context.pageSize) : DEFAULT_PAGE_SIZE;
+            context.pageSize = context.pageSize > 0 ? (context.pageSize > this._defaultPageSizeLimit ? context.pageSize = this._defaultPageSizeLimit : context.pageSize) : this._defaultPageSize;
 
             // build `skip` and `limit` based on `pageIndex` and `pageSize`
             // retrieve one more entity to check if there will be the next page

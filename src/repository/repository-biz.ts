@@ -11,8 +11,8 @@ import { IncludesOptions } from "./drivers/includes-options";
 
 abstract class BusinessRepository<TSession extends Session, TID extends Id, TDriver extends Driver<TSession, TID>, TEntity extends BusinessEntity> extends Repository<TSession, TID, TDriver, TEntity> {
 
-    constructor(EntityType: Function, collectionName?: string, driverProvider?: () => TDriver, plugins?: Plugin[]) {
-        super(EntityType, collectionName, driverProvider, plugins);
+    constructor(EntityType: Function, driverProvider?: () => TDriver, plugins?: Plugin[]) {
+        super(EntityType, driverProvider, plugins);
     }
 
     protected async onInsertOne(context: InsertOnePluginContext<TEntity, TSession>): Promise<void> {

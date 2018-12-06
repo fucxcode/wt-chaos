@@ -2,12 +2,14 @@ import * as TypeMoq from "typemoq";
 import * as mongodb from "mongodb";
 import { MongoDBDriver, MongoDBSession, MongoDBId, ReadWriteStrategy, ReadPreference } from "../src/repository/drivers";
 import { Entity } from "../src/repository/entities";
-import { Repository, Plugin, OperationDescription, ReadWriteStrategyPlugin } from "../src/repository";
+import { Repository, Plugin, OperationDescription, ReadWriteStrategyPlugin, collectionName } from "../src/repository";
 import * as _ from "../src/utilities";
 import * as uuid from "node-uuid";
 
 describe("read write strategy", () => {
 
+    @collectionName("__test_collection__")
+    // @ts-ignore
     class TestEntity implements Entity {
         _id: MongoDBId;
         name?: string;
@@ -16,7 +18,7 @@ describe("read write strategy", () => {
     class TestRepository extends Repository<MongoDBSession, MongoDBId, MongoDBDriver, TestEntity> {
 
         constructor(driverProvider: () => MongoDBDriver, plugins: Plugin[] = []) {
-            super(TestEntity, "__test_collection__", driverProvider, plugins);
+            super(TestEntity, driverProvider, plugins);
         }
 
     }

@@ -9,4 +9,4 @@ const getCollectionNameFromEntity = function (type: any): string {
     return Reflect.getMetadata("wt-entity-col-name", type);
 };
 
-export { collectionName, getCollectionNameFromEntity as getCollectionName };
+export { collectionName, getCollectionNameFromEntity };

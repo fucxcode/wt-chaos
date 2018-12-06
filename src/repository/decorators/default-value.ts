@@ -51,4 +51,4 @@ const applyEntityDefaultValues = function <T extends Object>(type: Function, obj
     return object;
 };
 
-export { defaultValue, applyEntityDefaultValues as applyDefaultValues };
+export { defaultValue, applyEntityDefaultValues };

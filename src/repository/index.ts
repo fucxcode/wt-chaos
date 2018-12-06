@@ -7,3 +7,4 @@ export * from "./operation-desc";
 export * from "./repository-biz";
 export * from "./repository";
 export * from "./decorators";
+export * from "./indexes-builder";

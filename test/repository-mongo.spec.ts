@@ -62,7 +62,7 @@ describe("repository: mongodb memory server", () => {
     abstract class MongoDBRepository<T extends Entity> extends Repository<MongoDBSession, MongoDBId, MongoDBDriver, T> {
 
         constructor(EntityType: Function) {
-            super(EntityType, undefined, () => driver, undefined, 10, 20);
+            super(EntityType, () => driver, undefined, 10, 20);
         }
 
         public async findAll(operationDescription: OperationDescription): Promise<Partial<T>[]> {

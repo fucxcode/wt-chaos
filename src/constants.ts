@@ -9,6 +9,11 @@ export enum Is {
     no = 0
 }
 
+export enum Direction {
+    ascending = 1,
+    descending = -1
+}
+
 export type ObjectID = Composite<mongodb.ObjectId, string>;
 
 export type UID = string;

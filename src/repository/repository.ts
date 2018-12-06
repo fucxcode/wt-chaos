@@ -24,7 +24,7 @@ import { MapReducePluginContext } from "./plugins/contexts/plugin-context-map-re
 import { FindByPageIndexResult } from "./find-by-page-index-result";
 import { FindByPageNextResult } from "./find-by-page-next-result";
 import { DriverExtensions } from "./drivers/driver-extensions";
-import { getCollectionName, applyDefaultValues } from "./decorators";
+import { getCollectionNameFromEntity, applyEntityDefaultValues } from "./decorators";
 import { InsertOnePluginContext } from "./plugins/contexts/plugin-context-insert-one";
 import { InsertManyPluginContext } from "./plugins/contexts/plugin-context-insert-many";
 
@@ -51,9 +51,9 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
 
     private _defaultPageSizeLimit: number;
 
-    constructor(EntityType: Function, collectionName?: string, driverProvider: () => TDriver = DriverExtensions.getDefault, plugins: Plugin[] = [], defaultPageSize: number = DEFAULT_PAGE_SIZE, pageSizeLimit: number = DEFAULT_PAGE_SIZE_LIMIT) {
+    constructor(EntityType: Function, driverProvider: () => TDriver = DriverExtensions.getDefault, plugins: Plugin[] = [], defaultPageSize: number = DEFAULT_PAGE_SIZE, pageSizeLimit: number = DEFAULT_PAGE_SIZE_LIMIT) {
         this._entityType = EntityType;
-        this._collectionName = collectionName || getCollectionName(EntityType);
+        this._collectionName = getCollectionNameFromEntity(EntityType);
         this._driverProvider = driverProvider;
         this._plugins = plugins;
         this._defaultPageSize = defaultPageSize;
@@ -83,7 +83,7 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
             operationDescription,
             this._driverProvider.name,
             this._collectionName,
-            applyDefaultValues(this._entityType, entity, operationDescription, (id?: Id) => this._driverProvider().parseId(id, true)),
+            applyEntityDefaultValues(this._entityType, entity, operationDescription, (id?: Id) => this._driverProvider().parseId(id, true)),
             options);
         await this.processPluginBeforeActions<Partial<TEntity> | undefined, InsertOnePluginContext<TEntity, TSession>>(context, (p, c) => p.beforeInsertOne(c));
 
@@ -104,7 +104,7 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
             operationDescription,
             this._driverProvider.name,
             this._collectionName,
-            _.map(entities, x => applyDefaultValues(this._entityType, x, operationDescription, (id?: Id) => this._driverProvider().parseId(id, true))),
+            _.map(entities, x => applyEntityDefaultValues(this._entityType, x, operationDescription, (id?: Id) => this._driverProvider().parseId(id, true))),
             options);
         await this.processPluginBeforeActions<Partial<TEntity>[] | undefined, InsertManyPluginContext<TEntity, TSession>>(context, (p, c) => p.beforeInsertMany(c));
 

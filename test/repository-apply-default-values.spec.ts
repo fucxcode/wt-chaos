@@ -1,4 +1,4 @@
-import { defaultValue, applyDefaultValues, OperationDescription, MongoDBId, Id, MongoDBDriver } from "../src/repository";
+import { defaultValue, applyEntityDefaultValues, OperationDescription, MongoDBId, Id, MongoDBDriver } from "../src/repository";
 import * as _ from "../src/utilities";
 import { assert } from "chai";
 import * as uuid from "node-uuid";
@@ -41,7 +41,7 @@ describe("repository: apply default values", () => {
             numberPropNoDef: _.random(10000, 20000),
             booleanPropNoDef: _.sample([true, false])
         };
-        const actual = applyDefaultValues<Entity>(Entity, {
+        const actual = applyEntityDefaultValues<Entity>(Entity, {
             stringPropNoDef: def.stringPropNoDef,
             numberPropNoDef: def.numberPropNoDef,
             booleanPropNoDef: def.booleanPropNoDef
@@ -79,7 +79,7 @@ describe("repository: apply default values", () => {
 
         }
 
-        const actual = applyDefaultValues<Entity>(Entity, {
+        const actual = applyEntityDefaultValues<Entity>(Entity, {
             numberProp: null
         }, undefined, undefined);
 
@@ -113,7 +113,7 @@ describe("repository: apply default values", () => {
         }
 
         const assignedString = _.randomString();
-        const actual = applyDefaultValues<Entity>(Entity, {
+        const actual = applyEntityDefaultValues<Entity>(Entity, {
             stringProp: assignedString
         }, undefined, undefined);
 
@@ -146,7 +146,7 @@ describe("repository: apply default values", () => {
 
         }
 
-        const actual = applyDefaultValues<Entity>(Entity, {}, undefined, undefined);
+        const actual = applyEntityDefaultValues<Entity>(Entity, {}, undefined, undefined);
 
         assert.strictEqual(actual.stringProp, expects.stringProp);
         assert.isUndefined(actual.numberProp);
@@ -177,7 +177,7 @@ describe("repository: apply default values", () => {
 
         }
 
-        const actual = applyDefaultValues<Entity>(Entity, {}, undefined, undefined);
+        const actual = applyEntityDefaultValues<Entity>(Entity, {}, undefined, undefined);
 
         assert.strictEqual(actual.stringProp, expects.stringProp);
         assert.isNull(actual.numberProp);
@@ -208,7 +208,7 @@ describe("repository: apply default values", () => {
 
         }
 
-        const actual = applyDefaultValues<Entity>(Entity, {}, undefined, undefined);
+        const actual = applyEntityDefaultValues<Entity>(Entity, {}, undefined, undefined);
 
         assert.strictEqual(actual.stringProp, expects.stringProp);
         assert.strictEqual(actual.numberProp, expects.numberProp);
@@ -233,7 +233,7 @@ describe("repository: apply default values", () => {
 
         }
 
-        const actual = applyDefaultValues<Entity>(Entity, {}, undefined, undefined);
+        const actual = applyEntityDefaultValues<Entity>(Entity, {}, undefined, undefined);
 
         assert.deepStrictEqual(actual.stringArray, expects);
     });
@@ -260,7 +260,7 @@ describe("repository: apply default values", () => {
             _.randomString(),
             _.randomString(),
         ];
-        const actual = applyDefaultValues<Entity>(Entity, {
+        const actual = applyEntityDefaultValues<Entity>(Entity, {
             stringArray: arr
         }, undefined, undefined);
 
@@ -279,7 +279,7 @@ describe("repository: apply default values", () => {
 
         }
 
-        const actual = applyDefaultValues<Entity>(Entity, {}, undefined, undefined);
+        const actual = applyEntityDefaultValues<Entity>(Entity, {}, undefined, undefined);
 
         assert.deepStrictEqual(actual.stringArray, expects);
     });
@@ -316,7 +316,7 @@ describe("repository: apply default values", () => {
 
         }
 
-        const actual = applyDefaultValues<Entity>(Entity, {}, undefined, undefined);
+        const actual = applyEntityDefaultValues<Entity>(Entity, {}, undefined, undefined);
 
         assert.ok(actual.obj1);
         assert.deepStrictEqual(actual.obj1, expects);
@@ -348,7 +348,7 @@ describe("repository: apply default values", () => {
 
         }
 
-        const actual = applyDefaultValues<Entity>(Entity, {}, undefined, undefined);
+        const actual = applyEntityDefaultValues<Entity>(Entity, {}, undefined, undefined);
 
         assert.ok(actual.obj1);
         assert.deepStrictEqual(actual.obj1.arr, expects);
@@ -387,7 +387,7 @@ describe("repository: apply default values", () => {
 
         }
 
-        const actual = applyDefaultValues<Entity>(Entity, {}, undefined, undefined);
+        const actual = applyEntityDefaultValues<Entity>(Entity, {}, undefined, undefined);
 
         assert.ok(actual.obj1);
         assert.deepStrictEqual(actual.obj1.arr, expects);
@@ -409,7 +409,7 @@ describe("repository: apply default values", () => {
 
         }
 
-        const actual = applyDefaultValues<Entity>(Entity, {}, operationDescription, undefined);
+        const actual = applyEntityDefaultValues<Entity>(Entity, {}, operationDescription, undefined);
 
         assert.strictEqual(actual.team.toString(), operationDescription.team.toString());
         assert.strictEqual(actual.created_by, operationDescription.uid);
@@ -430,7 +430,7 @@ describe("repository: apply default values", () => {
 
         }
 
-        const actual = applyDefaultValues<Entity>(Entity, {}, undefined, (id?: Id) => driver.parseId(id, true));
+        const actual = applyEntityDefaultValues<Entity>(Entity, {}, undefined, (id?: Id) => driver.parseId(id, true));
 
         assert.ok(actual._id);
         assert.isTrue(driver.isValidId(actual._id));
@@ -464,7 +464,7 @@ describe("repository: apply default values", () => {
 
         }
 
-        const actual = applyDefaultValues<Child>(Child, {}, undefined, undefined);
+        const actual = applyEntityDefaultValues<Child>(Child, {}, undefined, undefined);
 
         assert.strictEqual(actual.stringProp, expects.stringProp);
         assert.strictEqual(actual.numberProp, expects.numberProp);
@@ -507,7 +507,7 @@ describe("repository: apply default values", () => {
 
         }
 
-        const actual = applyDefaultValues<Child>(Child, {}, undefined, undefined);
+        const actual = applyEntityDefaultValues<Child>(Child, {}, undefined, undefined);
 
         assert.strictEqual(actual.stringProp, expects_child.stringProp);
         assert.strictEqual(actual.numberProp, expects_parent.numberProp);

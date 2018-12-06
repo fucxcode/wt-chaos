@@ -1,6 +1,6 @@
 import MongoMemoryServer from "mongodb-memory-server";
 import * as mongodb from "mongodb";
-import { MongoDBDriver, Entity, defaultValue, collectionName, Repository, MongoDBSession, MongoDBId, OperationDescription, Id } from "../src/repository";
+import { MongoDBDriver, Entity, defaultValue, collectionName, Repository, MongoDBSession, MongoDBId, OperationDescription, Id, DeleteOptions, DeleteResult } from "../src/repository";
 import * as uuid from "node-uuid";
 import * as _ from "../src/utilities";
 import { assert } from "chai";
@@ -69,6 +69,9 @@ describe("repository: mongodb memory server", () => {
             return this.driver.find<T>(this.collectionName, {});
         }
 
+        public async erase(operationDescription: OperationDescription, condition?: any, multi: boolean = false, options?: DeleteOptions<MongoDBSession>): Promise<DeleteResult> {
+            return await super.erase(operationDescription, condition, multi, options);
+        }
     }
 
 
@@ -234,7 +237,7 @@ describe("repository: mongodb memory server", () => {
 
     it(`findOne: one match entity, throw when multiple = true`, async () => {
         const operationDescription = createOperationDescription();
-        const all_arr: any[] = [];
+        const all_arr: ProjectEntity[] = [];
         const count = _.random(10, 20);
         for (let i = 0; i < count; i++) {
             all_arr.push({
@@ -332,6 +335,25 @@ describe("repository: mongodb memory server", () => {
         assert.strictEqual(actual.name, expect.name);
     });
 
+    it(`findOneById: match entity, condition not match, return undefined`, async () => {
+        const operationDescription = createOperationDescription();
+        const all_arr: any[] = [];
+        const count = _.random(10, 20);
+        for (let i = 0; i < count; i++) {
+            all_arr.push({
+                name: _.randomString()
+            });
+        }
+        await projectRepository.insertMany(operationDescription, all_arr);
+
+        const expect = _.cloneDeep(_.sample(all_arr));
+        const actual = await projectRepository.findOneById(operationDescription, expect._id, {
+            name: _.randomString()
+        });
+
+        assert.isUndefined(actual);
+    });
+
     it(`findOneByIds: no match entity, return empty array`, async () => {
         const operationDescription = createOperationDescription();
         const all_arr: any[] = [];
@@ -370,7 +392,7 @@ describe("repository: mongodb memory server", () => {
             not_match_arr.push(driver.parseId(undefined, true));
         }
         const match_count = _.random(count / 2, count / 4 * 3);
-        const match_arr = _.sampleSize(all_arr, match_count);
+        const match_arr = _.cloneDeep(_.sampleSize(all_arr, match_count));
         const search_ids = _.shuffle(_.map(match_arr, x => x._id).concat(not_match_arr));
 
         const actual_arr = await projectRepository.findByIds(operationDescription, search_ids);
@@ -395,7 +417,7 @@ describe("repository: mongodb memory server", () => {
         await projectRepository.insertMany(operationDescription, all_arr);
 
         const match_count = _.random(count / 2, count / 4 * 3);
-        const match_arr = _.sampleSize(all_arr, match_count);
+        const match_arr = _.cloneDeep(_.sampleSize(all_arr, match_count));
         const search_ids: MongoDBId[] = [];
         for (const match of match_arr) {
             for (let i = 0; i < _.random(1, 3); i++) {
@@ -425,6 +447,25 @@ describe("repository: mongodb memory server", () => {
         await projectRepository.insertMany(operationDescription, all_arr);
 
         const actual_arr = await projectRepository.findByIds(operationDescription, []);
+
+        assert.strictEqual(actual_arr.length, 0);
+    });
+
+    it(`findOneByIds: partial array ids, condition not match, return empty array`, async () => {
+        const operationDescription = createOperationDescription();
+        const all_arr: any[] = [];
+        const count = _.random(10, 20);
+        for (let i = 0; i < count; i++) {
+            all_arr.push({
+                name: _.randomString()
+            });
+        }
+        await projectRepository.insertMany(operationDescription, all_arr);
+
+        const search_ids = _.map(_.sampleSize(all_arr, _.random(count / 2, count / 4 * 3)), x => x._id);
+        const actual_arr = await projectRepository.findByIds(operationDescription, search_ids, {
+            name: _.randomString()
+        });
 
         assert.strictEqual(actual_arr.length, 0);
     });
@@ -942,7 +983,7 @@ describe("repository: mongodb memory server", () => {
             {
                 name: update_name
             }, false);
-        
+
         assert.strictEqual(result.ok, Is.yes);
         assert.strictEqual(result.n, 1);
         assert.strictEqual(result.nModified, 1);
@@ -1032,6 +1073,355 @@ describe("repository: mongodb memory server", () => {
         {
             const actual = _.find(actual_arr, x => driver.isEqualsIds(x._id, all_arr[2]._id));
             assert.strictEqual(actual.name, all_arr[2].name);
+        }
+    });
+
+    it(`updateById, match id, update that one`, async () => {
+        const operationDescription = createOperationDescription();
+        const all_arr: ProjectEntity[] = [];
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: _.randomString() });
+        await projectRepository.insertMany(operationDescription, all_arr);
+
+        const expect_id = _.cloneDeep(_.sample(all_arr))._id;
+        const update_name = _.randomString();
+        const result = await projectRepository.updateById(operationDescription, expect_id, undefined, {
+            name: update_name
+        });
+
+        assert.strictEqual(result.ok, Is.yes);
+        assert.strictEqual(result.n, 1);
+        assert.strictEqual(result.nModified, 1);
+
+        const actual_arr = await projectRepository.findAll(operationDescription);
+        for (const actual of actual_arr) {
+            const expect = _.find(all_arr, x => driver.isEqualsIds(x._id, actual._id));
+            if (driver.isEqualsIds(expect._id, expect_id)) {
+                assert.strictEqual(actual.name, update_name);
+            }
+            else {
+                assert.strictEqual(actual.name, expect.name);
+            }
+        }
+    });
+
+    it(`updateById, match id, condition not match, not update`, async () => {
+        const operationDescription = createOperationDescription();
+        const all_arr: ProjectEntity[] = [];
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: _.randomString() });
+        await projectRepository.insertMany(operationDescription, all_arr);
+
+        const expect_id = _.cloneDeep(_.sample(all_arr))._id;
+        const update_name = _.randomString();
+        const result = await projectRepository.updateById(operationDescription, expect_id,
+            {
+                name: _.randomString()
+            },
+            {
+                name: update_name
+            });
+
+        assert.strictEqual(result.ok, Is.yes);
+        assert.strictEqual(result.n, 0);
+        assert.strictEqual(result.nModified, 0);
+
+        const actual_arr = await projectRepository.findAll(operationDescription);
+        for (const actual of actual_arr) {
+            const expect = _.find(all_arr, x => driver.isEqualsIds(x._id, actual._id));
+            assert.strictEqual(actual.name, expect.name);
+        }
+    });
+
+    it(`updateById, not match id, not update`, async () => {
+        const operationDescription = createOperationDescription();
+        const all_arr: ProjectEntity[] = [];
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: _.randomString() });
+        await projectRepository.insertMany(operationDescription, all_arr);
+
+        const update_name = _.randomString();
+        const result = await projectRepository.updateById(operationDescription, driver.parseId(undefined, true), undefined, {
+            name: update_name
+        });
+
+        assert.strictEqual(result.ok, Is.yes);
+        assert.strictEqual(result.n, 0);
+        assert.strictEqual(result.nModified, 0);
+
+        const actual_arr = await projectRepository.findAll(operationDescription);
+        for (const actual of actual_arr) {
+            const expect = _.find(all_arr, x => driver.isEqualsIds(x._id, actual._id));
+            assert.strictEqual(actual.name, expect.name);
+        }
+    });
+
+    it(`updateByIds, match ids, not update`, async () => {
+        const operationDescription = createOperationDescription();
+        const all_arr: ProjectEntity[] = [];
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: _.randomString() });
+        await projectRepository.insertMany(operationDescription, all_arr);
+
+        const update_name = _.randomString();
+        const result = await projectRepository.updateByIds(operationDescription,
+            [
+                driver.parseId(undefined, true),
+                driver.parseId(undefined, true)
+            ], undefined,
+            {
+                name: update_name
+            });
+
+        assert.strictEqual(result.ok, Is.yes);
+        assert.strictEqual(result.n, 0);
+        assert.strictEqual(result.nModified, 0);
+
+        const actual_arr = await projectRepository.findAll(operationDescription);
+        for (const actual of actual_arr) {
+            const expect = _.find(all_arr, x => driver.isEqualsIds(x._id, actual._id));
+            assert.strictEqual(actual.name, expect.name);
+        }
+    });
+
+    it(`updateByIds, partial match ids, update`, async () => {
+        const operationDescription = createOperationDescription();
+        const all_arr: ProjectEntity[] = [];
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: _.randomString() });
+        await projectRepository.insertMany(operationDescription, all_arr);
+
+        const matched_arr = _.cloneDeep(_.sampleSize(all_arr, 2));
+        const not_matched_arr = [
+            driver.parseId(undefined, true),
+            driver.parseId(undefined, true)
+        ];
+        const search_arr = _.shuffle(_.map(matched_arr, x => x._id).concat(not_matched_arr));
+        const update_name = _.randomString();
+        const result = await projectRepository.updateByIds(operationDescription, search_arr, undefined, {
+            name: update_name
+        });
+
+        assert.strictEqual(result.ok, Is.yes);
+        assert.strictEqual(result.n, matched_arr.length);
+        assert.strictEqual(result.nModified, matched_arr.length);
+
+        const actual_arr = await projectRepository.findAll(operationDescription);
+        for (const actual of actual_arr) {
+            const expect = _.find(all_arr, x => driver.isEqualsIds(x._id, actual._id));
+            if (_.some(matched_arr, x => driver.isEqualsIds(expect._id, x._id))) {
+                assert.strictEqual(actual.name, update_name);
+            }
+            else {
+                assert.strictEqual(actual.name, expect.name);
+            }
+        }
+    });
+
+    it(`updateByIds, partial match ids, partial condition, update`, async () => {
+        const operationDescription = createOperationDescription();
+        const all_arr: ProjectEntity[] = [];
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: _.randomString() });
+        await projectRepository.insertMany(operationDescription, all_arr);
+
+        const matched_arr = _.sampleSize(all_arr, 2);
+        const not_matched_arr = [
+            driver.parseId(undefined, true),
+            driver.parseId(undefined, true)
+        ];
+        const condition = _.cloneDeep(_.sample(matched_arr));
+        const search_arr = _.shuffle(_.map(matched_arr, x => x._id).concat(not_matched_arr));
+        const update_name = _.randomString();
+        const result = await projectRepository.updateByIds(operationDescription, search_arr,
+            {
+                name: condition.name
+            },
+            {
+                name: update_name
+            });
+
+        assert.strictEqual(result.ok, Is.yes);
+        assert.strictEqual(result.n, 1);
+        assert.strictEqual(result.nModified, 1);
+
+        const actual_arr = await projectRepository.findAll(operationDescription);
+        for (const actual of actual_arr) {
+            const expect = _.find(all_arr, x => driver.isEqualsIds(x._id, actual._id));
+            if (driver.isEqualsIds(expect._id, condition._id)) {
+                assert.strictEqual(actual.name, update_name);
+            }
+            else {
+                assert.strictEqual(actual.name, expect.name);
+            }
+        }
+    });
+
+    it(`updateByEntity, match entity._id, property normal value, update`, async () => {
+        const operationDescription = createOperationDescription();
+        const all_arr: ProjectEntity[] = [];
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: _.randomString() });
+        const out_arr = await projectRepository.insertMany(operationDescription, all_arr);
+
+        const update_name = _.randomString();
+        const update_entity = _.cloneDeep(_.sample(out_arr));
+        update_entity.name = update_name;
+        await projectRepository.updateByEntity(operationDescription, update_entity);
+
+        const actual_arr = await projectRepository.findAll(operationDescription);
+        for (const actual of actual_arr) {
+            const expect = _.find(all_arr, x => driver.isEqualsIds(x._id, actual._id));
+            if (driver.isEqualsIds(expect._id, update_entity._id)) {
+                assert.strictEqual(actual.name, update_name);
+            }
+            else {
+                assert.strictEqual(actual.name, expect.name);
+            }
+        }
+    });
+
+    it(`updateByEntity, match entity._id, property null value, update`, async () => {
+        const operationDescription = createOperationDescription();
+        const all_arr: ProjectEntity[] = [];
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: _.randomString() });
+        const out_arr = await projectRepository.insertMany(operationDescription, all_arr);
+
+        const update_entity = _.cloneDeep(_.sample(out_arr));
+        update_entity.name = null;
+        await projectRepository.updateByEntity(operationDescription, update_entity);
+
+        const actual_arr = await projectRepository.findAll(operationDescription);
+        for (const actual of actual_arr) {
+            const expect = _.find(all_arr, x => driver.isEqualsIds(x._id, actual._id));
+            if (driver.isEqualsIds(expect._id, update_entity._id)) {
+                assert.isNull(actual.name);
+            }
+            else {
+                assert.strictEqual(actual.name, expect.name);
+            }
+        }
+    });
+
+    it(`updateByEntity, match entity._id, property undefined, not update`, async () => {
+        const operationDescription = createOperationDescription();
+        const all_arr: ProjectEntity[] = [];
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: _.randomString() });
+        const out_arr = await projectRepository.insertMany(operationDescription, all_arr);
+
+        const update_entity = _.cloneDeep(_.sample(out_arr));
+        update_entity.name = undefined;
+        await projectRepository.updateByEntity(operationDescription, update_entity);
+
+        const actual_arr = await projectRepository.findAll(operationDescription);
+        for (const actual of actual_arr) {
+            const expect = _.find(all_arr, x => driver.isEqualsIds(x._id, actual._id));
+            assert.strictEqual(actual.name, expect.name);
+        }
+    });
+
+    it(`erase, condition = undefined, multi = false, 1st deleted`, async () => {
+        const operationDescription = createOperationDescription();
+        const all_arr: ProjectEntity[] = [];
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: _.randomString() });
+        const out_arr = await projectRepository.insertMany(operationDescription, all_arr);
+
+        await projectRepository.erase(operationDescription, undefined, false);
+
+        const actual_arr = await projectRepository.findAll(operationDescription);
+        assert.strictEqual(actual_arr.length, all_arr.length - 1);
+        for (let i = 0; i < all_arr.length; i++) {
+            const expect = all_arr[i];
+            if (i === 0) {
+                assert.isFalse(_.some(actual_arr, x => x.name === expect.name));
+            }
+            else {
+                const actual = _.find(actual_arr, x => x.name === expect.name);
+                assert.isTrue(driver.isEqualsIds(actual._id, expect._id));
+            }
+        }
+    });
+
+    it(`erase, condition = undefined, multi = true, all deleted`, async () => {
+        const operationDescription = createOperationDescription();
+        const all_arr: ProjectEntity[] = [];
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: _.randomString() });
+        const out_arr = await projectRepository.insertMany(operationDescription, all_arr);
+
+        await projectRepository.erase(operationDescription, undefined, true);
+
+        const actual_arr = await projectRepository.findAll(operationDescription);
+        assert.strictEqual(actual_arr.length, 0);
+    });
+
+    it(`erase, condition = match multiple, multi = false, 1st deleted`, async () => {
+        const operationDescription = createOperationDescription();
+        const search_name = _.randomString();
+        const all_arr: ProjectEntity[] = [];
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: search_name });
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: search_name });
+        const out_arr = await projectRepository.insertMany(operationDescription, all_arr);
+
+        await projectRepository.erase(operationDescription, {
+            name: search_name
+        }, false);
+
+        const actual_arr = await projectRepository.findAll(operationDescription);
+        assert.strictEqual(actual_arr.length, 3);
+        let deleted = false;
+        for (const expect of all_arr) {
+            if (expect.name === search_name && !deleted) {
+                assert.isFalse(_.some(actual_arr, x => driver.isEqualsIds(x._id, expect._id)));
+                deleted = true;
+            }
+            else {
+                const actual = _.find(actual_arr, x => driver.isEqualsIds(x._id, expect._id));
+                assert.strictEqual(actual.name, expect.name);
+            }
+        }
+    });
+
+    it(`erase, condition = match multiple, multi = true, all matched deleted`, async () => {
+        const operationDescription = createOperationDescription();
+        const search_name = _.randomString();
+        const all_arr: ProjectEntity[] = [];
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: search_name });
+        all_arr.push({ name: _.randomString() });
+        all_arr.push({ name: search_name });
+        const out_arr = await projectRepository.insertMany(operationDescription, all_arr);
+
+        await projectRepository.erase(operationDescription, {
+            name: search_name
+        }, true);
+
+        const actual_arr = await projectRepository.findAll(operationDescription);
+        assert.strictEqual(actual_arr.length, 2);
+        for (const expect of all_arr) {
+            if (expect.name === search_name) {
+                assert.isFalse(_.some(actual_arr, x => driver.isEqualsIds(x._id, expect._id)));
+            }
+            else {
+                const actual = _.find(actual_arr, x => driver.isEqualsIds(x._id, expect._id));
+                assert.strictEqual(actual.name, expect.name);
+            }
         }
     });
 

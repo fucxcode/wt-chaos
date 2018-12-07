@@ -3,7 +3,7 @@ import { Direction } from "../../constants";
 import * as _ from "../../utilities";
 
 type Index<T extends Entity> = {
-    [key in keyof T]: Direction
+    [key in keyof T]?: Direction
 };
 
 interface IndexSpecification<T extends Entity> {
@@ -18,9 +18,20 @@ interface IndexSpecification<T extends Entity> {
 
 }
 
-const indexes = function <T extends Entity>(indexes: IndexSpecification<T>[]) {
+const indexes = function <T extends Entity>(indexes: Array<IndexSpecification<T> | Index<T>>) {
     return function (target: any) {
-        Reflect.defineMetadata("wt-entity-idx", indexes, target);
+        _.updateMetadata<IndexSpecification<T>[], Array<IndexSpecification<T> | Index<T>>>("wt-entity-idx", indexes, target, () => [], (v, u) => {
+            return v.concat(_.map(u, x => {
+                if (_.has(x, "key") && _.isObject(_.get(x, "key"))) {
+                    return x as unknown as IndexSpecification<T>;
+                }
+                else {
+                    return {
+                        key: x as unknown as Index<T>
+                    };
+                }
+            }));
+        });
         return target;
     };
 };

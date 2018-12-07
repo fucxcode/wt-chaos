@@ -1,6 +1,6 @@
 import MongoMemoryServer from "mongodb-memory-server";
 import * as mongodb from "mongodb";
-import { MongoDBDriver, collectionName, Id, indexes, Entity, getCollectionNameFromEntity, IndexSpecification } from "../src/repository";
+import { MongoDBDriver, collectionName, Id, indexes, Entity, getCollectionNameFromEntity, IndexSpecification, BusinessEntity, Index } from "../src/repository";
 import { Timestamp, UID, Direction, Is } from "../src/constants";
 import { assert } from "chai";
 import * as _ from "../src/utilities";
@@ -71,6 +71,49 @@ describe("driver: create indexes", () => {
         created_by?: UID;
     }
 
+    const COLLECTION_NAME_BASE = "base_entities";
+    const BASE_INDEXES: IndexSpecification<BaseEntity>[] = [
+        {
+            key: {
+                name: Direction.ascending
+            }
+        }
+    ];
+    @collectionName(COLLECTION_NAME_BASE)
+    @indexes<BaseEntity>(BASE_INDEXES)
+    // @ts-ignore
+    class BaseEntity extends Entity {
+        name: string;
+    }
+
+    const COLLECTION_NAME_SUB = "sub_entities";
+    const SUB_INDEXES: IndexSpecification<SubEntity>[] = [
+        {
+            key: {
+                age: Direction.ascending
+            }
+        }
+    ];
+    @collectionName(COLLECTION_NAME_SUB)
+    @indexes<SubEntity>(SUB_INDEXES)
+    // @ts-ignore
+    class SubEntity extends BaseEntity {
+        age: number;
+    }
+
+    const COLLECTION_NAME_SIMPLE = "simple";
+    const INDEXES_SIMPLE: Index<SimpleIndexEntity>[] = [
+        {
+            name: Direction.ascending
+        }
+    ];
+    @collectionName(COLLECTION_NAME_SIMPLE)
+    @indexes<SimpleIndexEntity>(INDEXES_SIMPLE)
+    // @ts-ignore
+    class SimpleIndexEntity extends Entity {
+        name: string;
+    }
+
     before(async () => {
         const uri = await mongod.getConnectionString();
         dbName = await mongod.getDbName();
@@ -97,7 +140,7 @@ describe("driver: create indexes", () => {
         assert.strictEqual(result.ok, Is.yes);
         assert.strictEqual(result.drop, false);
         assert.strictEqual(result.collections.length, 2);
-        
+
         const projectCollectionResult = _.find(result.collections, x => x.name === COLLECTION_NAME_PROJECTS);
         assert.strictEqual(projectCollectionResult.nIndexesBefore, 1);
         assert.strictEqual(projectCollectionResult.nIndexesAfter, 4);
@@ -109,7 +152,7 @@ describe("driver: create indexes", () => {
             assert.strictEqual(actual.unique, expect.unique);
             assert.strictEqual(actual.background, expect.background);
         }
-        
+
         const taskCollectionResult = _.find(result.collections, x => x.name === COLLECTION_NAME_TASKS);
         assert.strictEqual(taskCollectionResult.nIndexesBefore, 1);
         assert.strictEqual(taskCollectionResult.nIndexesAfter, 3);
@@ -272,6 +315,49 @@ describe("driver: create indexes", () => {
             assert.strictEqual(actual.background, expect.background);
         }
 
+    });
+
+    it(`create indexes defined in both base and sub entity`, async () => {
+        const result = await driver.createIndexes([
+            SubEntity
+        ], true);
+
+        const subCollectionResult = _.find(result.collections, x => x.name === COLLECTION_NAME_SUB);
+        assert.strictEqual(subCollectionResult.nIndexesBefore, 1);
+        assert.strictEqual(subCollectionResult.nIndexesAfter, 3);
+        const subCollectionIndexes = await client.db(dbName).collection(COLLECTION_NAME_SUB).listIndexes().toArray();
+        for (const expect of BASE_INDEXES) {
+            const actual = _.find(subCollectionIndexes, x => _.isEqual(x.key, expect.key));
+            assert.ok(actual);
+            assert.strictEqual(actual.name, expect.name);
+            assert.strictEqual(actual.unique, expect.unique);
+            assert.strictEqual(actual.background, expect.background);
+        }
+        for (const expect of SUB_INDEXES) {
+            const actual = _.find(subCollectionIndexes, x => _.isEqual(x.key, expect.key));
+            assert.ok(actual);
+            assert.strictEqual(actual.name, expect.name);
+            assert.strictEqual(actual.unique, expect.unique);
+            assert.strictEqual(actual.background, expect.background);
+        }
+    });
+
+    it(`indexes defined in simple mode`, async () => {
+        const result = await driver.createIndexes([
+            SimpleIndexEntity
+        ], true);
+
+        const collectionResult = _.find(result.collections, x => x.name === COLLECTION_NAME_SIMPLE);
+        assert.strictEqual(collectionResult.nIndexesBefore, 1);
+        assert.strictEqual(collectionResult.nIndexesAfter, INDEXES_SIMPLE.length + 1);
+        const simpleCollectionIndexes = await client.db(dbName).collection(COLLECTION_NAME_SIMPLE).listIndexes().toArray();
+        for (const expect of INDEXES_SIMPLE) {
+            const actual = _.find(simpleCollectionIndexes, x => _.isEqual(x.key, expect));
+            assert.ok(actual);
+            assert.ok(actual.name);
+            assert.isUndefined(actual.unique);
+            assert.isUndefined(actual.background);
+        }
     });
 
 });

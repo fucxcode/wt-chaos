@@ -244,6 +244,10 @@ class LokiDriver implements Driver<LokiSession, LokiId> {
         }
     }
 
+    public async createIndexes(EntityTypes: Function[], drop: boolean): Promise<any> {
+        throw new Error("not implements");
+    }
+    
 }
 
 export { LokiDriver };

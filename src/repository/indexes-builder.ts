@@ -1,5 +1,0 @@
-class IndexesBuilder {
-
-}
-
-export { IndexesBuilder };

@@ -21,6 +21,8 @@ import { MaxTimeMsOptions } from "../max-time-ms-options";
 import { SessionOptions } from "../session-option";
 import { MongoDBId } from "./mongodb-id";
 import { MongoDBSession } from "./mongodb-session";
+import { Index, getIndexesFromEntity, getCollectionNameFromEntity } from "../../decorators";
+import { CreateIndexesResult } from "../create-indexes-result";
 
 class MongoDBDriver implements Driver<MongoDBSession, MongoDBId> {
 
@@ -227,6 +229,42 @@ class MongoDBDriver implements Driver<MongoDBSession, MongoDBId> {
         else {
             return false;
         }
+    }
+
+    public async createIndexes(EntityTypes: Function[], drop: boolean): Promise<CreateIndexesResult> {
+        const result: CreateIndexesResult = {
+            ok: 1,
+            drop: drop,
+            collections: []
+        };
+        for (const EntityType of EntityTypes) {
+            const collectionName = getCollectionNameFromEntity(EntityType);
+            // create indexes for those entities has collection name specified
+            if (!_.isEmpty(collectionName)) {
+                const collection = this._db.collection(collectionName);
+                const indexes = getIndexesFromEntity<Entity>(EntityType);
+                // drop existing indexes if specied and only when collection does exist
+                if (drop) {
+                    if (_.some(await this._db.listCollections(
+                        {
+                            name: collectionName
+                        },
+                        {
+                            nameOnly: true
+                        }).toArray())) {
+                        await collection.dropIndexes();
+                    }
+                }
+                // create indexes and collect result
+                const output = await collection.createIndexes(indexes);
+                result.collections.push({
+                    name: collectionName,
+                    nIndexesBefore: output.numIndexesBefore,
+                    nIndexesAfter: output.numIndexesAfter
+                });
+            }
+        }
+        return result;
     }
 
 }

@@ -49,6 +49,8 @@ interface Driver<TSession extends Session, TID extends Id> {
 
     dropCollection(collectionName: string): Promise<boolean>;
 
+    createIndexes<T extends Entity>(EntityTypes: Function[], drop: boolean): Promise<any>;
+    
 }
 
 export { Driver };

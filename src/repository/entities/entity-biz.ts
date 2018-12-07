@@ -1,12 +1,16 @@
 import { Entity } from "./entity";
 import { Id } from "./id";
 import { Timestamp, UID, Is, Direction } from "../../constants";
-import { defaultValue, index } from "../decorators";
+import { defaultValue, indexes } from "../decorators";
 import moment from "moment";
 
-@index<BusinessEntity>({
-    team: Direction.ascending
-})
+@indexes<BusinessEntity>([
+    {
+        key: {
+            team: Direction.ascending
+        }
+    }
+])
 export abstract class BusinessEntity extends Entity {
 
     @defaultValue(operationDescription => operationDescription.team)

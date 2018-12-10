@@ -1,5 +1,5 @@
 import { Context } from "../context";
-import { Router, RouterMiddleware, RouterHandler, INextFunction } from "../router";
+import { Router, } from "../router";
 import Koa from "koa";
 import KoaRouterRaw from "koa-router";
 import * as _ from "../../utilities";
@@ -10,6 +10,9 @@ import { HttpMethod } from "../../constants";
 import { WTCode } from "../../errors";
 import { Container } from "../../container";
 import { Cookies } from "../cookies";
+import { INextFunction } from "../next-function";
+import { RouterMiddleware } from "../router-middleware";
+import { RouterHandler } from "../router-handler";
 
 class KoaContext<T> extends Context<T> {
 

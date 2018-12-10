@@ -1,5 +1,5 @@
 import { Context } from "../context";
-import { Router, RouterMiddleware, RouterHandler } from "../router";
+import { Router } from "../router";
 import * as express from "express";
 import * as _ from "../../utilities";
 import * as uuid from "node-uuid";
@@ -9,6 +9,8 @@ import { HttpMethod } from "../../constants";
 import { WTCode } from "../..";
 import { Container } from "../../container";
 import { Cookies, GetOption, SetOption } from "../cookies";
+import { RouterMiddleware } from "../router-middleware";
+import { RouterHandler } from "../router-handler";
 
 interface ExpressRequest extends express.Request {
 

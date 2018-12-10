@@ -2,24 +2,8 @@ import { Context } from "./context";
 import * as $path from "path";
 import { HttpMethod } from "../constants";
 import { Container, ContainerPool } from "../container";
-
-interface INextFunction {
-
-    (error?: any): Promise<void>;
-
-}
-
-interface RouterMiddleware<TContext extends Context<TState>, TState> {
-
-    (ctx: TContext, next: INextFunction): Promise<void>;
-
-}
-
-interface RouterHandler<TContext extends Context<TState>, TState> {
-
-    (ctx: TContext): Promise<any>;
-
-}
+import { RouterMiddleware } from "./router-middleware";
+import { RouterHandler } from "./router-handler";
 
 const DEFAULT_ROUTER_KEY = Symbol.for("default_router");
 
@@ -64,4 +48,4 @@ abstract class Router<TContext extends Context<TState>, TState> {
 
 }
 
-export { Router, INextFunction, RouterMiddleware, RouterHandler, DEFAULT_ROUTER_KEY };
+export { Router, DEFAULT_ROUTER_KEY };

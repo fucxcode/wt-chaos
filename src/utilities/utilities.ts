@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import * as _ from "./lodash-wrapper";
+import * as _ from "./lodash-wrapper-fallback";
 import moment from "moment";
 import { ObjectID, Is, Projection, ObjectOrId } from "../constants";
 import * as mongodb from "mongodb";
@@ -240,4 +240,4 @@ export function md5(input: string): string {
         .digest("hex");
 }
 
-export * from "./lodash-wrapper";
+export * from "./lodash-wrapper-fallback";

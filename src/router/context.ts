@@ -39,9 +39,11 @@ abstract class Context<T> {
 
     public abstract get params(): any;
 
-    public abstract get body(): any;
+    public abstract get requestBody(): any;
 
-    public abstract set body(vale: any);
+    public abstract get responseBody(): any;
+
+    public abstract set responseBody(vale: any);
 
     public abstract get statusCode(): number;
 

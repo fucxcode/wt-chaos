@@ -85,11 +85,15 @@ class ExpressContext<T> extends Context<T> {
         return this._req.params;
     }
 
-    public get body(): any {
+    public get requestBody(): any {
         return this._req.body;
     }
 
-    public set body(value: any) {
+    public get responseBody(): any {
+        throw new Error("not implements");
+    }
+
+    public set responseBody(value: any) {
         this._res.send(value);
     }
 

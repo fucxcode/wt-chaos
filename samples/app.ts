@@ -6,7 +6,6 @@ import { route, facade, middlewares } from "../src/facade";
 import { HttpMethod } from "../src/constants";
 import { ContainerPool, injectable, inject } from "../src/container";
 import { WTError, WTCode } from "../src";
-import { PromiseProvider } from "mongoose";
 
 const container = ContainerPool.registerContainer();
 

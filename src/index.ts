@@ -10,6 +10,7 @@ import * as facade from "./facade";
 import * as sms from "./sms";
 import * as i18n from "./i18n";
 import * as mailer from "./mailer";
+import * as application from "./application";
 
 export {
     _,
@@ -25,5 +26,6 @@ export {
     facade,
     sms,
     i18n,
-    mailer
+    mailer,
+    application
 };

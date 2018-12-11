@@ -17,10 +17,7 @@ import { RouterHandler } from "../router-handler";
 class KoaContext<T> extends Context<T> {
 
     private _ctx: Koa.Context;
-    public get innerContext(): Koa.Context {
-        return this._ctx;
-    }
-   
+
     constructor(ctx: Koa.Context, next?: INextFunction) {
         super(() => ctx.state, ctx.req, ctx.res, () => {
             if (!ctx.state.oid) {
@@ -43,11 +40,15 @@ class KoaContext<T> extends Context<T> {
         return this._ctx.params;
     }
 
-    public get body(): any {
+    public get requestBody(): any {
         return this._ctx.request.body;
     }
 
-    public set body(value: any) {
+    public get responseBody(): any {
+        return this._ctx.response.body;
+    }
+
+    public set responseBody(value: any) {
         this._ctx.body = value;
     }
 
@@ -99,6 +100,13 @@ class KoaContext<T> extends Context<T> {
     public redirect(url: string, alt?: string): void {
         this._ctx.redirect(url, alt);
     }
+
+    public static convertMiddleware<TState>(middleware: Koa.Middleware): RouterMiddleware<KoaContext<TState>, TState> {
+        return async function (ctx: KoaContext<TState>, next: INextFunction): Promise<void> {
+            await middleware(ctx._ctx, next);
+        };
+    }
+
 }
 
 class KoaRouter<T> extends Router<KoaContext<T>, T> {

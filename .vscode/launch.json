@@ -24,10 +24,10 @@
             "name": "Start Sample",
             "runtimeArgs": [
                 "-r",
-                "ts-node/register"
+                "ts-node/register/transpile-only"
             ],
             "args": [
-                "${workspaceFolder}/samples/app.ts"
+                "${workspaceFolder}/samples/new_app.ts"
             ]
         }
     ]

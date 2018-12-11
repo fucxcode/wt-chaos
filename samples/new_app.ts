@@ -20,11 +20,9 @@ class State {
 }
 
 @facade()
-// @ts-ignore
 class Facade1 {
 
     @get("/ping")
-    // @ts-ignore
     public async ping(ctx: Context<State>): Promise<string> {
         return "PONG!";
     }
@@ -32,11 +30,9 @@ class Facade1 {
 }
 
 @facade()
-// @ts-ignore
 class Facade2 {
 
     @post("/echo")
-    // @ts-ignore
     public async echo(ctx: Context<State>): Promise<{
         input: any,
         at: number

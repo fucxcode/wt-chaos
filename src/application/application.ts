@@ -9,9 +9,9 @@ export interface ApplicationOptions<TContext extends Context<TState>, TState> {
 
     port: number;
 
-    hostname: string;
+    hostname?: string;
 
-    prefix: string;
+    prefix?: string;
 
     facades: Function[];
 
@@ -42,7 +42,7 @@ export abstract class Application<TContext extends Context<TState>, TState, TRou
 
     protected abstract initializeServer(): TServer;
 
-    protected abstract initializeRouter(server: TServer, prefix: string): TRouter;
+    protected abstract initializeRouter(server: TServer, prefix?: string): TRouter;
 
     public start(container?: Container): Promise<ListenResult<TContext, TState, TRouter, TServer>> {
         container = container || ContainerPool.getDefaultContainer();

@@ -2,6 +2,7 @@ import http, { IncomingHttpHeaders } from "http";
 import * as uuid from "node-uuid";
 import * as _ from "../utilities";
 import { Cookies } from "./cookies";
+import { HttpMethod } from "../constants";
 
 abstract class Context<T> {
 
@@ -69,6 +70,7 @@ abstract class Context<T> {
 
     public abstract redirect(url: string, alt?: string): void;
 
+    public abstract get method(): HttpMethod;
 }
 
 export { Context };

@@ -107,6 +107,10 @@ class KoaContext<T> extends Context<T> {
         };
     }
 
+    public get method(): HttpMethod {
+        return this._ctx.method as HttpMethod;
+    }
+
 }
 
 class KoaRouter<T> extends Router<KoaContext<T>, T> {

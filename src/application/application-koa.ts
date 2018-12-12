@@ -22,7 +22,7 @@ export class KoaApplication<TState> extends Application<KoaContext<TState>, TSta
         return server;
     }
 
-    protected initializeRouter(server: Koa, prefix: string): KoaRouter<TState> {
+    protected initializeRouter(server: Koa, prefix?: string): KoaRouter<TState> {
         return new KoaRouter<TState>(server, prefix);
     }
 

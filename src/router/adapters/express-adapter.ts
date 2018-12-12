@@ -6,7 +6,6 @@ import * as uuid from "node-uuid";
 import { IncomingHttpHeaders } from "http";
 import bodyParser from "body-parser";
 import { HttpMethod } from "../../constants";
-import { WTCode } from "../..";
 import { Container } from "../../container";
 import { Cookies, GetOption, SetOption } from "../cookies";
 import { RouterMiddleware } from "../router-middleware";
@@ -145,6 +144,11 @@ class ExpressContext<T> extends Context<T> {
     public redirect(url: string, alt?: string): void {
         this._res.redirect(url);
     }
+
+    public get method(): HttpMethod {
+        return this._req.method as HttpMethod;
+    }
+
 }
 
 class ExpressRouter<T> extends Router<ExpressContext<T>, T> {

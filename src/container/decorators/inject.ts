@@ -1,5 +1,6 @@
 import { Container, Type, PropertyType } from "../container";
 import { ContainerPool } from "../container-pool";
+import * as _ from "../../utilities";
 
 const inject = function (container?: Container, throwErrorUnregister: boolean = true, type?: Type, lazy: boolean = false): (...args: any[]) => any {
     let realContainer: Container;
@@ -39,11 +40,13 @@ const inject = function (container?: Container, throwErrorUnregister: boolean = 
                 });
             }
             else {
-                // since this metadata will be retrieved in class decorator @injectable and it can only contact the `target.constructor`
+                // since this metadata will be retrieved in class decorator @injectable and it can only use `target.constructor`
                 // so in this case we should save metadata in `target.constructor` rather than `target`
-                const injectedProperties: PropertyType[] = Reflect.getMetadata(`wt-injected-props`, target.constructor) || [];
-                injectedProperties.push(new PropertyType(key, propertyType, realContainer));
-                Reflect.defineMetadata(`wt-injected-props`, injectedProperties, target.constructor);
+                _.updateMetadata<Map<string, PropertyType>, PropertyType>(`wt-injected-props`, new PropertyType(key, propertyType, realContainer), target.constructor, () => new Map<string, PropertyType>(), (v, u) => {
+                    const map = new Map<string, PropertyType>(v);
+                    map.set(key, u);
+                    return map;
+                });
             }
         }
         else if (args.length === 3 && typeof args[2] === `number`) {

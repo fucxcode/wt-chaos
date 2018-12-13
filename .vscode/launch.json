@@ -15,7 +15,7 @@
             "args": [
                 "${workspaceFolder}/test/bootstrap.ts",
                 "--s",
-                "mongodb-driver-create-indexes"
+                "#196709"
             ]
         },
         {

@@ -17,7 +17,7 @@ interface Driver<TSession extends Session, TID extends Id> {
 
     name: string;
 
-    parseId(id?: Id, createWhenNil?: boolean): TID | null | undefined;
+    parseId(id?: any, createWhenNil?: boolean): TID | null | undefined;
 
     isValidId(id?: any): id is Id;
 

@@ -3,19 +3,25 @@ import { MongoDBDriver, DriverExtensions, ReadWriteStrategy } from "../src/repos
 import { MongoClient } from "mongodb";
 import { PingFacade } from "./modules/ping/ping.facade";
 import { config } from "./config";
-import { ProductFacade } from "./modules/product/product.facade";
+import MongoMemoryServer from "mongodb-memory-server";
+import { TeamFacade } from "./modules/team/team.facade";
 
 const app = new App([
     PingFacade,
-    ProductFacade
+    TeamFacade
 ]);
 
 (async () => {
+    // start mongodb memory server
+    const mongod = new MongoMemoryServer();
+    const uri = await mongod.getConnectionString();
+    const dbName = await mongod.getDbName();
+
     // connect mongodb database
-    const client = await MongoClient.connect(config.mongodb.url, {
+    const client = await MongoClient.connect(uri, {
         useNewUrlParser: true
     });
-    const driver = new MongoDBDriver(client, config.mongodb.dbName, undefined, undefined, ReadWriteStrategy.AGGREGATE_SECONDARY);
+    const driver = new MongoDBDriver(client, dbName, undefined, undefined, ReadWriteStrategy.AGGREGATE_SECONDARY);
     DriverExtensions.setDefault(driver);
     // start api server
     return await app.start();

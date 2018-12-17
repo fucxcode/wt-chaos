@@ -84,7 +84,7 @@ class MongoDBDriver implements Driver<MongoDBSession, MongoDBId> {
         return result;
     }
 
-    public parseId(id?: Id, createWhenNil: boolean = false): MongoDBId | null | undefined {
+    public parseId(id?: any, createWhenNil: boolean = false): MongoDBId | null | undefined {
         if (id) {
             return new MongoDBId(id && id.toString());
         }

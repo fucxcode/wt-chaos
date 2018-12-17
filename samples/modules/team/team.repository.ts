@@ -1,12 +1,12 @@
 import { MongoDBRepository } from "../../core/mongodb-repository";
-import { ProductEntity } from "./product.entity";
+import { TeamEntity } from "./team.entity";
 import { injectable } from "../../../src/container";
 
 @injectable()
-export class ProductRepository extends MongoDBRepository<ProductEntity> {
+export class TeamRepository extends MongoDBRepository<TeamEntity> {
 
     constructor() {
-        super(ProductEntity);
+        super(TeamEntity);
     }
 
 }

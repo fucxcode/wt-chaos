@@ -1,10 +1,12 @@
 import * as _ from "../utilities";
 import { HttpMethod } from "../constants";
+import { RouterRequestConstructor, RouterRequest } from "../router";
+import { OperationContext } from "../router/operation-context";
 
 const METADATA_KEY_ROUTE_PREFIX = "wt-route-prefix";
 const METADATA_KEY_ROUTES = "wt-routes";
 
-class RouteOptions {
+class RouteOptions<T extends OperationContext> {
 
     private _method?: HttpMethod;
     public get method(): HttpMethod | undefined {
@@ -16,9 +18,15 @@ class RouteOptions {
         return this._path;
     }
 
-    constructor(path: string, method?: HttpMethod) {
+    private _RouterRequestConstructor?: RouterRequestConstructor<T, RouterRequest<T>>;
+    public get RouterRequestConstructor(): RouterRequestConstructor<T, RouterRequest<T>> | undefined {
+        return this._RouterRequestConstructor;
+    }
+
+    constructor(path: string, method?: HttpMethod, RouterRequestConstructor?: RouterRequestConstructor<T, RouterRequest<T>>) {
         this._path = path;
         this._method = method;
+        this._RouterRequestConstructor = RouterRequestConstructor;
     }
 }
 
@@ -30,19 +38,19 @@ const getRoutePrefixes = function (target: any): string[] {
     return Reflect.getMetadata(METADATA_KEY_ROUTE_PREFIX, target) || [];
 };
 
-const setMethodRoute = function (target: any, propertyKey: string, path: string, method?: HttpMethod): void {
-    _.updateMetadata<Map<string, RouteOptions>, RouteOptions>(METADATA_KEY_ROUTES, new RouteOptions(path, method), target, () => new Map<string, RouteOptions>(), (v, u) => {
-        const map = new Map<string, RouteOptions>(v);
+const setMethodRoute = function<T extends OperationContext> (target: any, propertyKey: string, path: string, method?: HttpMethod, RouterRequestConstructor?: RouterRequestConstructor<T, RouterRequest<T>>): void {
+    _.updateMetadata<Map<string, RouteOptions<T>>, RouteOptions<T>>(METADATA_KEY_ROUTES, new RouteOptions(path, method, RouterRequestConstructor), target, () => new Map<string, RouteOptions<T>>(), (v, u) => {
+        const map = new Map<string, RouteOptions<T>>(v);
         map.set(propertyKey, u);
         return map;
     });
 };
 
-const getMethodRoutes = function (target: any): Map<string, RouteOptions> {
-    return Reflect.getMetadata(METADATA_KEY_ROUTES, target) || new Map<string, RouteOptions>();
+const getMethodRoutes = function <T extends OperationContext> (target: any): Map<string, RouteOptions<T>> {
+    return Reflect.getMetadata(METADATA_KEY_ROUTES, target) || new Map<string, RouteOptions<T>>();
 };
 
-const route = function (path: string, method?: HttpMethod) {
+const route = function <T extends OperationContext> (path: string, method?: HttpMethod, RouterRequestConstructor?: RouterRequestConstructor<T, RouterRequest<T>>) {
     return function (...args: any[]) {
         if (args.length === 1) {
             // class decorator, `method` is ignored since `path` will be the prefix of url
@@ -51,7 +59,7 @@ const route = function (path: string, method?: HttpMethod) {
         else if (args.length === 3 && typeof args[2] !== "number") {
             // method decorator
             if (method) {
-                setMethodRoute(args[0], args[1], path, method);
+                setMethodRoute(args[0], args[1], path, method, RouterRequestConstructor);
             }
             else {
                 throw new Error("route decorator on method must specify 'method' parameter");
@@ -63,20 +71,20 @@ const route = function (path: string, method?: HttpMethod) {
     };
 };
 
-const get = function (path: string) {
-    return route(path, HttpMethod.GET);
+const get = function <T extends OperationContext> (path: string, RouterRequestConstructor?: RouterRequestConstructor<T, RouterRequest<T>>) {
+    return route(path, HttpMethod.GET, RouterRequestConstructor);
 };
 
-const post = function (path: string) {
-    return route(path, HttpMethod.POST);
+const post = function <T extends OperationContext> (path: string, RouterRequestConstructor?: RouterRequestConstructor<T, RouterRequest<T>>) {
+    return route(path, HttpMethod.POST, RouterRequestConstructor);
 };
 
-const put = function (path: string) {
-    return route(path, HttpMethod.PUT);
+const put = function <T extends OperationContext> (path: string, RouterRequestConstructor?: RouterRequestConstructor<T, RouterRequest<T>>) {
+    return route(path, HttpMethod.PUT, RouterRequestConstructor);
 };
 
-const del = function (path: string) {
-    return route(path, HttpMethod.DELETE);
+const del = function <T extends OperationContext> (path: string, RouterRequestConstructor?: RouterRequestConstructor<T, RouterRequest<T>>) {
+    return route(path, HttpMethod.DELETE, RouterRequestConstructor);
 };
 
 export { route, get, post, put, del, RouteOptions, setMethodRoute, getMethodRoutes, setRoutePrefix, getRoutePrefixes };

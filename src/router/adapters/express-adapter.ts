@@ -1,4 +1,4 @@
-import { Context } from "../context";
+import { RouterContext } from "../router-context";
 import { Router } from "../router";
 import * as express from "express";
 import * as _ from "../../utilities";
@@ -9,7 +9,8 @@ import { HttpMethod } from "../../constants";
 import { Container } from "../../container";
 import { Cookies, GetOption, SetOption } from "../cookies";
 import { RouterMiddleware } from "../router-middleware";
-import { RouterHandler } from "../router-handler";
+import { RouterContextHandler } from "../router-handler";
+import { OperationContext } from "../operation-context";
 
 interface ExpressRequest extends express.Request {
 
@@ -45,31 +46,26 @@ class ExpressCookies implements Cookies {
 
 }
 
-class ExpressContext<T> extends Context<T> {
+class ExpressContext<T extends OperationContext> extends RouterContext<T> {
 
     private _req: ExpressRequest;
 
     private _res: express.Response;
 
+    private _operationContext: T;
+
+    public get operationContext(): T {
+        return this._operationContext;
+    }
+
     constructor(request: ExpressRequest, response: express.Response) {
-        super(
-            () => {
-                if (!request.state) {
-                    request.state = {};
-                }
-                return request.state;
-            },
-            request,
-            response,
-            () => {
-                if (!request.oid) {
-                    request.oid = uuid.v4();
-                }
-                return request.oid;
-            }
-        );
+        super(request, response);
         this._req = request;
         this._res = response;
+        this._operationContext = {
+            oid: uuid.v4(),
+            path: this._req.path
+        } as any;
     }
 
     public get headers(): IncomingHttpHeaders {
@@ -151,7 +147,7 @@ class ExpressContext<T> extends Context<T> {
 
 }
 
-class ExpressRouter<T> extends Router<ExpressContext<T>, T> {
+class ExpressRouter<T extends OperationContext> extends Router<ExpressContext<T>, T> {
 
     private _app: express.Express;
 
@@ -183,7 +179,7 @@ class ExpressRouter<T> extends Router<ExpressContext<T>, T> {
         }));
     }
 
-    public onRoute(method: HttpMethod, path: string | RegExp, middlewares: RouterMiddleware<ExpressContext<T>, T>[], handler: RouterHandler<ExpressContext<T>, T>): void {
+    public onRoute(method: HttpMethod, path: string | RegExp, middlewares: RouterMiddleware<ExpressContext<T>, T>[], handler: RouterContextHandler<ExpressContext<T>, T>): void {
         const fn = (this._app as any)[method.toLowerCase()] as Function;
         if (_.isFunction(fn)) {
             const handlers: ((req: ExpressRequest, res: express.Response, next: express.NextFunction) => void)[] = [];

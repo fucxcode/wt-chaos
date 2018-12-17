@@ -33,7 +33,7 @@ class LokiDriver implements Driver<LokiSession, LokiId> {
         this._db = new Loki(databaseName);
     }
 
-    public parseId(id?: Id, createWhenNil: boolean = false): LokiId | null | undefined {
+    public parseId(id?: any, createWhenNil: boolean = false): LokiId | null | undefined {
         if (id) {
             return new LokiId(id && id.toString());
         }

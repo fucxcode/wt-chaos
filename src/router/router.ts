@@ -1,13 +1,14 @@
-import { Context } from "./context";
+import { RouterContext } from "./router-context";
 import * as $path from "path";
 import { HttpMethod } from "../constants";
 import { Container, ContainerPool } from "../container";
 import { RouterMiddleware } from "./router-middleware";
-import { RouterHandler } from "./router-handler";
+import { RouterContextHandler, RouterRequestHandler, RouterRequestConstructor, RouterRequest } from "./router-handler";
+import { OperationContext } from "./operation-context";
 
 const DEFAULT_ROUTER_KEY = Symbol.for("default_router");
 
-abstract class Router<TContext extends Context<TState>, TState> {
+abstract class Router<TContext extends RouterContext<T>, T extends OperationContext> {
 
     private _prefix: string;
     public get prefix(): string {
@@ -24,17 +25,17 @@ abstract class Router<TContext extends Context<TState>, TState> {
         }
     }
 
-    public use(handler: RouterMiddleware<TContext, TState>): void {
+    public use(handler: RouterMiddleware<TContext, T>): void {
         this.onUse(handler);
     }
 
-    protected abstract onUse(handler: RouterMiddleware<TContext, TState>): void;
+    protected abstract onUse(handler: RouterMiddleware<TContext, T>): void;
 
-    public route(method: HttpMethod, path: string, middlewares: RouterMiddleware<TContext, TState>[], handler: RouterHandler<TContext, TState>): void {
-        this.onRoute(method, $path.join(this._prefix, path), middlewares, handler);
+    public route(method: HttpMethod, path: string, middlewares: RouterMiddleware<TContext, T>[], handler: RouterContextHandler<TContext, T> | RouterRequestHandler<T>, RouterRequestConstructor?: RouterRequestConstructor<T, RouterRequest<T>>): void {
+        this.onRoute(method, $path.join(this._prefix, path), middlewares, handler, RouterRequestConstructor);
     }
 
-    protected abstract onRoute(method: HttpMethod, path: string, middlewares: RouterMiddleware<TContext, TState>[], handler: RouterHandler<TContext, TState>): void;
+    protected abstract onRoute(method: HttpMethod, path: string, middlewares: RouterMiddleware<TContext, T>[], handler: RouterContextHandler<TContext, T> | RouterRequestHandler<T>, RouterRequestConstructor?: RouterRequestConstructor<T, RouterRequest<T>>): void;
 
     public setDefault(container: Container | undefined = ContainerPool.getDefaultContainer()): void {
         if (container) {

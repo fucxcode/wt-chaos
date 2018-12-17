@@ -1,5 +1,5 @@
 import { KoaApplication } from "../src/application";
-import { OperationContext } from "./info/operation-context";
+import { SampleOperationContext } from "./info/sample-operation-context";
 import { config } from "./config";
 import { KoaContext, KoaRouter } from "../src/router";
 import bodyParser from "koa-bodyparser";
@@ -9,7 +9,7 @@ import moment from "moment";
 
 ContainerPool.registerContainer();
 
-export class App extends KoaApplication<OperationContext> {
+export class App extends KoaApplication<SampleOperationContext> {
 
     constructor(facades: Function[]) {
         super(
@@ -17,20 +17,14 @@ export class App extends KoaApplication<OperationContext> {
                 port: config.port,
                 prefix: "/api",
                 facades: facades,
-                middlewares: [
-                    async (ctx, next) => {
-                        ctx.state.oid = ctx.oid;
-                        ctx.state.path = ctx.path;
-                        await next();
-                    }
-                ]
+                middlewares: []
             },
-            KoaContext.convertMiddleware(bodyParser()),
-            KoaContext.convertMiddleware(cors()),
+            KoaContext.toRouterMiddleware(bodyParser()),
+            KoaContext.toRouterMiddleware(cors()),
             async (ctx, next) => {
                 const start = Date.now();
                 await next();
-                console.log(`[${moment().format("YYYY-MM-DD HH:mm:ss.SSS")}] ${ctx.method} ${ctx.originalUrl}: ${Date.now() - start}`);
+                console.log(`[${moment().format("YYYY-MM-DD HH:mm:ss.SSS")}] ${ctx.method} ${ctx.originalUrl}: ${Date.now() - start}ms`);
             }
         );
     }

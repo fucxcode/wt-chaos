@@ -1,8 +1,9 @@
 import { Application, ApplicationOptions } from "./application";
 import { KoaContext, KoaRouter, RouterMiddleware } from "../router";
 import Koa from "koa";
+import { OperationContext } from "../router/operation-context";
 
-export class KoaApplication<TState> extends Application<KoaContext<TState>, TState, KoaRouter<TState>, Koa> {
+export class KoaApplication<TState extends OperationContext> extends Application<KoaContext<TState>, TState, KoaRouter<TState>, Koa> {
     
     private _middlewares: RouterMiddleware<KoaContext<TState>, TState>[];
 

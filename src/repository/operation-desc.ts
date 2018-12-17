@@ -1,18 +1,7 @@
 import { Id } from "./entities";
 import { UID } from "../constants";
 import * as uuid from "node-uuid";
-
-interface OperationContextLike {
-
-    oid?: string;
-
-    team?: Id;
-
-    uid?: UID;
-
-    path?: string;
-
-}
+import { OperationContext } from "../router/operation-context";
 
 class OperationDescription {
 
@@ -43,10 +32,10 @@ class OperationDescription {
         this._path = path;
     }
 
-    public static from(operationContext: OperationContextLike): OperationDescription {
+    public static from(operationContext: OperationContext): OperationDescription {
         return new OperationDescription(operationContext.oid, operationContext.team, operationContext.uid, operationContext.path);
     }
 
 }
 
-export { OperationDescription, OperationContextLike };
+export { OperationDescription };

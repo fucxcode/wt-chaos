@@ -1,4 +1,4 @@
-import { Context, Router, RouterMiddleware, RouterHandler } from "../src/router";
+import { RouterContext, Router, RouterMiddleware, RouterHandler } from "../src/router";
 import { IncomingHttpHeaders } from "http";
 import { HttpMethod } from "../src/constants";
 import * as _ from "../src/utilities";
@@ -7,10 +7,11 @@ import * as uuid from "node-uuid";
 import { assert } from "chai";
 import { Cookies } from "../src/router/cookies";
 import { ContainerPool } from "../src/container";
+import { OperationContext } from "../src/router/operation-context";
 
 describe("facade", () => {
 
-    class TestState {
+    class TestOperationContext extends OperationContext {
 
         private _traces: string[];
         public get traces(): string[] {
@@ -18,12 +19,32 @@ describe("facade", () => {
         }
 
         constructor() {
+            super();
             this._traces = [];
         }
 
     }
 
-    class TestContext extends Context<TestState> {
+    class TestContext extends RouterContext<TestOperationContext> {
+
+        private _operationContext: TestOperationContext;
+
+        public get operationContext(): TestOperationContext {
+            return this._operationContext;
+        }
+
+        public get requestBody(): any {
+            throw new Error("not implemented");
+        }
+
+        public get responseBody(): any {
+            throw new Error("not implemented");
+        }
+
+        public get method(): HttpMethod {
+            throw new Error("not implemented");
+        }
+
 
         public get path(): string {
             throw new Error("not implemented");
@@ -65,8 +86,9 @@ describe("facade", () => {
             throw new Error("not implemented.");
         }
 
-        constructor(state: TestState) {
-            super(() => state);
+        constructor(operationContext: TestOperationContext) {
+            super();
+            this._operationContext = operationContext;
         }
 
         public get headers(): IncomingHttpHeaders {
@@ -96,13 +118,13 @@ describe("facade", () => {
         constructor(
             public method: HttpMethod,
             public path: string,
-            public middlewares: RouterMiddleware<TestContext, TestState>[],
-            public handler: RouterHandler<TestContext, TestState>
+            public middlewares: RouterMiddleware<TestContext, TestOperationContext>[],
+            public handler: RouterHandler<TestContext, TestOperationContext>
         ) { }
 
     }
 
-    class TestRouter extends Router<TestContext, TestState> {
+    class TestRouter extends Router<TestContext, TestOperationContext> {
 
         private _routes: RouteEntry[];
         public get routes(): RouteEntry[] {
@@ -122,11 +144,11 @@ describe("facade", () => {
             throw new Error("not implemented");
         }
 
-        protected onUse(handler: RouterMiddleware<TestContext, TestState>): void {
+        protected onUse(handler: RouterMiddleware<TestContext, TestOperationContext>): void {
             throw new Error("not implemented");
         }
 
-        protected onRoute(method: HttpMethod, path: string, middlewares: RouterMiddleware<TestContext, TestState>[], handler: RouterHandler<TestContext, TestState>): void {
+        protected onRoute(method: HttpMethod, path: string, middlewares: RouterMiddleware<TestContext, TestOperationContext>[], handler: RouterHandler<TestContext, TestOperationContext>): void {
             this._routes.push(new RouteEntry(method, path, middlewares, handler));
         }
 
@@ -134,8 +156,8 @@ describe("facade", () => {
             this._routes = [];
         }
 
-        public async receive(path: string, method: HttpMethod, state: TestState): Promise<void> {
-            const context = new TestContext(state);
+        public async receive(path: string, method: HttpMethod, operationContext: TestOperationContext): Promise<void> {
+            const context = new TestContext(operationContext);
             const entry = _.find(this._routes, r => r.method === method && r.path === path);
             if (entry) {
                 for (const middleware of entry.middlewares) {
@@ -163,7 +185,7 @@ describe("facade", () => {
         const expect_traces: string[] = [
             uuid.v4()
         ];
-        const state = new TestState();
+        const state = new TestOperationContext();
 
         @facade(router)
         // @ts-ignore
@@ -171,8 +193,8 @@ describe("facade", () => {
 
             @route("/handler1", HttpMethod.GET)
             // @ts-ignore
-            public async handler1(ctx: Context<TestState>): Promise<void> {
-                ctx.state.traces.push(expect_traces[0]);
+            public async handler1(ctx: Context<TestOperationContext>): Promise<void> {
+                ctx.operationContext.traces.push(expect_traces[0]);
             }
 
         }
@@ -191,7 +213,7 @@ describe("facade", () => {
 
     it(`facade route: no, facade middleware: no, method route: path mismatch, method middleware no. > handler: error`, async () => {
 
-        const state = new TestState();
+        const state = new TestOperationContext();
 
         @facade(router)
         // @ts-ignore
@@ -199,7 +221,7 @@ describe("facade", () => {
 
             @route("/handler1", HttpMethod.GET)
             // @ts-ignore
-            public async handler1(ctx: Context<TestState>): Promise<void> {
+            public async handler1(ctx: Context<TestOperationContext>): Promise<void> {
                 throw new Error("not implemented");
             }
 
@@ -219,7 +241,7 @@ describe("facade", () => {
 
     it(`facade route: no, facade middleware: no, method route: method mismatch, method middleware no. > handler: error`, async () => {
 
-        const state = new TestState();
+        const state = new TestOperationContext();
 
         @facade(router)
         // @ts-ignore
@@ -227,7 +249,7 @@ describe("facade", () => {
 
             @route("/handler1", HttpMethod.GET)
             // @ts-ignore
-            public async handler1(ctx: Context<TestState>): Promise<void> {
+            public async handler1(ctx: Context<TestOperationContext>): Promise<void> {
                 throw new Error("not implemented");
             }
 
@@ -250,7 +272,7 @@ describe("facade", () => {
         const expect_traces: string[] = [
             uuid.v4()
         ];
-        const state = new TestState();
+        const state = new TestOperationContext();
 
         @facade(router)
         @route("api")
@@ -259,8 +281,8 @@ describe("facade", () => {
 
             @route("/handler1", HttpMethod.GET)
             // @ts-ignore
-            public async handler1(ctx: Context<TestState>): Promise<void> {
-                ctx.state.traces.push(expect_traces[0]);
+            public async handler1(ctx: Context<TestOperationContext>): Promise<void> {
+                ctx.operationContext.traces.push(expect_traces[0]);
             }
 
         }
@@ -281,7 +303,7 @@ describe("facade", () => {
         const expect_traces: string[] = [
             uuid.v4()
         ];
-        const state = new TestState();
+        const state = new TestOperationContext();
 
         @facade(router)
         @route("api/v1/test")
@@ -290,8 +312,8 @@ describe("facade", () => {
 
             @route("/handler/1", HttpMethod.GET)
             // @ts-ignore
-            public async handler1(ctx: Context<TestState>): Promise<void> {
-                ctx.state.traces.push(expect_traces[0]);
+            public async handler1(ctx: Context<TestOperationContext>): Promise<void> {
+                ctx.operationContext.traces.push(expect_traces[0]);
             }
 
         }
@@ -315,8 +337,8 @@ describe("facade", () => {
         const expect_traces_put: string[] = [
             uuid.v4()
         ];
-        const state_get = new TestState();
-        const state_put = new TestState();
+        const state_get = new TestOperationContext();
+        const state_put = new TestOperationContext();
 
         @facade(router)
         // @ts-ignore
@@ -324,14 +346,14 @@ describe("facade", () => {
 
             @route("/handler", HttpMethod.GET)
             // @ts-ignore
-            public async handler_get(ctx: Context<TestState>): Promise<void> {
-                ctx.state.traces.push(expect_traces_get[0]);
+            public async handler_get(ctx: Context<TestOperationContext>): Promise<void> {
+                ctx.operationContext.traces.push(expect_traces_get[0]);
             }
 
             @route("/handler", HttpMethod.PUT)
             // @ts-ignore
-            public async handler_put(ctx: Context<TestState>): Promise<void> {
-                ctx.state.traces.push(expect_traces_put[0]);
+            public async handler_put(ctx: Context<TestOperationContext>): Promise<void> {
+                ctx.operationContext.traces.push(expect_traces_put[0]);
             }
 
         }
@@ -369,23 +391,23 @@ describe("facade", () => {
             uuid.v4(),
             uuid.v4()
         ];
-        const state = new TestState();
+        const state = new TestOperationContext();
 
         @facade(router)
         @middlewares(
-            async (ctx: Context<TestState>) => {
-                ctx.state.traces.push(expect_traces[0]);
+            async (ctx: RouterContext<TestOperationContext>) => {
+                ctx.operationContext.traces.push(expect_traces[0]);
             },
-            async (ctx: Context<TestState>) => {
-                ctx.state.traces.push(expect_traces[1]);
+            async (ctx: RouterContext<TestOperationContext>) => {
+                ctx.operationContext.traces.push(expect_traces[1]);
             }
         )
         @middlewares(
-            async (ctx: Context<TestState>) => {
-                ctx.state.traces.push(expect_traces[2]);
+            async (ctx: RouterContext<TestOperationContext>) => {
+                ctx.operationContext.traces.push(expect_traces[2]);
             },
-            async (ctx: Context<TestState>) => {
-                ctx.state.traces.push(expect_traces[3]);
+            async (ctx: RouterContext<TestOperationContext>) => {
+                ctx.operationContext.traces.push(expect_traces[3]);
             }
         )
         // @ts-ignore
@@ -393,24 +415,24 @@ describe("facade", () => {
 
             @route("/handler", HttpMethod.GET)
             @middlewares(
-                async (ctx: Context<TestState>) => {
-                    ctx.state.traces.push(expect_traces[4]);
+                async (ctx: RouterContext<TestOperationContext>) => {
+                    ctx.operationContext.traces.push(expect_traces[4]);
                 },
-                async (ctx: Context<TestState>) => {
-                    ctx.state.traces.push(expect_traces[5]);
+                async (ctx: RouterContext<TestOperationContext>) => {
+                    ctx.operationContext.traces.push(expect_traces[5]);
                 }
             )
             @middlewares(
-                async (ctx: Context<TestState>) => {
-                    ctx.state.traces.push(expect_traces[6]);
+                async (ctx: RouterContext<TestOperationContext>) => {
+                    ctx.operationContext.traces.push(expect_traces[6]);
                 },
-                async (ctx: Context<TestState>) => {
-                    ctx.state.traces.push(expect_traces[7]);
+                async (ctx: RouterContext<TestOperationContext>) => {
+                    ctx.operationContext.traces.push(expect_traces[7]);
                 }
             )
             // @ts-ignore
-            public async handler(ctx: Context<TestState>): Promise<void> {
-                ctx.state.traces.push(expect_traces[8]);
+            public async handler(ctx: Context<TestOperationContext>): Promise<void> {
+                ctx.operationContext.traces.push(expect_traces[8]);
             }
 
 
@@ -439,17 +461,17 @@ describe("facade", () => {
             uuid.v4(),
             uuid.v4()
         ];
-        const state = new TestState();
+        const state = new TestOperationContext();
 
         @facade(router)
         @middlewares(
-            async (ctx: Context<TestState>) => {
-                ctx.state.traces.push(expect_traces[0]);
+            async (ctx: RouterContext<TestOperationContext>) => {
+                ctx.operationContext.traces.push(expect_traces[0]);
             }
         )
         @middlewares(
-            async (ctx: Context<TestState>) => {
-                ctx.state.traces.push(expect_traces[1]);
+            async (ctx: RouterContext<TestOperationContext>) => {
+                ctx.operationContext.traces.push(expect_traces[1]);
             }
         )
         // @ts-ignore
@@ -458,13 +480,13 @@ describe("facade", () => {
 
         @facade(router)
         @middlewares(
-            async (ctx: Context<TestState>) => {
-                ctx.state.traces.push(expect_traces[2]);
+            async (ctx: RouterContext<TestOperationContext>) => {
+                ctx.operationContext.traces.push(expect_traces[2]);
             }
         )
         @middlewares(
-            async (ctx: Context<TestState>) => {
-                ctx.state.traces.push(expect_traces[3]);
+            async (ctx: RouterContext<TestOperationContext>) => {
+                ctx.operationContext.traces.push(expect_traces[3]);
             }
         )
         // @ts-ignore
@@ -473,21 +495,21 @@ describe("facade", () => {
 
         @facade(router)
         @middlewares(
-            async (ctx: Context<TestState>) => {
-                ctx.state.traces.push(expect_traces[4]);
+            async (ctx: RouterContext<TestOperationContext>) => {
+                ctx.operationContext.traces.push(expect_traces[4]);
             }
         )
         @middlewares(
-            async (ctx: Context<TestState>) => {
-                ctx.state.traces.push(expect_traces[5]);
+            async (ctx: RouterContext<TestOperationContext>) => {
+                ctx.operationContext.traces.push(expect_traces[5]);
             }
         )
         // @ts-ignore
         class Class3 extends Class2 {
             @route("/handler", HttpMethod.GET)
             // @ts-ignore
-            public async handler(ctx: Context<TestState>): Promise<void> {
-                ctx.state.traces.push(expect_traces[6]);
+            public async handler(ctx: Context<TestOperationContext>): Promise<void> {
+                ctx.operationContext.traces.push(expect_traces[6]);
             }
         }
 
@@ -508,7 +530,7 @@ describe("facade", () => {
         const expect_traces: string[] = [
             uuid.v4()
         ];
-        const state = new TestState();
+        const state = new TestOperationContext();
 
         @facade(router)
         @route("/cls1")
@@ -528,8 +550,8 @@ describe("facade", () => {
         class Class3 extends Class2 {
             @route("/handler", HttpMethod.GET)
             // @ts-ignore
-            public async handler(ctx: Context<TestState>): Promise<void> {
-                ctx.state.traces.push(expect_traces[0]);
+            public async handler(ctx: Context<TestOperationContext>): Promise<void> {
+                ctx.operationContext.traces.push(expect_traces[0]);
             }
         }
 

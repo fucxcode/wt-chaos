@@ -1,10 +1,11 @@
 import * as _ from "../utilities";
-import { Context, RouterMiddleware } from "../router";
+import { RouterContext, RouterMiddleware } from "../router";
+import { OperationContext } from "../router/operation-context";
 
 const METADATA_KEY_FACADE_MIDDLEWARES = "wt-facade-middlewares";
 const METADATA_KEY_METHOD_MIDDLEWARES = "wt-actions-middlewares";
 
-const setFacadeMiddlewares = function <TContext extends Context<TState>, TState>(target: any, middlewares: RouterMiddleware<TContext, TState>[]): void {
+const setFacadeMiddlewares = function <TContext extends RouterContext<TState>, TState extends OperationContext>(target: any, middlewares: RouterMiddleware<TContext, TState>[]): void {
     _.updateMetadata<Map<Function, RouterMiddleware<TContext, TState>[]>, RouterMiddleware<TContext, TState>[]>(METADATA_KEY_FACADE_MIDDLEWARES, middlewares, target, () => new Map<Function, RouterMiddleware<TContext, TState>[]>(), (v, u) => {
         const currentMap = new Map<Function, RouterMiddleware<TContext, TState>[]>(v);
         let currentMiddlewares = currentMap.get(target);
@@ -21,7 +22,7 @@ const setFacadeMiddlewares = function <TContext extends Context<TState>, TState>
     });
 };
 
-const getFacadeMiddlewares = function <TContext extends Context<TState>, TState>(target: any): RouterMiddleware<TContext, TState>[] {
+const getFacadeMiddlewares = function <TContext extends RouterContext<TState>, TState extends OperationContext>(target: any): RouterMiddleware<TContext, TState>[] {
     const middlewaresMap: Map<Function, RouterMiddleware<TContext, TState>[]> = Reflect.getMetadata(METADATA_KEY_FACADE_MIDDLEWARES, target) || new Map<Function, RouterMiddleware<TContext, TState>[]>();
     const output: RouterMiddleware<TContext, TState>[] = [];
     for (const [fn, middlewares] of middlewaresMap) {
@@ -32,7 +33,7 @@ const getFacadeMiddlewares = function <TContext extends Context<TState>, TState>
     return output;
 };
 
-const setMethodMiddlewares = function <TContext extends Context<TState>, TState>(target: any, propertyKey: string, middlewares: RouterMiddleware<TContext, TState>[]): void {
+const setMethodMiddlewares = function <TContext extends RouterContext<TState>, TState extends OperationContext>(target: any, propertyKey: string, middlewares: RouterMiddleware<TContext, TState>[]): void {
     _.updateMetadata<Map<string, RouterMiddleware<TContext, TState>[]>, RouterMiddleware<TContext, TState>[]>(METADATA_KEY_METHOD_MIDDLEWARES, middlewares, target, () => new Map<string, RouterMiddleware<TContext, TState>[]>(), (v, u) => {
         const currentMap = new Map<string, RouterMiddleware<TContext, TState>[]>(v);
         let currentMiddlewares = currentMap.get(propertyKey);
@@ -49,11 +50,11 @@ const setMethodMiddlewares = function <TContext extends Context<TState>, TState>
     });
 };
 
-const getMethodMiddlewares = function <TContext extends Context<TState>, TState>(target: any): Map<string, RouterMiddleware<TContext, TState>[]> {
+const getMethodMiddlewares = function <TContext extends RouterContext<TState>, TState extends OperationContext>(target: any): Map<string, RouterMiddleware<TContext, TState>[]> {
     return Reflect.getMetadata(METADATA_KEY_METHOD_MIDDLEWARES, target) || new Map<string, RouterMiddleware<TContext, TState>[]>();
 };
 
-const middlewares = function <TContext extends Context<TState>, TState>(...middlewares: RouterMiddleware<TContext, TState>[]) {
+const middlewares = function <TContext extends RouterContext<TState>, TState extends OperationContext>(...middlewares: RouterMiddleware<TContext, TState>[]) {
     return function (...args: any[]): any {
         if (args.length === 1) {
             // class decorator

@@ -1,11 +1,12 @@
-import { Context, RouterMiddleware, Router, KoaContext } from "../router";
+import { RouterContext, RouterMiddleware, Router, KoaContext } from "../router";
 import { Container, ContainerPool } from "../container";
 import { IncomingMessage, ServerResponse, createServer } from "http";
 import Koa from "koa";
 import { Server } from "./server";
 import { ListenResult } from "./listen-result";
+import { OperationContext } from "../router/operation-context";
 
-export interface ApplicationOptions<TContext extends Context<TState>, TState> {
+export interface ApplicationOptions<TContext extends RouterContext<TState>, TState extends OperationContext> {
 
     port: number;
 
@@ -19,7 +20,7 @@ export interface ApplicationOptions<TContext extends Context<TState>, TState> {
 
 }
 
-export abstract class Application<TContext extends Context<TState>, TState, TRouter extends Router<TContext, TState>, TServer extends Server> {
+export abstract class Application<TContext extends RouterContext<TState>, TState extends OperationContext, TRouter extends Router<TContext, TState>, TServer extends Server> {
 
     private _server!: TServer;
     public get server(): TServer {

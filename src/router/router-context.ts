@@ -3,18 +3,11 @@ import * as uuid from "node-uuid";
 import * as _ from "../utilities";
 import { Cookies } from "./cookies";
 import { HttpMethod } from "../constants";
+import { OperationContext } from "./operation-context";
 
-abstract class Context<T> {
+export abstract class RouterContext<T extends OperationContext> {
 
-    private _oid: string;
-    public get oid(): string {
-        return this._oid;
-    }
-
-    private _state: T;
-    public get state(): T {
-        return this._state;
-    }
+    public abstract get operationContext(): T
 
 
     private _request?: http.IncomingMessage;
@@ -27,9 +20,7 @@ abstract class Context<T> {
         return this._response;
     }
 
-    constructor(stateResolver: () => T, request?: http.IncomingMessage, response?: http.ServerResponse, oidResolver: () => string = uuid.v4) {
-        this._oid = oidResolver();
-        this._state = stateResolver();
+    constructor(request?: http.IncomingMessage, response?: http.ServerResponse) {
         this._request = request;
         this._response = response;
     }
@@ -66,11 +57,9 @@ abstract class Context<T> {
 
     public abstract get originalUrl(): string;
 
-    public abstract json(data: any): Context<T>;
+    public abstract json(data: any): RouterContext<T>;
 
     public abstract redirect(url: string, alt?: string): void;
 
     public abstract get method(): HttpMethod;
 }
-
-export { Context };

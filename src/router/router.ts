@@ -3,8 +3,10 @@ import * as $path from "path";
 import { HttpMethod } from "../constants";
 import { Container, ContainerPool } from "../container";
 import { RouterMiddleware } from "./router-middleware";
-import { RouterContextHandler, RouterRequestHandler, RouterRequestConstructor, RouterRequest } from "./router-handler";
+import { RouterContextHandler, RouterRequestHandler } from "./router-handler";
 import { OperationContext } from "./operation-context";
+import { RouterRequestConstructor } from "./request/router-request-ctor";
+import { RouterRequest } from "./request/router-request";
 
 const DEFAULT_ROUTER_KEY = Symbol.for("default_router");
 

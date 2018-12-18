@@ -12,8 +12,12 @@ import { Container } from "../../container";
 import { Cookies } from "../cookies";
 import { INextFunction } from "../next-function";
 import { RouterMiddleware } from "../router-middleware";
-import { RouterContextHandler, RouterRequestHandler, RouterRequest, RouterRequestConstructor } from "../router-handler";
+import { RouterContextHandler, RouterRequestHandler } from "../router-handler";
 import { OperationContext } from "../operation-context";
+import { RouterRequestConstructor } from "../request/router-request-ctor";
+import { RouterRequest } from "../request/router-request";
+import { fulfillRouterRequestProperties } from "../request/fulfill-properties";
+import { validateRouterRequest } from "../request/validate-properties";
 
 class KoaContext<T extends OperationContext> extends RouterContext<T> {
 
@@ -159,9 +163,20 @@ class KoaRouter<T extends OperationContext> extends Router<KoaContext<T>, T> {
             }
             handlers.push(async (ctx: Koa.Context, next: INextFunction) => {
                 const context = new KoaContext<T>(ctx, next);
-                const data = RouterRequestConstructor ?
-                    await (handler as RouterRequestHandler<T>)(new RouterRequestConstructor(context)) :
-                    await (handler as RouterContextHandler<KoaContext<T>, T>)(context);
+                let data: any;
+                if (RouterRequestConstructor) {
+                    const h = handler as RouterRequestHandler<T>;
+                    const req = new RouterRequestConstructor();
+                    // fulfill properties based on `@resolve` decorators
+                    fulfillRouterRequestProperties(req, context);
+                    // validate properties based on `@validate` decorators
+                    await validateRouterRequest(req, context);
+                    data = await h(req);
+                }
+                else {
+                    const h = handler as RouterContextHandler<KoaContext<T>, T>;
+                    data = await h(context);
+                }
                 ctx.body = {
                     oid: context.operationContext.oid,
                     code: WTCode.ok,

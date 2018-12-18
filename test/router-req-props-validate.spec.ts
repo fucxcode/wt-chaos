@@ -341,9 +341,10 @@ describe("router request: validate properties", () => {
 
         class TestRouterRequest extends RouterRequest<TestOperationContext> {
 
-            @validate<TestOperationContext, TestRouterRequest, string>(async (value, request, ctx) => {
+            @validate<TestOperationContext, TestRouterRequest, string>(async (value, key, request, ctx) => {
                 request_param = request;
                 context_param = ctx;
+                key_param = key;
                 return true;
             })
             // @ts-ignore
@@ -353,6 +354,7 @@ describe("router request: validate properties", () => {
 
         let request_param: TestRouterRequest;
         let context_param: RouterContext<TestOperationContext>;
+        let key_param: string;
 
         const request = new TestRouterRequest();
         request.name = _.randomString();
@@ -360,6 +362,7 @@ describe("router request: validate properties", () => {
 
         assert.equal(request_param, request);
         assert.equal(context_param, contextMock.object);
+        assert.equal(key_param, "name");
     });
 
 });

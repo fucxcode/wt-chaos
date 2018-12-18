@@ -13,11 +13,11 @@ export class CreateTeamRequest extends RouterRequest<SampleOperationContext> {
 
     @resolve(ctx => ctx.requestBody.admin_name)
     @validate(async value => !_.isNilOrWriteSpaces(value))
-    @validate<SampleOperationContext, CreateTeamRequest, string>(async (value, self) => {
-        if (value === self.teamName) {
+    @validate<SampleOperationContext, CreateTeamRequest, string>(async (value, key, request) => {
+        if (value === request.teamName) {
             throw new WTError(WTCode.invalidInput, "admin name cannot be the same as team name", undefined, {
                 admin_name: value,
-                team_name: self.teamName
+                team_name: request.teamName
             });
         }
         else {

@@ -7,7 +7,17 @@ import { Id, Session, Driver } from "../repository";
 import * as randomstring from "randomstring";
 import crypto from "crypto";
 
-const REGEX_OBJECT_ID = new RegExp("^[0-9a-fA-F]{24}$");
+export interface Stringable {
+
+    toString(): string;
+
+}
+
+export interface Lengthable {
+
+    length: number;
+
+}
 
 export function wait(milliseconds: number): Promise<void> {
     return new Promise<void>((resolve) => {

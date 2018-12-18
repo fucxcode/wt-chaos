@@ -5,7 +5,7 @@ import * as _ from "../../utilities";
 import { WTError } from "../..";
 import { WTCode } from "../../errors";
 
-export type Validator<T extends OperationContext, TRequest extends RouterRequest<T>, TValue> = (value: TValue, request: TRequest, ctx: RouterContext<T>) => Promise<boolean>;
+export type Validator<T extends OperationContext, TRequest extends RouterRequest<T>, TValue> = (value: TValue, propertyKey: string, request: TRequest, ctx: RouterContext<T>) => Promise<boolean>;
 
 export class ValidateEntry<T extends OperationContext, TRequest extends RouterRequest<T>, TValue> {
 
@@ -38,7 +38,7 @@ export const validateRouterRequest = async function <T extends OperationContext,
         for (const [key, entries] of map) {
             const value = _.get(request, key);
             for (const entry of entries) {
-                if (!(await entry.validator.call(request, value, request, ctx))) {
+                if (!(await entry.validator.call(request, value, key, request, ctx))) {
                     throw new WTError(
                         entry.code,
                         _.isNilOrWriteSpaces(entry.message) ? `validation failed on property ${key}` : entry.message,

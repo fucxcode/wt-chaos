@@ -15,7 +15,7 @@
             "args": [
                 "${workspaceFolder}/test/bootstrap.ts",
                 "--s",
-                "#196709"
+                "router-req-props-validate"
             ]
         },
         {

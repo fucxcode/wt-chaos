@@ -8,19 +8,11 @@ import { SampleOperationContext } from "../../info/sample-operation-context";
 export class CreateTeamRequest extends RouterRequest<SampleOperationContext> {
 
     @resolve(ctx => ctx.requestBody.team_name)
-    @validate(async value => {
-        if (_.isNilOrWriteSpaces(value)) {
-            throw new WTError(WTCode.invalidInput, "team name not specified", undefined, value);
-        }
-    })
+    @validate(async value => !_.isNilOrWriteSpaces(value))
     public teamName!: string;
 
     @resolve(ctx => ctx.requestBody.admin_name)
-    @validate(async value => {
-        if (_.isNilOrWriteSpaces(value)) {
-            throw new WTError(WTCode.invalidInput, "admin name not specified", undefined, value);
-        }
-    })
+    @validate(async value => !_.isNilOrWriteSpaces(value))
     @validate<SampleOperationContext, CreateTeamRequest, string>(async (value, self) => {
         if (value === self.teamName) {
             throw new WTError(WTCode.invalidInput, "admin name cannot be the same as team name", undefined, {
@@ -28,15 +20,14 @@ export class CreateTeamRequest extends RouterRequest<SampleOperationContext> {
                 team_name: self.teamName
             });
         }
+        else {
+            return true;
+        }
     })
     public adminName!: string;
 
     @resolve(ctx => ctx.requestBody.admin_pwd)
-    @validate(async value => {
-        if (_.isNilOrWriteSpaces(value)) {
-            throw new WTError(WTCode.invalidInput, "admin password not specified", undefined, value);
-        }
-    })
+    @validate(async value => !_.isNilOrWriteSpaces(value))
     public adminPassword!: string;
 
 }

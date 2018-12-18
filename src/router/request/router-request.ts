@@ -6,7 +6,7 @@ import { resolve } from "./decorator-resolve";
 export class RouterRequest<T extends OperationContext> {
 
     @resolve<T>(ctx => ctx.operationContext)
-    private _operationContext: T;
+    private _operationContext!: T;
     public get operationContext(): T {
         return this._operationContext;
     }
@@ -19,7 +19,6 @@ export class RouterRequest<T extends OperationContext> {
     }
 
     constructor() {
-        this._operationContext = {} as T;
     }
 
 }

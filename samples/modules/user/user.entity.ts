@@ -13,7 +13,7 @@ export class UserEntity extends BusinessEntity {
     @defaultValue(() => uuid.v4())
     uid?: UID;
 
-    name?: string;
+    email?: string;
 
     password?: string;
 

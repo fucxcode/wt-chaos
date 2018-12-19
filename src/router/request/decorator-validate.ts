@@ -27,11 +27,11 @@ export const validate = function <T extends OperationContext, TRequest extends R
 
 export const required = function <T extends OperationContext, TRequest extends RouterRequest<T>, TValue extends Stringable>(message?: string, code?: number) {
     return validate<T, TRequest, TValue>(async (value, key) => {
-        if (value && _.isNilOrWriteSpaces(value.toString())) {
-            throw new WTError(code || WTCode.invalidInput, message || `property ${key} is required`, undefined, value);
+        if (value && !_.isNilOrWriteSpaces(value.toString())) {
+            return true;
         }
         else {
-            return true;
+            throw new WTError(code || WTCode.invalidInput, message || `property ${key} is required`, undefined, value);
         }
     });
 };
@@ -67,6 +67,17 @@ export const equals = function <T extends OperationContext, TRequest extends Rou
         }
         else {
             throw new WTError(code || WTCode.invalidInput, message || `the value of property ${key} must be equals to ${target}`, target, value);
+        }
+    });
+};
+
+export const regex = function <T extends OperationContext, TRequest extends RouterRequest<T>>(regex: RegExp, message?: string, code?: number) {
+    return validate<T, TRequest, string>(async (value, key) => {
+        if (regex.test(value)) {
+            return true;
+        }
+        else {
+            throw new WTError(code || WTCode.invalidInput, message || `the value of property ${key} failed with regex test`, regex.source, value);
         }
     });
 };

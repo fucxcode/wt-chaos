@@ -18,18 +18,18 @@ export class UserService {
     @inject()
     private _teamRepository!: TeamRepository;
 
-    public async createUser(operationContext: OperationContext, name: string, password: string): Promise<UID | undefined> {
-        if (_.isNilOrWriteSpaces(name)) {
-            throw new WTError(WTCode.invalidInput, "user name not specified", undefined, name);
+    public async createUser(operationContext: OperationContext, email: string, password: string): Promise<UID | undefined> {
+        if (_.isNilOrWriteSpaces(email)) {
+            throw new WTError(WTCode.invalidInput, "user email not specified", undefined, email);
         }
         if (_.isNilOrWriteSpaces(password)) {
             throw new WTError(WTCode.invalidInput, "user password not specified", undefined, password);
         }
-        await this._userRepository.validateUsernameExistsByTeam(OperationDescription.from(operationContext), name);
+        await this._userRepository.validateUsernameExistsByTeam(OperationDescription.from(operationContext), email);
 
         const entity: UserEntity = {
             uid: uuid.v4(),
-            name: name,
+            email: email,
             password: password
         };
         operationContext.uid = entity.uid;

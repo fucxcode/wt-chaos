@@ -27,7 +27,7 @@ export class TeamService {
 
         // assign team id into operation context since the user service invokes user repository with this property in used
         request.operationContext.team = team._id;
-        const uid = await this._userService.createUser(request.operationContext, request.adminName, request.adminPassword);
+        const uid = await this._userService.createUser(request.operationContext, request.adminEmail, request.adminPassword);
         return new CreateTeamResponse(team._id, uid);
     }
 

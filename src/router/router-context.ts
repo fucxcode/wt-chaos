@@ -27,9 +27,13 @@ export abstract class RouterContext<T extends OperationContext> {
 
     public abstract get headers(): IncomingHttpHeaders;
 
-    public abstract get query(): any;
+    public abstract get query(): {
+        [key: string]: string | string[] | undefined
+    };
 
-    public abstract get params(): any;
+    public abstract get params(): {
+        [key: string]: string | string[] | undefined
+    };
 
     public abstract get requestBody(): any;
 

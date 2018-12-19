@@ -14,22 +14,37 @@ export const resolve = function <T extends OperationContext>(resolver: Resolver<
     };
 };
 
-export const body = function <T extends OperationContext>(path?: string) {
-    return resolve<T>(ctx => path ? _.get(ctx.requestBody, path) : ctx.requestBody);
+export const body = function <T extends OperationContext, U, V>(path?: string, parser?: (source: U) => V) {
+    return resolve<T>(ctx => {
+        const source = path ? _.get(ctx.requestBody, path) : ctx.requestBody;
+        return parser ? parser(source) : source;
+    });
 };
 
-export const param = function <T extends OperationContext>(name: string) {
-    return resolve<T>(ctx => _.get(ctx.params, name));
+export const param = function <T extends OperationContext, U>(name: string, parser?: (source: string) => U) {
+    return resolve<T>(ctx => {
+        const source: string = _.get(ctx.params, name);
+        return parser ? parser(source) : source;
+    });
 };
 
-export const query = function <T extends OperationContext>(name: string) {
-    return resolve<T>(ctx => _.get(ctx.query, name));
+export const query = function <T extends OperationContext, U>(name: string, parser?: (source: string | string[] | undefined) => U) {
+    return resolve<T>(ctx => {
+        const source: string = _.get(ctx.query, name);
+        return parser ? parser(source) : source;
+    });
 };
 
-export const header = function <T extends OperationContext>(name: string) {
-    return resolve<T>(ctx => _.get(ctx.headers, name));
+export const header = function <T extends OperationContext, U>(name: string, parser?: (source: string | string[] | undefined) => U) {
+    return resolve<T>(ctx => {
+        const source = ctx.headers[name];
+        return parser ? parser(source) : source;
+    });
 };
 
-export const cookie = function <T extends OperationContext>(name: string, opts?: GetOption) {
-    return resolve<T>(ctx => ctx.cookies.get(name, opts));
+export const cookie = function <T extends OperationContext, U>(name: string, parser?: (source: string | string[] | undefined) => U, opts?: GetOption) {
+    return resolve<T>(ctx => {
+        const source = ctx.cookies.get(name, opts);
+        return parser ? parser(source) : source;
+    });
 };

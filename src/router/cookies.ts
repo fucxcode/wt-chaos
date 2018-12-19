@@ -2,7 +2,7 @@ interface Cookies {
 
     secure: boolean;
 
-    get(name: string, opts?: GetOption): string;
+    get(name: string, opts?: GetOption): string | string[] | undefined;
 
     set(name: string, value?: string, opts?: SetOption): Cookies;
 

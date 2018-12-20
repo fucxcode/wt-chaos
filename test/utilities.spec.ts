@@ -96,16 +96,16 @@ describe("utilities", () => {
         it(`projection: undefined. output: all properties`, () => {
             const object = {
                 _id: new mongodb.ObjectId(),
-                string_prop: $.randomString(),
+                string_prop: _.randomString(),
                 number_prop: _.random(0, 100),
                 object_prop: {
-                    string_prop: $.randomString(),
+                    string_prop: _.randomString(),
                     number_prop: _.random(0, 100),
                 },
                 array_prop: [
-                    $.randomString(),
-                    $.randomString(),
-                    $.randomString()
+                    _.randomString(),
+                    _.randomString(),
+                    _.randomString()
                 ]
             };
 
@@ -117,16 +117,16 @@ describe("utilities", () => {
         it(`projection: null. output: all properties`, () => {
             const object = {
                 _id: new mongodb.ObjectId(),
-                string_prop: $.randomString(),
+                string_prop: _.randomString(),
                 number_prop: _.random(0, 100),
                 object_prop: {
-                    string_prop: $.randomString(),
+                    string_prop: _.randomString(),
                     number_prop: _.random(0, 100),
                 },
                 array_prop: [
-                    $.randomString(),
-                    $.randomString(),
-                    $.randomString()
+                    _.randomString(),
+                    _.randomString(),
+                    _.randomString()
                 ]
             };
 
@@ -138,16 +138,16 @@ describe("utilities", () => {
         it(`projection: []. output: all properties`, () => {
             const object = {
                 _id: new mongodb.ObjectId(),
-                string_prop: $.randomString(),
+                string_prop: _.randomString(),
                 number_prop: _.random(0, 100),
                 object_prop: {
-                    string_prop: $.randomString(),
+                    string_prop: _.randomString(),
                     number_prop: _.random(0, 100),
                 },
                 array_prop: [
-                    $.randomString(),
-                    $.randomString(),
-                    $.randomString()
+                    _.randomString(),
+                    _.randomString(),
+                    _.randomString()
                 ]
             };
 
@@ -159,16 +159,16 @@ describe("utilities", () => {
         it(`projection: {}. output: all properties`, () => {
             const object = {
                 _id: new mongodb.ObjectId(),
-                string_prop: $.randomString(),
+                string_prop: _.randomString(),
                 number_prop: _.random(0, 100),
                 object_prop: {
-                    string_prop: $.randomString(),
+                    string_prop: _.randomString(),
                     number_prop: _.random(0, 100),
                 },
                 array_prop: [
-                    $.randomString(),
-                    $.randomString(),
-                    $.randomString()
+                    _.randomString(),
+                    _.randomString(),
+                    _.randomString()
                 ]
             };
 
@@ -180,16 +180,16 @@ describe("utilities", () => {
         it(`projection: [_id, string_prop, object_prop]. output: [_id, string_prop, object_prop]`, () => {
             const object = {
                 _id: new mongodb.ObjectId(),
-                string_prop: $.randomString(),
+                string_prop: _.randomString(),
                 number_prop: _.random(0, 100),
                 object_prop: {
-                    string_prop: $.randomString(),
+                    string_prop: _.randomString(),
                     number_prop: _.random(0, 100),
                 },
                 array_prop: [
-                    $.randomString(),
-                    $.randomString(),
-                    $.randomString()
+                    _.randomString(),
+                    _.randomString(),
+                    _.randomString()
                 ]
             };
 
@@ -201,16 +201,16 @@ describe("utilities", () => {
         it(`projection: {_id: 1, number_prop: 1, object_prop: 1}. output: [_id, number_prop, object_prop]`, () => {
             const object = {
                 _id: new mongodb.ObjectId(),
-                string_prop: $.randomString(),
+                string_prop: _.randomString(),
                 number_prop: _.random(0, 100),
                 object_prop: {
-                    string_prop: $.randomString(),
+                    string_prop: _.randomString(),
                     number_prop: _.random(0, 100),
                 },
                 array_prop: [
-                    $.randomString(),
-                    $.randomString(),
-                    $.randomString()
+                    _.randomString(),
+                    _.randomString(),
+                    _.randomString()
                 ]
             };
 
@@ -226,16 +226,16 @@ describe("utilities", () => {
         it(`projection: {_id: 1, number_prop: 0, object_prop: 1}. output: [_id, object_prop]`, () => {
             const object = {
                 _id: new mongodb.ObjectId(),
-                string_prop: $.randomString(),
+                string_prop: _.randomString(),
                 number_prop: _.random(0, 100),
                 object_prop: {
-                    string_prop: $.randomString(),
+                    string_prop: _.randomString(),
                     number_prop: _.random(0, 100),
                 },
                 array_prop: [
-                    $.randomString(),
-                    $.randomString(),
-                    $.randomString()
+                    _.randomString(),
+                    _.randomString(),
+                    _.randomString()
                 ]
             };
 
@@ -251,16 +251,16 @@ describe("utilities", () => {
         it(`projection: {number_prop: 0}. output: [_id, string_prop, object_prop, array_prop]`, () => {
             const object = {
                 _id: new mongodb.ObjectId(),
-                string_prop: $.randomString(),
+                string_prop: _.randomString(),
                 number_prop: _.random(0, 100),
                 object_prop: {
-                    string_prop: $.randomString(),
+                    string_prop: _.randomString(),
                     number_prop: _.random(0, 100),
                 },
                 array_prop: [
-                    $.randomString(),
-                    $.randomString(),
-                    $.randomString()
+                    _.randomString(),
+                    _.randomString(),
+                    _.randomString()
                 ]
             };
 
@@ -274,16 +274,16 @@ describe("utilities", () => {
         it(`projection: {_id: 0, string_prop: 0, number_prop: 0, object_prop: 0, array_prop: 0}. output: []`, () => {
             const object = {
                 _id: new mongodb.ObjectId(),
-                string_prop: $.randomString(),
+                string_prop: _.randomString(),
                 number_prop: _.random(0, 100),
                 object_prop: {
-                    string_prop: $.randomString(),
+                    string_prop: _.randomString(),
                     number_prop: _.random(0, 100),
                 },
                 array_prop: [
-                    $.randomString(),
-                    $.randomString(),
-                    $.randomString()
+                    _.randomString(),
+                    _.randomString(),
+                    _.randomString()
                 ]
             };
 
@@ -301,16 +301,16 @@ describe("utilities", () => {
         it(`projection: {string_prop: 1}. default: [] output: [_id, string_prop]`, () => {
             const object = {
                 _id: new mongodb.ObjectId(),
-                string_prop: $.randomString(),
+                string_prop: _.randomString(),
                 number_prop: _.random(0, 100),
                 object_prop: {
-                    string_prop: $.randomString(),
+                    string_prop: _.randomString(),
                     number_prop: _.random(0, 100),
                 },
                 array_prop: [
-                    $.randomString(),
-                    $.randomString(),
-                    $.randomString()
+                    _.randomString(),
+                    _.randomString(),
+                    _.randomString()
                 ]
             };
 
@@ -324,16 +324,16 @@ describe("utilities", () => {
         it(`projection: {string_prop: 1}. default: [_id, number_prop] output: [_id, string_prop, number_prop]`, () => {
             const object = {
                 _id: new mongodb.ObjectId(),
-                string_prop: $.randomString(),
+                string_prop: _.randomString(),
                 number_prop: _.random(0, 100),
                 object_prop: {
-                    string_prop: $.randomString(),
+                    string_prop: _.randomString(),
                     number_prop: _.random(0, 100),
                 },
                 array_prop: [
-                    $.randomString(),
-                    $.randomString(),
-                    $.randomString()
+                    _.randomString(),
+                    _.randomString(),
+                    _.randomString()
                 ]
             };
 
@@ -347,16 +347,16 @@ describe("utilities", () => {
         it(`projection: {string_prop: 1}. default: [number_prop] output: [string_prop, number_prop]`, () => {
             const object = {
                 _id: new mongodb.ObjectId(),
-                string_prop: $.randomString(),
+                string_prop: _.randomString(),
                 number_prop: _.random(0, 100),
                 object_prop: {
-                    string_prop: $.randomString(),
+                    string_prop: _.randomString(),
                     number_prop: _.random(0, 100),
                 },
                 array_prop: [
-                    $.randomString(),
-                    $.randomString(),
-                    $.randomString()
+                    _.randomString(),
+                    _.randomString(),
+                    _.randomString()
                 ]
             };
 
@@ -370,16 +370,16 @@ describe("utilities", () => {
         it(`projection: {string_prop: 1, _id: 0}. default: [_id] output: [string_prop]`, () => {
             const object = {
                 _id: new mongodb.ObjectId(),
-                string_prop: $.randomString(),
+                string_prop: _.randomString(),
                 number_prop: _.random(0, 100),
                 object_prop: {
-                    string_prop: $.randomString(),
+                    string_prop: _.randomString(),
                     number_prop: _.random(0, 100),
                 },
                 array_prop: [
-                    $.randomString(),
-                    $.randomString(),
-                    $.randomString()
+                    _.randomString(),
+                    _.randomString(),
+                    _.randomString()
                 ]
             };
 
@@ -393,8 +393,8 @@ describe("utilities", () => {
 
         it(`object: { "prop.has.dot", "shaun.1.xu" }, projection: ["prop.has.dot"], output: ["prop.has.dot"]`, () => {
             const object = {
-                "prop.has.dot": $.randomString(),
-                "shaun.1.xu": $.randomString()
+                "prop.has.dot": _.randomString(),
+                "shaun.1.xu": _.randomString()
             };
 
             const output = _.project(object, ["prop.has.dot"]);
@@ -404,8 +404,8 @@ describe("utilities", () => {
 
         it(`object: { "prop.has.dot", "shaun.1.xu" }, projection: { "shaun.1.xu": 1 }, output: ["shaun.1.xu"]`, () => {
             const object = {
-                "prop.has.dot": $.randomString(),
-                "shaun.1.xu": $.randomString()
+                "prop.has.dot": _.randomString(),
+                "shaun.1.xu": _.randomString()
             };
 
             const output = _.project(object, {
@@ -417,8 +417,8 @@ describe("utilities", () => {
 
         it(`object: { "prop.has.dot", "shaun.1.xu" }, projection: { "shaun.1.xu": 0 }, output: ["prop.has.dot"]`, () => {
             const object = {
-                "prop.has.dot": $.randomString(),
-                "shaun.1.xu": $.randomString()
+                "prop.has.dot": _.randomString(),
+                "shaun.1.xu": _.randomString()
             };
 
             const output = _.project(object, {
@@ -430,9 +430,9 @@ describe("utilities", () => {
 
         it(`object: { "prop.has.dot", "prop.has", "prop" }, projection: { "prop.has.dot": 1 }, output: ["prop.has.dot"]`, () => {
             const object = {
-                "prop.has.dot": $.randomString(),
-                "prop.has": $.randomString(),
-                prop: $.randomString()
+                "prop.has.dot": _.randomString(),
+                "prop.has": _.randomString(),
+                prop: _.randomString()
             };
 
             const output = _.project(object, {
@@ -444,9 +444,9 @@ describe("utilities", () => {
 
         it(`object: { "prop.has.dot", "prop.has", "prop" }, projection: { "prop.has": 1 }, output: ["prop.has"]`, () => {
             const object = {
-                "prop.has.dot": $.randomString(),
-                "prop.has": $.randomString(),
-                prop: $.randomString()
+                "prop.has.dot": _.randomString(),
+                "prop.has": _.randomString(),
+                prop: _.randomString()
             };
 
             const output = _.project(object, {
@@ -458,9 +458,9 @@ describe("utilities", () => {
 
         it(`object: { "prop.has.dot", "prop.has", "prop" }, projection: { "prop": 1 }, output: ["prop"]`, () => {
             const object = {
-                "prop.has.dot": $.randomString(),
-                "prop.has": $.randomString(),
-                prop: $.randomString()
+                "prop.has.dot": _.randomString(),
+                "prop.has": _.randomString(),
+                prop: _.randomString()
             };
 
             const output = _.project(object, {

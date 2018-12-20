@@ -15,14 +15,7 @@ class $ {
         return resolver(body);
     }
 
-    public static randomString(length: number = 8, charset: string = "alphabetic"): string {
-        return randomstring.generate({
-            length: length,
-            charset: "alphabetic"
-        });
-    }
-
-    public static async throwAsync<T>(fn: () => Promise<T>, expectedCode?: number, expectedMessage?: string): Promise<T> {
+    public static async throwAsync<T>(fn: () => Promise<T>, expectCode?: number, expectMessage?: string, expectActualValue?: any, expectExpectValue?: any): Promise<T> {
         try {
             const result = await fn();
             assert.fail(undefined, undefined, "expect an error through but actually not");
@@ -30,13 +23,19 @@ class $ {
         }
         catch (ex) {
             assert.ok(ex);
-            if (expectedCode || expectedMessage) {
+            if (expectCode || expectMessage) {
                 const error = ex as WTError;
-                if (expectedCode) {
-                    assert.strictEqual(expectedCode, error.code);
+                if (expectCode) {
+                    assert.strictEqual(expectCode, error.code);
                 }
-                if (expectedMessage) {
-                    assert.strictEqual(expectedMessage, error.message);
+                if (expectMessage) {
+                    assert.strictEqual(expectMessage, error.message);
+                }
+                if (expectActualValue) {
+                    assert.deepStrictEqual(expectActualValue, error.actualValue);
+                }
+                if (expectExpectValue) {
+                    assert.deepStrictEqual(expectExpectValue, error.expectValue);
                 }
             }
         }

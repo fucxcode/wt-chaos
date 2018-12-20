@@ -11,7 +11,7 @@ class Entity {
     constructor(
         public _id: mongodb.ObjectId = new mongodb.ObjectId(),
         public team: mongodb.ObjectId = new mongodb.ObjectId(),
-        public title: string = $.randomString()
+        public title: string = _.randomString()
     ) {
     }
 }
@@ -22,8 +22,8 @@ describe("redis-cache", () => {
 
     it(`getByKey: key = exists, expireInMilliseconds = undefined -> return value`, async () => {
         const serializer = new BSONSerializer();
-        const prefix = $.randomString();
-        const collectionName = $.randomString();
+        const prefix = _.randomString();
+        const collectionName = _.randomString();
         const entity = new Entity();
         const expectKey = keyResolver(entity, collectionName);
         const expectValue = serializer.serialize(entity);
@@ -39,8 +39,8 @@ describe("redis-cache", () => {
 
     it(`getByKey: key = not exists (redis return undefined), expireInMilliseconds = undefined -> return undefined`, async () => {
         const serializer = new BSONSerializer();
-        const prefix = $.randomString();
-        const collectionName = $.randomString();
+        const prefix = _.randomString();
+        const collectionName = _.randomString();
         const entity = new Entity();
         const expectKey = keyResolver(entity, collectionName);
 
@@ -55,8 +55,8 @@ describe("redis-cache", () => {
 
     it(`getByKey: key = not exists (redis return empty buffer), expireInMilliseconds = undefined -> return undefined`, async () => {
         const serializer = new BSONSerializer();
-        const prefix = $.randomString();
-        const collectionName = $.randomString();
+        const prefix = _.randomString();
+        const collectionName = _.randomString();
         const entity = new Entity();
         const expectKey = keyResolver(entity, collectionName);
 
@@ -71,9 +71,9 @@ describe("redis-cache", () => {
 
     it(`getByKey: key = exists, expireInMilliseconds = specified -> update ttl, return value`, async () => {
         const serializer = new BSONSerializer();
-        const prefix = $.randomString();
+        const prefix = _.randomString();
         const jitter = _.random(1, 50);
-        const collectionName = $.randomString();
+        const collectionName = _.randomString();
         const entity = new Entity();
         const expectKey = keyResolver(entity, collectionName);
         const expectValue = serializer.serialize(entity);
@@ -94,8 +94,8 @@ describe("redis-cache", () => {
 
     it(`getByKey: key = not exists, expireInMilliseconds = specified -> not update ttl, return undefined`, async () => {
         const serializer = new BSONSerializer();
-        const prefix = $.randomString();
-        const collectionName = $.randomString();
+        const prefix = _.randomString();
+        const collectionName = _.randomString();
         const entity = new Entity();
         const expectKey = keyResolver(entity, collectionName);
 
@@ -110,8 +110,8 @@ describe("redis-cache", () => {
 
     it(`setByEntity: expireInMilliseconds = undefined -> set without expire`, async () => {
         const serializer = new BSONSerializer();
-        const prefix = $.randomString();
-        const collectionName = $.randomString();
+        const prefix = _.randomString();
+        const collectionName = _.randomString();
         const entity = new Entity();
         const expectKey = keyResolver(entity, collectionName);
         const expectValue = serializer.serialize(entity);

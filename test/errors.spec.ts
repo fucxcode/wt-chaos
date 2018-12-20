@@ -8,6 +8,7 @@ import {
     WTCode
 } from "../src/errors";
 import { $ } from "./$";
+import * as _ from "../src/utilities";
 
 function assertWTError(
     error: WTError,
@@ -25,10 +26,10 @@ function assertWTError(
 
 describe("errors", () => {
     it("error code [401]", () => {
-        const expectValue = $.randomString();
-        const actualValue = $.randomString();
+        const expectValue = _.randomString();
+        const actualValue = _.randomString();
         const resCode = WTCode.invalidInput;
-        const message = $.randomString();
+        const message = _.randomString();
         const error = new WTError(resCode, message, expectValue, actualValue);
         const response = error.toHttpResponseValue();
         assert.equal(resCode, response.code);
@@ -38,9 +39,9 @@ describe("errors", () => {
     });
 
     it("WTInvalidInputError code [401]", () => {
-        const expectValue = $.randomString();
-        const actualValue = $.randomString();
-        const message = $.randomString();
+        const expectValue = _.randomString();
+        const actualValue = _.randomString();
+        const message = _.randomString();
         const error = new WTInvalidInputError(
             message,
             expectValue,
@@ -56,9 +57,9 @@ describe("errors", () => {
     });
 
     it("WTForbiddenError code [403] forbidden", () => {
-        const expectValue = $.randomString();
-        const actualValue = $.randomString();
-        const message = $.randomString();
+        const expectValue = _.randomString();
+        const actualValue = _.randomString();
+        const message = _.randomString();
         const error = new WTForbiddenError(
             message,
             expectValue,
@@ -74,9 +75,9 @@ describe("errors", () => {
     });
 
     it("WTInternalError code [500] internal", () => {
-        const expectValue = $.randomString();
-        const actualValue = $.randomString();
-        const message = $.randomString();
+        const expectValue = _.randomString();
+        const actualValue = _.randomString();
+        const message = _.randomString();
         const error = new WTInternalError(
             message,
             expectValue,
@@ -92,9 +93,9 @@ describe("errors", () => {
     });
 
     it("WTNotFoundError code [404] not-found", () => {
-        const expectValue = $.randomString();
-        const actualValue = $.randomString();
-        const message = $.randomString();
+        const expectValue = _.randomString();
+        const actualValue = _.randomString();
+        const message = _.randomString();
         const error = new WTNotFoundError(
             message,
             expectValue,

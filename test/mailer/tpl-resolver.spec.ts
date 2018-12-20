@@ -7,8 +7,8 @@ import { TPLResolver, TPLConfig, TPLOptions } from "../../src/mailer";
 describe("#tpl-resolver", function() {
     let tpl: TPLResolver;
 
-    const noreply = $.randomString();
-    const service = $.randomString();
+    const noreply = _.randomString();
+    const service = _.randomString();
 
     const layout: string = "<div>\
         {{> body }}\
@@ -31,8 +31,8 @@ describe("#tpl-resolver", function() {
             }
         });
 
-        templateKey = $.randomString();
-        layoutKey = $.randomString();
+        templateKey = _.randomString();
+        layoutKey = _.randomString();
         const templateTail = `<div>${templateKey}<div>`;
         const layoutTail = `<div>${layoutKey}<div>`;
         if (fs.existsSync(__dirname + "/template/template.html")) {
@@ -50,8 +50,8 @@ describe("#tpl-resolver", function() {
     });
 
     it("#subject, from, to", async () => {
-        const exceptedSubject = $.randomString();
-        const exceptedTo = $.randomString();
+        const exceptedSubject = _.randomString();
+        const exceptedTo = _.randomString();
         const options = new TPLOptions(
             exceptedSubject,
             exceptedTo,
@@ -68,8 +68,8 @@ describe("#tpl-resolver", function() {
 
     it("#read template", async () => {
         const options = new TPLOptions(
-            $.randomString(),
-            $.randomString(),
+            _.randomString(),
+            _.randomString(),
             {},
             "template.html",
             "layout.html"
@@ -83,8 +83,8 @@ describe("#tpl-resolver", function() {
 
     it("#read layout", async () => {
         const options = new TPLOptions(
-            $.randomString(),
-            $.randomString(),
+            _.randomString(),
+            _.randomString(),
             {},
             "template.html",
             "layout.html"
@@ -97,10 +97,10 @@ describe("#tpl-resolver", function() {
     });
 
     it("render data", async () => {
-        const exceptedRenderData = $.randomString();
+        const exceptedRenderData = _.randomString();
         const options = new TPLOptions(
-            $.randomString(),
-            $.randomString(),
+            _.randomString(),
+            _.randomString(),
             { templateData: exceptedRenderData },
             "template.html",
             "layout.html"

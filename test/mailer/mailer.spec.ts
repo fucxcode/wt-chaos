@@ -3,6 +3,7 @@ import Mail = require("nodemailer/lib/mailer");
 import { $ } from "../$";
 import * as assert from "assert";
 import { EventEmitter } from "events";
+import * as _ from "../../src/utilities";
 
 class TestTransport extends EventEmitter  implements ITransport {
     private _name: string;
@@ -69,10 +70,10 @@ class TestOptionsResolver implements IOptionsResolver {
 describe("#mailer", function() {
     it("#send => optionsResolver invoked. transport invoked", async () => {
         const transport = new TestTransport();
-        const transitionOptions = { token: $.randomString() };
+        const transitionOptions = { token: _.randomString() };
         const resolver = new TestOptionsResolver(transitionOptions);
         const mailer = new Mailer(transport, resolver);
-        const inputOptions = $.randomString();
+        const inputOptions = _.randomString();
         await mailer.send(inputOptions);
 
         assert.equal(resolver.invoked, true);

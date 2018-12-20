@@ -355,3 +355,7 @@ export function chunk<T>(arr?: T[], size?: number): T[][] {
 export function shuffle<T>(collection: List<T> | null | undefined): T[] {
     return _.shuffle(collection);
 }
+
+export function reverse<TList extends List<any>>(array: TList): TList {
+    return _.reverse(array);
+}

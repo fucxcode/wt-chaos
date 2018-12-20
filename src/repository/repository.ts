@@ -208,18 +208,12 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
             // build `skip` and `limit` based on `pageIndex` and `pageSize`
             const skip = context.pageIndex * context.pageSize;
             const limit = context.pageSize;
-            // build `sort` based on `sort` and ensure the last sort key is `[_id, 1]`
-            const sort = context.options.sort || [];
-            sort.push([
-                "_id",
-                1
-            ]);
             // retrieve the result list and total count in order to calculate the output page count
             const [entities, count] = await Promise.all([
                 this.onFind(operationDescription, context.condition, _.assign({}, context.options, {
                     skip: skip,
                     limit: limit,
-                    sort: sort
+                    sort: context.options.sort
                 })),
                 this.count(operationDescription, context.condition, {
                     hint: context.options.hint,
@@ -250,17 +244,11 @@ abstract class Repository<TSession extends Session, TID extends Id, TDriver exte
             // retrieve one more entity to check if there will be the next page
             const skip = context.pageIndex * context.pageSize;
             const limit = context.pageSize + 1;
-            // build `sort` based on `sort` and ensure the last sort key is `[_id, 1]`
-            const sort = context.options.sort || [];
-            sort.push([
-                "_id",
-                1
-            ]);
             // retrieve the result list (+1 entities)
             const entitiesOneMore = await this.onFind(operationDescription, context.condition, _.assign({}, context.options, {
                 skip: skip,
                 limit: limit,
-                sort: sort
+                sort: context.options.sort
             }));
             const entities = _.take(entitiesOneMore, context.pageSize);
             const next = entitiesOneMore.length > entities.length;

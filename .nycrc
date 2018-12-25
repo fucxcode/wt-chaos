@@ -6,7 +6,8 @@
       "src/**/*.ts"
     ],
     "reporter": [
-      "text"
+      "text",
+      "html"
     ],
     "all": true,
     "cache": false,

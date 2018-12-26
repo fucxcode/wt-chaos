@@ -26,23 +26,6 @@ export class App extends KoaApplication<SampleOperationContext> {
                 const start = Date.now();
                 await next();
                 console.log(`[${moment().format("YYYY-MM-DD HH:mm:ss.SSS")}] ${ctx.method} ${ctx.originalUrl}: ${Date.now() - start}ms`);
-            },
-            async (ctx, next) => {
-                try {
-                    await next();
-                }
-                catch (error) {
-                    if (error.toHttpResponseValue) {
-                        const wtError = <WTError>error;
-                        ctx.responseBody = wtError.toHttpResponseValue();
-                    }
-                    else {
-                        ctx.responseBody = {
-                            code: WTCode.internalError,
-                            message: error.message || `router middleware error ${ctx.originalUrl}`
-                        };
-                    }
-                }
             }
         );
     }

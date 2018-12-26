@@ -2,6 +2,7 @@ import { Application, ApplicationOptions } from "./application";
 import { KoaContext, KoaRouter, RouterMiddleware } from "../router";
 import Koa from "koa";
 import { OperationContext } from "../router/operation-context";
+import { WTError, WTCode } from "../errors";
 
 export class KoaApplication<TState extends OperationContext> extends Application<KoaContext<TState>, TState, KoaRouter<TState>, Koa> {
     
@@ -11,6 +12,24 @@ export class KoaApplication<TState extends OperationContext> extends Application
         super(options);
 
         this._middlewares = middlewares;
+        // append default error handler middleware if not specified in `options.customErrorHandler`
+        this._middlewares.push(this.options.customErrorHandler || (async (ctx, next) => {
+            try {
+                await next();
+            }
+            catch (error) {
+                if (error.toHttpResponseValue) {
+                    const wtError = <WTError>error;
+                    ctx.responseBody = wtError.toHttpResponseValue();
+                }
+                else {
+                    ctx.responseBody = {
+                        code: WTCode.internalError,
+                        message: error.message || `router middleware error ${ctx.originalUrl}`
+                    };
+                }
+            }
+        }));
     }
 
     protected initializeServer(): Koa {

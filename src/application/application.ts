@@ -1,4 +1,4 @@
-import { RouterContext, RouterMiddleware, Router, KoaContext } from "../router";
+import { RouterContext, RouterMiddleware, Router, KoaContext, INextFunction } from "../router";
 import { Container, ContainerPool } from "../container";
 import { IncomingMessage, ServerResponse, createServer } from "http";
 import Koa from "koa";
@@ -17,6 +17,8 @@ export interface ApplicationOptions<TContext extends RouterContext<TState>, TSta
     facades: Function[];
 
     middlewares: RouterMiddleware<TContext, TState>[];
+
+    customErrorHandler?: RouterMiddleware<TContext, TState>;
 
 }
 

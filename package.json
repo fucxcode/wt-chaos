@@ -1,6 +1,6 @@
 {
   "name": "@worktile/wt-chaos",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Infrastructure for Worktile",
   "main": "index.js",
   "scripts": {

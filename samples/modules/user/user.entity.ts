@@ -3,7 +3,7 @@ import * as uuid from "node-uuid";
 import { Direction, UID } from "../../../src/constants";
 
 @collectionName("users")
-    @indexes<UserEntity>([
+@indexes<UserEntity>([
     {
         uid: Direction.ascending
     }
